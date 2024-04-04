@@ -60,6 +60,8 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
 
         data class ChangeLoadingWorkspace(val isLoading: Boolean) : Msg
 
+        data class ChangeLoadingWorkspaceZones(val isLoading: Boolean) : Msg
+
         data class UpdateSelectedBookingPeriodState(val selectedSate: SelectedBookingPeriodState) :
             Msg
 
@@ -209,12 +211,16 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
             }
         }
         private suspend fun initZones() {
+
+            dispatch(Msg.ChangeLoadingWorkspaceZones(true))
+
             withContext(Dispatchers.IO) {
                 bookingInteract.getZones().collect { zonesResponse ->
                     withContext(Dispatchers.Main) {
                         when (zonesResponse) {
                             is Either.Success -> {
                                 val zones: WorkspacesList = zonesResponse.data
+                                dispatch(Msg.ChangeLoadingWorkspaceZones(false))
                                 dispatch(Msg.UpdateAllZones(zones = zones))
                             }
 
@@ -299,6 +305,8 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
                     )
 
                 is Msg.ChangeLoadingWorkspace -> copy(isLoadingListWorkspaces = msg.isLoading)
+
+                is Msg.ChangeLoadingWorkspaceZones -> copy(isLoadingWorkspaceZones = msg.isLoading)
 
                 is Msg.UpdateAllZones -> copy(
                     currentWorkspaceZones = msg.zones.workspaces[workSpacesType]?: listOf(),
