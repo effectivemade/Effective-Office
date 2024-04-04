@@ -2,14 +2,17 @@ package band.effective.office.network.api.impl
 
 import band.effective.office.network.api.Api
 import band.effective.office.network.api.Collector
+import band.effective.office.network.dto.avatar.AvatarDTO
 import band.effective.office.network.dto.BookingDTO
 import band.effective.office.network.dto.SuccessResponse
 import band.effective.office.network.dto.UserDTO
 import band.effective.office.network.dto.WorkspaceDTO
 import band.effective.office.network.dto.WorkspaceZoneDTO
+import band.effective.office.network.dto.avatar.AvatarRequestBody
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.utils.KtorEtherClient
+import band.effective.office.utils.KtorEtherClient.avatarHttpEngine
 import band.effective.office.utils.buildUtils.params
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -29,6 +32,7 @@ class ApiImpl : Api {
     /**KtorEitherClient for safe request*/
     private val client = KtorEtherClient
     private val baseUrl: String = params().serverUrl
+    private val baseAvatarUrl: String = "https://avatarapi.com/v2/api.aspx" //TODO: Remove hardcode
     override suspend fun getWorkspace(id: String): Either<ErrorResponse, WorkspaceDTO> =
         with(getWorkspaces("meeting")) {
             when (this) {
@@ -212,4 +216,18 @@ class ApiImpl : Api {
     ): Flow<Either<ErrorResponse, List<BookingDTO>>> =
         collector.flow(scope).filter { it == "booking" }
             .map { Either.Success(listOf()) }
+
+    override suspend fun getUserAvatar(
+        avatarRequestBody: AvatarRequestBody
+    ): Either<ErrorResponse, AvatarDTO> = client.securityResponse(
+        urlString = baseAvatarUrl,
+        method = KtorEtherClient.RestMethod.Post,
+        client = avatarHttpEngine
+    ) {
+        contentType(ContentType.Application.Json)
+        setBody(avatarRequestBody)
+    }
+
+    override suspend fun subscribeOnAvatar(scope: CoroutineScope): Flow<Either<ErrorResponse, AvatarDTO>> =
+        collector.flow(scope).filter { it == "avatar" }.map { Either.Success(data = AvatarDTO()) }
 }

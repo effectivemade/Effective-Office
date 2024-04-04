@@ -1,10 +1,12 @@
 package band.effective.office.network.api
 
+import band.effective.office.network.dto.avatar.AvatarDTO
 import band.effective.office.network.dto.BookingDTO
 import band.effective.office.network.dto.SuccessResponse
 import band.effective.office.network.dto.UserDTO
 import band.effective.office.network.dto.WorkspaceDTO
 import band.effective.office.network.dto.WorkspaceZoneDTO
+import band.effective.office.network.dto.avatar.AvatarRequestBody
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import kotlinx.coroutines.CoroutineScope
@@ -116,4 +118,13 @@ interface Api {
         rangeFrom: Long? = null,
         rangeTo: Long? = null
     ): Either<ErrorResponse, List<BookingDTO>>
+
+    /** Get user avatar
+     * @param avatarRequestBody body by its one get avatar image
+     * @return Flow with updates*/
+    suspend fun getUserAvatar(avatarRequestBody: AvatarRequestBody) : Either<ErrorResponse, AvatarDTO>
+
+    /**Subscribe on bookings list updates
+     * @param scope CoroutineScope for collect updates*/
+    suspend fun subscribeOnAvatar(scope: CoroutineScope) : Flow<Either<ErrorResponse, AvatarDTO>>
 }

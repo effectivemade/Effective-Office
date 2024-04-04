@@ -59,6 +59,23 @@ object KtorEtherClient {
         }
     }
 
+    val avatarHttpEngine by lazy {
+        createHttpEngine().config {
+            install(KtorEitherPlugin)
+            install(HttpTimeout) {
+                requestTimeoutMillis = 10000
+                connectTimeoutMillis = 10000
+            }
+            install(ContentNegotiation) {
+                json()
+            }
+            install(Logging) {
+                logger = Logger.DEFAULT
+                level = LogLevel.ALL
+            }
+        }
+    }
+
     enum class RestMethod { Get, Post, Delete, Put }
 
     /**Safety response
