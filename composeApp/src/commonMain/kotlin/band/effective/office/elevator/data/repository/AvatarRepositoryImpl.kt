@@ -7,6 +7,7 @@ import band.effective.office.network.dto.avatar.AvatarDTO
 import band.effective.office.network.dto.avatar.AvatarRequestBody
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -19,12 +20,17 @@ class AvatarRepositoryImpl(
         password: String,
         username: String
     ): Flow<Either<ErrorWithData<AvatarDTO>, AvatarDTO>> = flow {
-        emit(getA())
+        emit(getA(email, password, username))
     }
 
-    private suspend fun getA(): Either<ErrorWithData<AvatarDTO>, AvatarDTO> {
+    private suspend fun getA(email: String, password: String, username: String): Either<ErrorWithData<AvatarDTO>, AvatarDTO> {
         val avatarRequestBody = AvatarRequestBody(email = "sl1vka.run@gmail.com", password = "ye2gwEgs5snRcm6", username = "sl1vka") //TODO(Slava Deych: REMOVE HARDCODE LATER
         val either: Either<ErrorResponse, AvatarDTO> = api.getUserAvatar(avatarRequestBody = avatarRequestBody)
+
+        Napier.d(tag="BIG_TAG") {
+            either.toString()
+        }
+
         return when (either) {
             is Either.Error -> {
                 val errorEither = Either.Error(error = ErrorWithData(error = either.error, saveData = AvatarDTO()))

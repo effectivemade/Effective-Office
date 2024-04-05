@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 
 class ApiImpl : Api {
     /**Update collector*/
@@ -33,6 +34,7 @@ class ApiImpl : Api {
     private val client = KtorEtherClient
     private val baseUrl: String = params().serverUrl
     private val baseAvatarUrl: String = "https://avatarapi.com/v2/api.aspx" //TODO: Remove hardcode
+
     override suspend fun getWorkspace(id: String): Either<ErrorResponse, WorkspaceDTO> =
         with(getWorkspaces("meeting")) {
             when (this) {

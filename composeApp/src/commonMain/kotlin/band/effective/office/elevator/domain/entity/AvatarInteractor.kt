@@ -7,5 +7,5 @@ class AvatarInteractor(
     private val getUserAvatarUseCase: GetUserAvatarUseCase
 ) {
     suspend fun get(email: String, username: String, password: String) =
-        getUserAvatarUseCase.get(avatarRequestBody = AvatarRequestBody(username, password, email))
+        getUserAvatarUseCase.execute(avatarRequestBody = AvatarRequestBody(username, password, email))
 }
