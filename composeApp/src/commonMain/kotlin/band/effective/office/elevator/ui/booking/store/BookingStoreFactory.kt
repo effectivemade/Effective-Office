@@ -58,9 +58,9 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
 
         data class UpdateSelectedWorkspace(val workspaceId: String, val seatName: String) : Msg
 
-        data class ChangeLoadingWorkspace(val isLoading: Boolean) : Msg
+        data class ChangeLoadingWorkspace(val isLoading: Boolean, val isError: Boolean) : Msg
 
-        data class ChangeLoadingWorkspaceZones(val isLoading: Boolean) : Msg
+        data class ChangeLoadingWorkspaceZones(val isLoading: Boolean, val isError: Boolean) : Msg
 
         data class UpdateSelectedBookingPeriodState(val selectedSate: SelectedBookingPeriodState) :
             Msg
@@ -176,6 +176,26 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
 
                 is BookingStore.Intent.HandleLabelFromBookingPeriodSheet ->
                     handleLabelFromBookingPeriodSheet(intent.label)
+
+                is BookingStore.Intent.ReloadWorkspaceZones -> scope.launch {
+                    initZones()
+                }
+
+                is BookingStore.Intent.ReloadWorkspacesList -> scope.launch {
+                    val state = getState()
+                    getSpacesUI(
+                        workspaceZoneUI = state.currentWorkspaceZones,
+                        selectedStartTime = state.selectedStartTime,
+                        selectedFinishDate = state.selectedFinishDate,
+                        selectedStartDate = state.selectedStartDate,
+                        selectedFinishTime = state.selectedFinishTime,
+                        workSpacesType = state.workSpacesType,
+                        dispatch = {
+                            dispatch(Msg.UpdateAllWorkspaceList(it))
+                            dispatch(Msg.ChangeWorkSpacesUI(it))
+                        }
+                    )
+                }
             }
         }
 
@@ -212,7 +232,7 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
         }
         private suspend fun initZones() {
 
-            dispatch(Msg.ChangeLoadingWorkspaceZones(true))
+            dispatch(Msg.ChangeLoadingWorkspaceZones(true, isError = false))
 
             withContext(Dispatchers.IO) {
                 bookingInteract.getZones().collect { zonesResponse ->
@@ -220,11 +240,13 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
                         when (zonesResponse) {
                             is Either.Success -> {
                                 val zones: WorkspacesList = zonesResponse.data
-                                dispatch(Msg.ChangeLoadingWorkspaceZones(false))
+                                dispatch(Msg.ChangeLoadingWorkspaceZones(false, isError = false))
                                 dispatch(Msg.UpdateAllZones(zones = zones))
                             }
 
                             is Either.Error -> {
+                                dispatch(Msg.ChangeLoadingWorkspaceZones(false, isError = true))
+                                publish(BookingStore.Label.ShowToast(zonesResponse.error.message.toString()))
                                 Napier.e { zonesResponse.error.message.toString() }
                             }
                         }
@@ -249,7 +271,7 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
             dispatch: (List<WorkSpaceUI>) -> Unit,
         ) {
 
-            dispatch(Msg.ChangeLoadingWorkspace(isLoading = true))
+            dispatch(Msg.ChangeLoadingWorkspace(isLoading = true, false))
 
             withContext(Dispatchers.IO) {
                 bookingInteract.getWorkspaces(
@@ -268,12 +290,19 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
                         when (response) {
                             is Either.Success -> {
                                 dispatch(response.data)
-                                dispatch(Msg.ChangeLoadingWorkspace(false))
+                                dispatch(Msg.ChangeLoadingWorkspace(false, isError = false))
                             }
 
                             is Either.Error -> {
                                 dispatch(listOf())
-                                // TODO SHOW ERROR ON UI
+                                // 400 is a client error, this is simply means
+                                // that we have problem with zones/booking period
+                                // (i.e. if none of zones selected)
+                                val isError = response.error.error.code != 400
+                                if (isError)
+                                    publish(BookingStore.Label.ShowToast(response.error.error.description))
+
+                                dispatch(Msg.ChangeLoadingWorkspace(false, isError))
                             }
                         }
                     }
@@ -304,9 +333,15 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
                         selectedSeatName = msg.seatName
                     )
 
-                is Msg.ChangeLoadingWorkspace -> copy(isLoadingListWorkspaces = msg.isLoading)
+                is Msg.ChangeLoadingWorkspace -> copy(
+                    isLoadingListWorkspaces = msg.isLoading,
+                    isErrorLoadingWorkspacesList = msg.isError
+                )
 
-                is Msg.ChangeLoadingWorkspaceZones -> copy(isLoadingWorkspaceZones = msg.isLoading)
+                is Msg.ChangeLoadingWorkspaceZones -> copy(
+                    isLoadingWorkspaceZones = msg.isLoading,
+                    isErrorLoadingWorkspaceZones = msg.isError
+                )
 
                 is Msg.UpdateAllZones -> copy(
                     currentWorkspaceZones = msg.zones.workspaces[workSpacesType]?: listOf(),

@@ -72,9 +72,17 @@ fun BookingScreen(bookingComponent: BookingComponent) {
                 selectedTypesList = state.selectedType,
                 isLoadingWorkspacesList = state.isLoadingListWorkspaces,
                 isLoadingWorkspaceZones = state.isLoadingWorkspaceZones,
+                isErrorLoadingWorkspaceZones = state.isErrorLoadingWorkspaceZones,
+                isErrorLoadingWorkspacesList = state.isErrorLoadingWorkspacesList,
                 typeOfTypeEndPeriodBooking = state.typeOfEnd,
                 bookingPeriod = state.bookingPeriod,
-                )
+                onClickWorkspaceZoneError = {
+                    bookingComponent.onEvent(BookingStore.Intent.ReloadWorkspaceZones)
+                },
+                onClickWorkspacesListError = {
+                    bookingComponent.onEvent(BookingStore.Intent.ReloadWorkspacesList)
+                }
+            )
         }
     }
 }
@@ -83,6 +91,10 @@ fun BookingScreen(bookingComponent: BookingComponent) {
 private fun BookingScreenContent(
     isLoadingWorkspaceZones: Boolean,
     isLoadingWorkspacesList: Boolean,
+    isErrorLoadingWorkspaceZones: Boolean,
+    isErrorLoadingWorkspacesList: Boolean,
+    onClickWorkspaceZoneError: () -> Unit,
+    onClickWorkspacesListError: () -> Unit,
     workSpaces: List<WorkSpaceUI>,
     onClickOpenBookPeriod: () -> Unit,
     onClickOpenChoseZone: () -> Unit,
@@ -131,6 +143,10 @@ private fun BookingScreenContent(
         onClickChangeSelectedType = onClickChangeSelectedType,
         selectedTypesList = selectedTypesList,
         isLoadingWorkspacesList = isLoadingWorkspacesList,
-        isLoadingWorkspaceZones = isLoadingWorkspaceZones
+        isLoadingWorkspaceZones = isLoadingWorkspaceZones,
+        isErrorLoadingWorkspaceZones = isErrorLoadingWorkspaceZones,
+        isErrorLoadingWorkspacesList = isErrorLoadingWorkspacesList,
+        onClickWorkspaceZoneError = onClickWorkspaceZoneError,
+        onClickWorkspacesListError = onClickWorkspacesListError
     )
 }

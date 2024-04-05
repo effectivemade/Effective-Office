@@ -36,6 +36,10 @@ interface BookingStore : Store<BookingStore.Intent, BookingStore.State, BookingS
         data class ApplyBookingPeriodFromSheet (val selectedState: SelectedBookingPeriodState) : Intent
 
         data class HandleLabelFromBookingPeriodSheet(val label: BookPeriodStore.Label) : Intent
+
+        data object ReloadWorkspacesList : Intent
+
+        data object ReloadWorkspaceZones : Intent
     }
 
     data class State(
@@ -54,7 +58,9 @@ interface BookingStore : Store<BookingStore.Intent, BookingStore.State, BookingS
         val selectedType: TypesList,
         val selectedSeatName: String,
         val selectedWorkspaceId: String,
+        val isErrorLoadingWorkspacesList: Boolean,
         val isLoadingListWorkspaces: Boolean,
+        val isErrorLoadingWorkspaceZones: Boolean,
         val isLoadingWorkspaceZones: Boolean,
         val typeOfEnd: TypeEndPeriodBooking,
         val dateOfEndPeriod: LocalDate,
@@ -81,6 +87,8 @@ interface BookingStore : Store<BookingStore.Intent, BookingStore.State, BookingS
                 selectedWorkspaceId = "",
                 isLoadingListWorkspaces = true,
                 isLoadingWorkspaceZones = false,
+                isErrorLoadingWorkspaceZones = false,
+                isErrorLoadingWorkspacesList = false,
                 typeOfEnd = TypeEndPeriodBooking.CountRepeat(1),
                 dateOfEndPeriod = getCurrentDate(),
                 allZonesList = WorkspacesList(workspaces = mapOf()),

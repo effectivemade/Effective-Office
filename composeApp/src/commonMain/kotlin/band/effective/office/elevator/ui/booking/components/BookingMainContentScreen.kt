@@ -3,10 +3,13 @@ package band.effective.office.elevator.ui.booking.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.ExtendedColors.purple_heart_600
 import band.effective.office.elevator.MainRes
@@ -55,6 +59,8 @@ fun BookingMainContentScreen(
     isExpandedCard: Boolean,
     isLoadingWorkspacesList: Boolean,
     isLoadingWorkspaceZones: Boolean,
+    isErrorLoadingWorkspaceZones: Boolean,
+    isErrorLoadingWorkspacesList: Boolean,
     isExpandedOptions: Boolean,
     iconRotationStateCard: Float,
     iconRotationStateOptions: Float,
@@ -69,6 +75,8 @@ fun BookingMainContentScreen(
     typeEndPeriodBooking: TypeEndPeriodBooking,
     repeatBooking: StringResource,
     onClickChangeSelectedType: (TypesList) -> Unit,
+    onClickWorkspaceZoneError: () -> Unit,
+    onClickWorkspacesListError: () -> Unit,
     selectedTypesList: TypesList
 ) {
     Scaffold(
@@ -161,7 +169,31 @@ fun BookingMainContentScreen(
                     )
                 )
                 Spacer(modifier = Modifier.weight(.1f))
-                if (isLoadingWorkspaceZones) {
+
+                if (isErrorLoadingWorkspaceZones) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .width(192.dp)
+                            .clickable {
+                                onClickWorkspaceZoneError()
+                            }
+                    ) {
+                        Icon(
+                            painterResource(MainRes.images.loading_ic),
+                            tint = purple_heart_500,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(MainRes.strings.something_went_wrong),
+                            style = MaterialTheme.typography.subtitle1.copy(
+                                color = purple_heart_600,
+                                fontWeight = FontWeight(400)
+                            )
+                        )
+                    }
+                } else if (isLoadingWorkspaceZones) {
                     LinearProgressIndicator(
                         Modifier.width(64.dp),
                         color = purple_heart_600
@@ -188,12 +220,35 @@ fun BookingMainContentScreen(
                     }
                 }
             }
-            when(isLoadingWorkspacesList) {
-                true -> LoadingIndicator()
-                else -> WorkSpaceList(
-                    workSpaces = workSpaces,
-                    scrollState = scrollState,
-                    onClickOpenBookAccept = onClickOpenBookAccept,
+
+            if (isErrorLoadingWorkspacesList) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable {
+                            onClickWorkspacesListError()
+                        }
+                ) {
+                    Icon(
+                        painterResource(MainRes.images.loading_ic),
+                        tint = MaterialTheme.colors.primary,
+                        contentDescription = null
+                    )
+                    Text(
+                        text = stringResource(MainRes.strings.something_went_wrong),
+                        style = MaterialTheme.typography.body2,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else if (isLoadingWorkspacesList) {
+                LoadingIndicator()
+            } else {
+                WorkSpaceList(
+                        workSpaces = workSpaces,
+                        scrollState = scrollState,
+                        onClickOpenBookAccept = onClickOpenBookAccept
                 )
             }
         }
