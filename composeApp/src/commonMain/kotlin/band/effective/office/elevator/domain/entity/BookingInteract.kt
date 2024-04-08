@@ -70,7 +70,8 @@ class BookingInteract(
                     val filteredWorkspacesList = filterWorkspacesList(
                         workspaces = listWorkSpaces, zones = selectedWorkspacesZone
                     )
-                    Either.Success(filteredWorkspacesList)
+                    val sortedWorkspacesList = sortWorkspacesList(filteredWorkspacesList)
+                    Either.Success(sortedWorkspacesList)
                 }
 
                 is Either.Error -> {
@@ -88,6 +89,12 @@ class BookingInteract(
         return workspaces.filter { workspaces ->
             selectedZones.count { zone -> zone.name == workspaces.zoneName } > 0
         }
+    }
+    fun sortWorkspacesList(
+        workspaces: List<WorkSpaceUI>
+    ): List<WorkSpaceUI> {
+        return workspaces.sortedWith(
+            compareBy({it.zoneName.first()}, {it.workSpaceName.last()})).toMutableList()
     }
 
     suspend fun deleteBooking(bookingId: String) = repository.deleteBooking(bookingId)
