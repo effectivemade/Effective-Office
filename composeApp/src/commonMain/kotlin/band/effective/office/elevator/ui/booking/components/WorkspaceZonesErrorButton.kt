@@ -1,18 +1,13 @@
 package band.effective.office.elevator.ui.booking.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.ExtendedColors
@@ -25,12 +20,8 @@ fun WorkspaceZonesErrorButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Button(
-        onClick,
-        shape = RectangleShape,
-        elevation = ButtonDefaults.elevatedButtonElevation(0.dp, 0.5.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        contentPadding = PaddingValues(0.dp),
+    ErrorButton(
+        onClick = onClick,
         modifier = modifier
     ) {
         Row(
