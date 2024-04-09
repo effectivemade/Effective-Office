@@ -3,17 +3,18 @@ package band.effective.office.elevator.ui.booking.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -151,9 +152,11 @@ fun BookingMainContentScreen(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
+                    .defaultMinSize(minHeight = 64.dp)
+                    .wrapContentHeight()
                     .background(MaterialTheme.colors.onBackground)
-                    .padding(horizontal = 16.dp)
-                    .height(64.dp),
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -161,29 +164,31 @@ fun BookingMainContentScreen(
                     style = MaterialTheme.typography.subtitle1.copy(
                         color = Color.Black,
                         fontWeight = FontWeight(500)
-                    )
+                    ),
+                    modifier = Modifier.weight(.45f)
                 )
                 Spacer(modifier = Modifier.weight(.1f))
 
                 when {
                     isErrorLoadingWorkspaceZones -> WorkspaceZonesErrorButton(
-                        Modifier
-                            .width(192.dp)
-                            .clickable { onClickWorkspaceZoneError() }
+                        onClickWorkspaceZoneError,
+                        Modifier.weight(.45f)
                     )
                     isLoadingWorkspaceZones -> LinearProgressIndicator(
                         Modifier.width(64.dp),
                         color = purple_heart_600
                     )
-                    else -> ZonesSelectionButton(onClickOpenChoseZone, Modifier.padding(top = 3.dp))
+                    else -> ZonesSelectionButton(
+                        onClickOpenChoseZone,
+                        Modifier.padding(top = 3.dp)
+                    )
                 }
             }
 
             when {
                 isErrorLoadingWorkspacesList -> WorkspacesErrorButton(
-                    Modifier
-                        .fillMaxSize()
-                        .clickable { onClickWorkspacesListError() }
+                    onClickWorkspacesListError,
+                    Modifier.fillMaxSize()
                 )
                 isLoadingWorkspacesList -> LoadingIndicator()
                 else -> WorkSpaceList(
