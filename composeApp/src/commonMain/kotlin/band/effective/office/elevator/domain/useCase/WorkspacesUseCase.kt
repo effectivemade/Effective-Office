@@ -7,9 +7,9 @@ import band.effective.office.elevator.domain.models.toUIModel
 import band.effective.office.elevator.domain.models.toUIModelZones
 import band.effective.office.elevator.domain.repository.WorkspaceRepository
 import band.effective.office.elevator.ui.booking.models.WorkSpaceType
-import band.effective.office.elevator.ui.booking.models.WorkSpaceUI
 import band.effective.office.elevator.ui.booking.models.WorkspaceZoneUI
 import band.effective.office.elevator.ui.booking.models.WorkspacesList
+import band.effective.office.elevator.ui.booking.models.mapWorkspaceToZone
 import band.effective.office.network.model.Either
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -55,14 +55,18 @@ class WorkspacesUseCase (
 
     private fun Flow<Either<ErrorWithData<List<WorkSpace>>, List<WorkSpace>>>.map() =
         this.map { response ->
-            when(response) {
-                is Either.Error -> Either.Error(
+            when {
+                // 400 is a client error, this is simply means
+                // that we have problem with zones/booking period
+                // (i.e. if none of zones selected)
+                response is Either.Error && response.error.error.code != 400 -> Either.Error(
                     ErrorWithData(
-                    error = response.error.error,
-                    saveData = response.error.saveData?.toUIModel()
+                        error = response.error.error,
+                        saveData = response.error.saveData?.toUIModel()
+                    )
                 )
-                )
-                is Either.Success -> Either.Success(response.data.toUIModel())
+                response is Either.Success -> Either.Success(response.data.toUIModel())
+                else -> Either.Success(emptyList())
             }
         }
 
@@ -77,13 +81,5 @@ class WorkspacesUseCase (
                 )
                 is Either.Success -> Either.Success(response.data.toUIModelZones())
             }
-        }
-
-    private fun List<WorkSpaceUI>.mapWorkspaceToZone()  =
-        map {
-            WorkspaceZoneUI (
-                name = it.zoneName,
-                isSelected = false
-            )
         }
 }

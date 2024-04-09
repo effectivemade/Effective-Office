@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,8 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -35,7 +32,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.ExtendedColors.purple_heart_600
 import band.effective.office.elevator.MainRes
@@ -44,7 +40,6 @@ import band.effective.office.elevator.ui.booking.models.WorkSpaceUI
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import band.effective.office.elevator.ExtendedColors._66x
-import band.effective.office.elevator.ExtendedColors.purple_heart_500
 import band.effective.office.elevator.components.LoadingIndicator
 import band.effective.office.elevator.domain.models.BookingPeriod
 import band.effective.office.elevator.domain.models.TypeEndPeriodBooking
@@ -170,85 +165,31 @@ fun BookingMainContentScreen(
                 )
                 Spacer(modifier = Modifier.weight(.1f))
 
-                if (isErrorLoadingWorkspaceZones) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
+                when {
+                    isErrorLoadingWorkspaceZones -> WorkspaceZonesErrorButton(
+                        Modifier
                             .width(192.dp)
-                            .clickable {
-                                onClickWorkspaceZoneError()
-                            }
-                    ) {
-                        Icon(
-                            painterResource(MainRes.images.loading_ic),
-                            tint = purple_heart_500,
-                            contentDescription = null
-                        )
-                        Text(
-                            text = stringResource(MainRes.strings.something_went_wrong),
-                            style = MaterialTheme.typography.subtitle1.copy(
-                                color = purple_heart_600,
-                                fontWeight = FontWeight(400)
-                            )
-                        )
-                    }
-                } else if (isLoadingWorkspaceZones) {
-                    LinearProgressIndicator(
+                            .clickable { onClickWorkspaceZoneError() }
+                    )
+                    isLoadingWorkspaceZones -> LinearProgressIndicator(
                         Modifier.width(64.dp),
                         color = purple_heart_600
                     )
-                } else {
-                    IconButton(
-                        onClick = onClickOpenChoseZone, modifier = Modifier.padding(top = 3.dp),
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(MainRes.images.icon_location),
-                                tint = purple_heart_500,
-                                contentDescription = null
-                            )
-                            Text(
-                                modifier = Modifier.padding(start = 8.dp),
-                                text = stringResource(MainRes.strings.select_zones),
-                                style = MaterialTheme.typography.subtitle1.copy(
-                                    color = purple_heart_600,
-                                    fontWeight = FontWeight(400)
-                                )
-                            )
-                        }
-                    }
+                    else -> ZonesSelectionButton(onClickOpenChoseZone, Modifier.padding(top = 3.dp))
                 }
             }
 
-            if (isErrorLoadingWorkspacesList) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
-                    modifier = Modifier
+            when {
+                isErrorLoadingWorkspacesList -> WorkspacesErrorButton(
+                    Modifier
                         .fillMaxSize()
-                        .clickable {
-                            onClickWorkspacesListError()
-                        }
-                ) {
-                    Icon(
-                        painterResource(MainRes.images.loading_ic),
-                        tint = MaterialTheme.colors.primary,
-                        contentDescription = null
-                    )
-                    Text(
-                        text = stringResource(MainRes.strings.something_went_wrong),
-                        style = MaterialTheme.typography.body2,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else if (isLoadingWorkspacesList) {
-                LoadingIndicator()
-            } else {
-                WorkSpaceList(
-                        workSpaces = workSpaces,
-                        scrollState = scrollState,
-                        onClickOpenBookAccept = onClickOpenBookAccept
+                        .clickable { onClickWorkspacesListError() }
+                )
+                isLoadingWorkspacesList -> LoadingIndicator()
+                else -> WorkSpaceList(
+                    workSpaces = workSpaces,
+                    scrollState = scrollState,
+                    onClickOpenBookAccept = onClickOpenBookAccept
                 )
             }
         }

@@ -25,7 +25,7 @@ data class WorkspaceZone(val id: String, val name: String)
 
 fun WorkspaceZone.toUIModelZone() =
     WorkspaceZoneUI(
-        isSelected = true,
+        isSelected = false,
         name = name
     )
 

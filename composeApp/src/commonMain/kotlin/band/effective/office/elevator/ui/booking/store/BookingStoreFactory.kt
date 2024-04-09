@@ -295,14 +295,8 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
 
                             is Either.Error -> {
                                 dispatch(listOf())
-                                // 400 is a client error, this is simply means
-                                // that we have problem with zones/booking period
-                                // (i.e. if none of zones selected)
-                                val isError = response.error.error.code != 400
-                                if (isError)
-                                    publish(BookingStore.Label.ShowToast(response.error.error.description))
-
-                                dispatch(Msg.ChangeLoadingWorkspace(false, isError))
+                                publish(BookingStore.Label.ShowToast(response.error.error.description))
+                                dispatch(Msg.ChangeLoadingWorkspace(false, isError = true))
                             }
                         }
                     }
