@@ -37,6 +37,8 @@ object RecurrenceConverter {
      * @author Max Mishenko
      */
     fun dtoToModel(dto: RecurrenceDTO): RecurrenceModel {
+        if (dto.count != null && dto.until != null)
+            throw IllegalArgumentException("You can use either COUNT or UNTIL to specify the end of the event recurrence. Don't use both in the same rule.")
         return RecurrenceModel(
             dto.interval, dto.freq, dto.count, dto.until, dto.byDay, dto.byMonth, dto.byYearDay, dto.byHour
         )

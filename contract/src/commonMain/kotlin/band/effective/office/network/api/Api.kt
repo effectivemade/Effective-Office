@@ -60,12 +60,18 @@ interface Api {
     /**Get bookings in workspace
      * @param workspaceId workspace id to be reserved
      * @return list bookings in current workspace*/
-    suspend fun getBookingsByWorkspaces(workspaceId: String): Either<ErrorResponse, List<BookingDTO>>
+    suspend fun getBookingsByWorkspaces(
+        workspaceId: String,
+        from: Long? = null,
+        to: Long? = null
+    ): Either<ErrorResponse, List<BookingDTO>>
 
     /**Booking workspace
      * @param bookingInfo information for booking workspace
      * @return Created entry from database*/
-    suspend fun createBooking(bookingInfo: BookingDTO): Either<ErrorResponse, BookingDTO>
+    suspend fun createBooking(
+        bookingInfo: BookingDTO
+    ): Either<ErrorResponse, BookingDTO>
 
     /**Update booking info
      * @param bookingInfo new information about booking

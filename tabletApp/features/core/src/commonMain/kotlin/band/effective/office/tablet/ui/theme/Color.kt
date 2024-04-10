@@ -43,6 +43,8 @@ val roomInfoColor = Color(0xFFFAFAFA)
 val alertColor = Color(0xFF95260E)
 val disconnectColor = Color(0xFFD01E1E)
 val undefineStateColor = Color(0xFF6E6E6E)
+val subslotColor = Color(0xFFFAC6C6)
+val deleteProgressColor = Color(0xFFEF7234)
 
 object ScrollBarColor{
     val background = Color(0xFF4D4D4D)

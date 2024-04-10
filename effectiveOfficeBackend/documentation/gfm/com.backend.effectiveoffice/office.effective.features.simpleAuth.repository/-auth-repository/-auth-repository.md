@@ -1,4 +1,4 @@
-//[com.backend.effectiveoffice](../../../index.md)/[office.effective.features.simpleAuth.repository](../index.md)/[AuthRepository](index.md)/[AuthRepository](-auth-repository.md)
+//[com.backend.effectiveoffice](../../../index.md)/[office.effective.features.auth.repository](../index.md)/[AuthRepository](index.md)/[AuthRepository](-auth-repository.md)
 
 # AuthRepository
 

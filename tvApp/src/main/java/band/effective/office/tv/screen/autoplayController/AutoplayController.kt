@@ -86,7 +86,7 @@ class AutoplayController {
     }
 
     fun resetController() {
-        mutableState.update { AutoplayState.default }
+        mutableState.update { AutoplayState.default.copy(screensList = listOf()) }
         error = false
     }
 }

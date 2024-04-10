@@ -1,4 +1,4 @@
-//[com.backend.effectiveoffice](../../index.md)/[office.effective.features.simpleAuth.repository](index.md)/[apikeys](apikeys.md)
+//[com.backend.effectiveoffice](../../index.md)/[office.effective.features.auth.repository](index.md)/[apikeys](apikeys.md)
 
 # apikeys
 

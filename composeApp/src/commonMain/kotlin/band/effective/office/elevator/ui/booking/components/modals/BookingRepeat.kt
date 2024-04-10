@@ -73,7 +73,6 @@ import band.effective.office.elevator.domain.models.DayOfWeek
 import band.effective.office.elevator.domain.models.TypeEndPeriodBooking
 import band.effective.office.elevator.domain.models.listToString
 import band.effective.office.elevator.textInBorderGray
-import band.effective.office.elevator.ui.booking.models.Frequency
 import band.effective.office.elevator.utils.MonthLocalizations
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.aakira.napier.Napier

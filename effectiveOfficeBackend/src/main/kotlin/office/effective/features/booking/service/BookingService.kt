@@ -140,7 +140,7 @@ class BookingService(
             workspaceId != null -> {
                 val workspace = workspaceRepository.findById(workspaceId)
                     ?: throw InstanceNotFoundException(
-                        UserEntity::class, "User with id $workspaceId not found", workspaceId
+                        UserEntity::class, "Workspace with id $workspaceId not found", workspaceId
                     )
 
                 if (workspace.tag == "meeting") {

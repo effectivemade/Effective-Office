@@ -1,7 +1,9 @@
 package band.effective.office.tablet.ui.freeSelectRoom
 
+import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.ui.freeSelectRoom.store.FreeSelectStore
 import band.effective.office.tablet.ui.freeSelectRoom.store.FreeSelectStoreFactory
+import band.effective.office.tablet.ui.modal.ModalWindow
 import band.effective.office.tablet.utils.componentCoroutineScope
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
@@ -15,11 +17,12 @@ import org.koin.core.component.KoinComponent
 class FreeSelectRoomComponent(
     private val componentContext: ComponentContext,
     storeFactory: StoreFactory,
+    eventInfo: EventInfo,
     private val onCloseRequest: () -> Unit
-) : ComponentContext by componentContext, KoinComponent {
+) : ComponentContext by componentContext, KoinComponent, ModalWindow {
 
     private val store: FreeSelectStore = instanceKeeper.getStore {
-        FreeSelectStoreFactory(storeFactory = storeFactory).create()
+        FreeSelectStoreFactory(storeFactory = storeFactory, eventInfo = eventInfo).create()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

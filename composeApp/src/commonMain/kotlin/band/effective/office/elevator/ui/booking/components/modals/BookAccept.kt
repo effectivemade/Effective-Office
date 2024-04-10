@@ -35,23 +35,28 @@ import band.effective.office.elevator.ui.booking.models.Frequency
 import band.effective.office.elevator.utils.stringFromBookPeriod
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 
 @Composable
 fun BookAccept(
-    onClickCloseBookAccept: () -> Unit,
-    confirmBooking: () -> Unit,
-    bookingInfo: BookingInfo,
+    seatName: String,
+    startDate: LocalDateTime,
+    finishDate: LocalDateTime,
     bookingPeriod: BookingPeriod,
     typeEndPeriodBooking: TypeEndPeriodBooking,
-    repeatBooking: StringResource
+    repeatBooking: StringResource,
+    onClickCloseBookAccept: () -> Unit,
+    confirmBooking: () -> Unit,
 ) {
-    val startTime = bookingInfo.dateOfStart.time
-    val finishTime = bookingInfo.dateOfEnd.time
+    val startTime = startDate.time
+    val finishTime = finishDate.time
 
     val date = stringFromBookPeriod(
         bookingPeriod = bookingPeriod,
-        finishDate = bookingInfo.dateOfEnd.date,
-        startDate = bookingInfo.dateOfStart.date,
+        finishDate = finishDate.date,
+        startDate = startDate.date,
         typeEndPeriodBooking = typeEndPeriodBooking,
         repeatBooking = repeatBooking
     )
@@ -93,7 +98,7 @@ fun BookAccept(
                 }
                 Column(modifier = Modifier.padding(horizontal = 5.dp)) {
                     Text(
-                        text = bookingInfo.seatName,
+                        text = seatName,
                         style = MaterialTheme.typography.subtitle1,
                         fontSize = 20.sp,
                         fontWeight = FontWeight(600),

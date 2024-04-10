@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import band.effective.office.tablet.ui.mainScreen.mainScreen.uiComponents.LoadMainScreen
 import band.effective.office.tablet.ui.mainScreen.settingsComponents.store.SettingsStore
 import band.effective.office.tablet.ui.mainScreen.settingsComponents.uiComponents.ChooseButtonView
 import band.effective.office.tablet.ui.mainScreen.settingsComponents.uiComponents.ExitButtonView
@@ -25,17 +26,21 @@ import band.effective.office.tablet.ui.mainScreen.settingsComponents.uiComponent
 fun SettingsScreen(component: SettingsComponent) {
     val state by component.state.collectAsState()
 
-    SettingsView(
-        listRooms = state.rooms,
-        nameCurrentRoom = state.currentName,
-        onExitApp = { component.onIntent(SettingsStore.Intent.OnExitApp) },
-        onChangeCurrentName = { name: String ->
-            component.onIntent(SettingsStore.Intent.ChangeCurrentNameRoom(name))
-        },
-        onSaveData = {
-            component.onIntent(SettingsStore.Intent.SaveData)
-        }
-    )
+    if (state.loading) {
+        LoadMainScreen()
+    } else {
+        SettingsView(
+            listRooms = state.rooms,
+            nameCurrentRoom = state.currentName,
+            onExitApp = { component.onIntent(SettingsStore.Intent.OnExitApp) },
+            onChangeCurrentName = { name: String ->
+                component.onIntent(SettingsStore.Intent.ChangeCurrentNameRoom(name))
+            },
+            onSaveData = {
+                component.onIntent(SettingsStore.Intent.SaveData)
+            }
+        )
+    }
 }
 
 @Composable
@@ -69,9 +74,9 @@ fun SettingsView(
             data = listRooms,
             currentName = nameCurrentRoom,
             onChangeCurrentName = onChangeCurrentName
-            )
+        )
         Spacer(modifier = Modifier.height(80.dp))
-        if(nameCurrentRoom.isNotEmpty()) {
+        if (nameCurrentRoom.isNotEmpty()) {
             ChooseButtonView(
                 modifier = Modifier
                     .fillMaxWidth(),

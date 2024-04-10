@@ -43,7 +43,8 @@ fun ChooseZone(
     sheetTile: String,
     workSpacecZone: List<WorkspaceZoneUI>,
     onClickCloseChoseZone: () -> Unit,
-    onClickConfirmSelectedZone: (List<WorkspaceZoneUI>) -> Unit
+    onClickConfirmSelectedZone: () -> Unit,
+    onClickZone: (WorkspaceZoneUI) -> Unit
 ) {
     val countItemsInRow = 2
     val selectedZones: MutableList<WorkspaceZoneUI> = mutableListOf()
@@ -106,23 +107,15 @@ fun ChooseZone(
             listItems = workSpacecZone,
             horizontalPaddingContent = 12.dp,
             verticalPaddingContent = 12.dp
-        ) { workSpaceZone, columnIndex, rowIndex ->
-            val currentIndex = countItemsInRow * columnIndex + rowIndex
-            //TODO(Artem Gruzdev) refactor this code
+        ) { workSpaceZone, _, _ ->
             WorkingZones(
                 workspaceZoneUI = workSpaceZone,
-                onClickZone = { workSpaceZone1 ->
-                    val isSelected = !workSpaceZone1.isSelected
-                    selectedZones[currentIndex] = workSpaceZone1.copy(isSelected = isSelected)
-                }
+                onClickZone = { onClickZone(it) }
             )
         }
 
         Button(
-            onClick = {
-                onClickConfirmSelectedZone(selectedZones)
-                onClickCloseChoseZone()
-            },
+            onClick = { onClickConfirmSelectedZone() },
             modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                 .fillMaxWidth()
                 .height(60.dp)
@@ -146,24 +139,18 @@ fun WorkingZones(
     workspaceZoneUI: WorkspaceZoneUI,
     onClickZone: (WorkspaceZoneUI) -> Unit,
 ) {
-    var isSelected by remember { mutableStateOf(workspaceZoneUI.isSelected) }
-
     Button(
-        onClick = {
-            isSelected = !isSelected
-            onClickZone(workspaceZoneUI)
-          },
+        onClick = { onClickZone(workspaceZoneUI) },
         colors = ButtonDefaults.buttonColors(ExtendedThemeColors.colors.whiteColor),
-        modifier = modifier
-            .padding(end = 10.dp),
+        modifier = modifier.padding(end = 10.dp),
         border = BorderStroke(
             width = 1.dp,
-            color = if (isSelected)  ExtendedThemeColors.colors.purple_heart_800  else textInBorderGray
+            color = if (workspaceZoneUI.isSelected) ExtendedThemeColors.colors.purple_heart_800 else textInBorderGray
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = ButtonDefaults.elevation(0.dp, 2.dp, 0.dp)
     ) {
-        if (isSelected) {
+        if (workspaceZoneUI.isSelected) {
             Icon(
                 imageVector = Icons.Rounded.Done,
                 tint = ExtendedThemeColors.colors.purple_heart_800,
@@ -178,7 +165,7 @@ fun WorkingZones(
             fontSize = 16.sp,
             fontWeight = FontWeight(500),
             maxLines = 1,
-            color = if (isSelected) ExtendedThemeColors.colors.purple_heart_800
+            color = if (workspaceZoneUI.isSelected) ExtendedThemeColors.colors.purple_heart_800
             else textInBorderGray
         )
     }

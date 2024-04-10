@@ -47,12 +47,14 @@ import band.effective.office.tv.ui.theme.robotoFontFamily
 data class ItemRes(
     val text: String,
     val icon: Painter? = null,
-    val activeIcon: Painter? = null
+    val activeIcon: Painter? = null,
 ) {}
 
 @Composable
 fun AutoplayMenuScreen(
-    viewModel: AutoplayMenuViewModel = hiltViewModel(), navController: NavController
+    viewModel: AutoplayMenuViewModel = hiltViewModel(),
+    navController: NavController,
+    startAutoplat: Boolean = false
 ) {
     viewModel.navController = navController
     val state by viewModel.state.collectAsState()
@@ -167,5 +169,9 @@ fun AutoplayMenuScreen(
     LaunchedEffect(Unit) {
         viewModel.onDraw()
         buttonFocusRequester.requestFocus()
+    }
+    LaunchedEffect(Unit) {
+        if (startAutoplat)
+            viewModel.startAutoplay()
     }
 }

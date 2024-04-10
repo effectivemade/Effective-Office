@@ -12,22 +12,19 @@ interface UpdateEventStore :
         data class OnUpdateLength(val update: Int) : Intent
         data class OnUpdateDate(val updateInDays: Int) : Intent
         data class OnSetDate(
-            val year: Int,
-            val month: Int,
-            val day: Int,
-            val hour: Int,
-            val minute: Int
+            val calendar: Calendar
         ) : Intent
 
         object OnExpandedChange : Intent
         data class OnSelectOrganizer(val newOrganizer: Organizer) : Intent
         data class OnUpdateEvent(val room: String) : Intent
         object OnDeleteEvent : Intent
-        data class OnInit(val event: EventInfo) : Intent
         data class OnInput(val input: String) : Intent
         object OnDoneInput : Intent
         object OnOpenSelectDateDialog : Intent
         object OnCloseSelectDateDialog : Intent
+        object OnClose: Intent
+        object OnBooking: Intent
     }
 
     data class State(
@@ -64,6 +61,8 @@ interface UpdateEventStore :
                 enableUpdateButton = true
             )
         }
+
+        fun isCreatedEvent() = !event.isNotCreated()
     }
 
     sealed interface Label {

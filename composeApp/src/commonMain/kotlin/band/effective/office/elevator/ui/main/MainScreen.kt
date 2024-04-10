@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +16,9 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -62,6 +65,16 @@ fun MainScreen(component: MainComponent) {
     var showOptionsMenu by remember { mutableStateOf(false) }
     var showDeleteBooking by remember { mutableStateOf(false) }
     var showModalOptionCard by remember { mutableStateOf(false) }
+
+    val isRefreshing = state.isRefreshing
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = {
+            Napier.d { "refresh content" }
+            component.onEvent(MainStore.Intent.OnRefreshContent)
+        }
+    )
 
     var bottomSheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -114,6 +127,7 @@ fun MainScreen(component: MainComponent) {
 
     Box(
         modifier = Modifier
+            .pullRefresh(pullRefreshState)
             .background(ExtendedThemeColors.colors.whiteColor)
             .fillMaxSize()
     ) {
@@ -122,7 +136,6 @@ fun MainScreen(component: MainComponent) {
             bottomSheetState = bottomSheetState,
             beginDate = state.beginDate,
             endDate = state.endDate,
-            dateFiltrationOnReserves = state.dateFiltrationOnReserves,
             onClickBook = { component.onOutput(MainComponent.Output.OpenBookingScreen) },
             onClickOptionMenu = { id ->
                 component.onEvent(MainStore.Intent.OnClickShowOption(bookingId = id))
@@ -139,6 +152,14 @@ fun MainScreen(component: MainComponent) {
             isLoadingBooking = state.isLoading,
             onCallElevator = { component.onEvent(MainStore.Intent.OnClickCallElevator) },
             enableCallElevator = state.enableCallElevator
+        )
+
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = pullRefreshState,
+            backgroundColor = ExtendedThemeColors.colors.whiteColor,
+            modifier = Modifier.align(Alignment.TopCenter),
+            contentColor = Color.Black
         )
 
         if (showModalCalendar) {
@@ -219,7 +240,6 @@ fun MainScreenContent(
     isLoadingBooking: Boolean,
     beginDate: LocalDate,
     endDate: LocalDate?,
-    dateFiltrationOnReserves: Boolean,
     enableCallElevator: Boolean,
     onClickBook: () -> Unit,
     onClickOptionMenu: (String) -> Unit,
@@ -273,7 +293,6 @@ fun MainScreenContent(
                             reservedSeats = reservedSeats,
                             beginDate = beginDate,
                             endDate = endDate,
-                            dateFiltrationOnReserves = dateFiltrationOnReserves,
                             onClickBook = onClickBook,
                             onClickOptionMenu = onClickOptionMenu,
                             onClickOpenCalendar = onClickOpenCalendar,

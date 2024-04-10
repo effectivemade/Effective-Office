@@ -23,7 +23,7 @@ fun ButtonAutoplay(
     var isFocus by remember { mutableStateOf(false) }
     val animatedBackgroundColor by animateColorAsState(
         targetValue = if (isFocus) MaterialTheme.colors.primaryVariant
-        else MaterialTheme.colors.secondaryVariant
+        else MaterialTheme.colors.secondaryVariant, label = ""
     )
     Button(onClick = { onClick() },
         colors = ButtonDefaults.buttonColors(animatedBackgroundColor),

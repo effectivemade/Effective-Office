@@ -1,7 +1,6 @@
 package band.effective.office.elevator.ui.content
 
-import band.effective.office.elevator.domain.entity.BookingInteractor
-import band.effective.office.elevator.domain.models.BookingInfo
+import band.effective.office.elevator.domain.entity.BookingInteract
 import band.effective.office.elevator.ui.booking.BookingComponent
 import band.effective.office.elevator.ui.employee.FullEmployeeComponent
 import band.effective.office.elevator.ui.main.MainComponent
@@ -31,11 +30,13 @@ class ContentComponent(
 
     private val navigation = StackNavigation<Config>()
     private val stack = childStack(
-        source = navigation,
         initialStack = { listOf(Config.MainScreen) },
+        handleBackButton = true,
+        source = navigation,
         childFactory = ::child,
     )
-    val bookingInteractor by inject<BookingInteractor>()
+
+    val bookingInteract by inject<BookingInteract>()
     val childStack: Value<ChildStack<*, Child>> = stack
 
     private fun child(config: Config, componentContext: ComponentContext): Child = when (config) {
@@ -76,7 +77,7 @@ class ContentComponent(
         when (output) {
             is MainComponent.Output.DeleteBooking -> {
                 CoroutineScope(Dispatchers.IO).launch {
-                    bookingInteractor.deleteBooking(
+                    bookingInteract.deleteBooking(
                         bookingId = output.id
                     )
                 }
@@ -108,6 +109,7 @@ class ContentComponent(
 
         class Employee(val component: FullEmployeeComponent) : Child()
     }
+
 
     private sealed interface Config : Parcelable {
         @Parcelize

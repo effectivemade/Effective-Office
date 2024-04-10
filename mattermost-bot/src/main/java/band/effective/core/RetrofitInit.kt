@@ -30,7 +30,7 @@ val okHttpClient = OkHttpClient.Builder()
 
 val unsafeOkHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient()
         .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = HttpLoggingInterceptor.Level.BASIC
         }).build()
 
 val mattermostEitherFactory = EitherMattermostAdapterFactory()

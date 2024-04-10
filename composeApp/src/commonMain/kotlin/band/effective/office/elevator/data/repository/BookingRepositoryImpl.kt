@@ -231,7 +231,6 @@ class BookingRepositoryImpl(
         dateFilter: LocalDate
     ) =
         map(errorMapper = { error ->
-            println("errors sow booking $error")
             ErrorWithData(
                 error = error, saveData = when (oldValue) {
                     is Either.Error -> oldValue.error.saveData
@@ -270,7 +269,7 @@ class BookingRepositoryImpl(
             },
             until = when (typeEndPeriod) {
                 is TypeEndPeriodBooking.DatePeriodEnd ->
-                    localDateTimeToUnix(typeEndPeriod.date.atTime(hour = 0, minute = 0))
+                    localDateTimeToUnix(typeEndPeriod.date.atTime(hour = 23, minute = 59))
 
                 else -> null
             },

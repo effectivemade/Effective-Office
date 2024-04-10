@@ -4,9 +4,10 @@
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="${LOG_LEVEL:-INFO}">
+    <root level="${LOG_LEVEL:-DEBUG}">
         <appender-ref ref="STDOUT"/>
     </root>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
+    <logger name="com.github.victools.jsonschema.generator.impl.SchemaGenerationContextImpl" level="INFO"/>
 </configuration>

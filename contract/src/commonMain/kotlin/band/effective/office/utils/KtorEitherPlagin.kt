@@ -4,6 +4,7 @@ import band.effective.office.network.dto.SuccessResponse
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import io.ktor.client.plugins.api.createClientPlugin
+import io.ktor.client.statement.request
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
@@ -28,7 +29,7 @@ val KtorEitherPlugin = createClientPlugin("KtorEitherPlugin") {
 
         } else {
             println(
-                "KtorEitherPluginError: ${response.status.value}: ${response.status.description}\n" +
+                "KtorEitherPluginError: ${response.request.method} ${response.request.url} ${response.status.value}: ${response.status.description}\n" +
                         "${content.readUTF8Line()}"
             )
             Either.Error(ErrorResponse.getResponse(response.status.value))

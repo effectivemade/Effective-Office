@@ -13,8 +13,8 @@ android {
 
     defaultConfig {
         applicationId = "band.effective.office.tablet"
-        versionCode = 3
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.1.0"
 
         minSdk = 26
         targetSdk = 34
@@ -28,6 +28,32 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    signingConfigs {
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = file("${rootDir}/keystore/debug.keystore")
+            storePassword = "android"
+        }
+        create("release") {
+            keyAlias = System.getenv()["OFFICE_ELEVATOR_RELEASE_ALIAS"]
+            keyPassword = System.getenv()["OFFICE_ELEVATOR_RELEASE_KEY_PASSWORD"]
+            storeFile = file("${rootDir}/keystore/main.keystore")
+            storePassword = System.getenv()["OFFICE_ELEVATOR_RELEASE_STORE_PASSWORD"]
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = true
+        }
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = false
+            isMinifyEnabled = false
+        }
+    }
 }
 
 kotlin {
@@ -60,8 +86,8 @@ kotlin {
 
                 implementation(project(":tabletApp:features:selectRoom"))
                 implementation(project(":tabletApp:features:roomInfo"))
-                implementation(project(":tabletApp:features:freeNegotiationsScreen"))
                 implementation(project(":tabletApp:features:core"))
+                implementation(project(":tabletApp:features:di"))
 
             }
         }

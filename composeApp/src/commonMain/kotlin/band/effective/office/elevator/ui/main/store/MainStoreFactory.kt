@@ -2,7 +2,7 @@ package band.effective.office.elevator.ui.main.store
 
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.data.ApiResponse
-import band.effective.office.elevator.domain.entity.BookingInteractor
+import band.effective.office.elevator.domain.entity.BookingInteract
 import band.effective.office.elevator.domain.useCase.DeleteBookingUseCase
 import band.effective.office.elevator.domain.useCase.ElevatorCallUseCase
 import band.effective.office.elevator.ui.employee.aboutEmployee.models.BookingsFilter
@@ -26,9 +26,12 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.plus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -38,10 +41,9 @@ internal class MainStoreFactory(
 
     private val elevatorUseCase: ElevatorCallUseCase by inject()
     private val deleteBookingUseCase: DeleteBookingUseCase by inject()
-    private val bookingInteractor: BookingInteractor by inject()
+    private val bookingInteract: BookingInteract by inject()
 
     private var filtration = BookingsFilter(meetRoom = true, workPlace = true)
-    private var updatedList = false
 
     @OptIn(ExperimentalMviKotlinApi::class)
     fun create(): MainStore =
@@ -52,11 +54,11 @@ internal class MainStoreFactory(
                     reservedSeats = listOf(),
                     elevatorState = ElevatorState.Below,
                     beginDate = getCurrentDate(),
-                    dateFiltrationOnReserves = updatedList,
                     idSelectedBooking = "",
                     isLoading = true,
                     endDate = null,
-                    enableCallElevator = true
+                    enableCallElevator = true,
+                    isRefreshing = false
                 ),
                 executorFactory = ::ExecutorImpl,
                 reducer = ReducerImpl,
@@ -80,11 +82,12 @@ internal class MainStoreFactory(
             val beginDate: LocalDate,
             val endDate: LocalDate?,
             val reservedSeats: List<ReservedSeat>,
-            val dateFiltrationOnReserves: Boolean,
         ) : Msg
 
         data class UpdateBookingLoadingState(val isLoading: Boolean) : Msg
         data class UpdateCallElevator(val newValue: Boolean) : Msg
+
+        data class UpdateRefreshing(val newValue: Boolean) : Msg
     }
 
     private sealed interface Action {
@@ -98,6 +101,7 @@ internal class MainStoreFactory(
                 MainStore.Intent.OnClickCallElevator -> {
                     //doElevatorCall() TODO(Maksim Mishenko) uncomment call elevator
                     // NOTE(Maksim Mishenko) if call success do this:
+
                     scope.launch {
                         dispatch(Msg.UpdateCallElevator(false))
                         delay(10000L)
@@ -129,7 +133,6 @@ internal class MainStoreFactory(
                         "Selected dates  ${intent.dates}"
                     }
                     publish(MainStore.Label.CloseCalendar)
-                    updatedList = true
                     changeBookingsByDate(dates = intent.dates, bookingsFilter = filtration)
                 }
 
@@ -138,8 +141,8 @@ internal class MainStoreFactory(
                         publish(MainStore.Label.HideOptions)
                     }
                     scope.launch(Dispatchers.IO) {
-                        bookingInteractor.deleteBooking(getState().idSelectedBooking)
-                        getBookingsForUserByDate(
+                        bookingInteract.deleteBooking(getState().idSelectedBooking)
+                        changeBookingsByDate(
                             dates = listOf(
                                 getState().beginDate,
                                 getState().endDate
@@ -156,29 +159,7 @@ internal class MainStoreFactory(
                 }
 
                 is MainStore.Intent.CloseFiltersBottomDialog -> {
-                    scope.launch {
-                        publish(MainStore.Label.CloseFiltersBottomDialog)
-                        intent.bookingsFilter.let { bookingsFilter ->
-                            if (updatedList) {
-                                changeBookingsByDate(
-                                    dates = listOf(
-                                        getState().beginDate,
-                                        getState().endDate
-                                    )
-                                        .mapNotNull { it },
-                                    bookingsFilter = bookingsFilter
-                                )
-                            } else {
-                                getBookingsForUserByDate(
-                                    dates = listOf(
-                                        getState().beginDate,
-                                        getState().endDate
-                                    ).mapNotNull { it },
-                                    bookingsFilter = bookingsFilter
-                                )
-                            }
-                        }
-                    }
+                    publish(MainStore.Label.CloseFiltersBottomDialog)
                 }
 
                 MainStore.Intent.OnClickHideOption -> {
@@ -186,6 +167,17 @@ internal class MainStoreFactory(
                         publish(MainStore.Label.HideOptions)
                     }
                 }
+
+                MainStore.Intent.OnRefreshContent -> {
+                    refreshBookings(
+                        dates = listOf(
+                            getState().beginDate,
+                            getState().endDate
+                        ).mapNotNull { it },
+                        bookingsFilter = filtration
+                    )
+                }
+
             }
         }
 
@@ -200,10 +192,19 @@ internal class MainStoreFactory(
 
         override fun executeAction(action: Action, getState: () -> MainStore.State) {
             when (action) {
-                is Action.LoadBookings -> getBookingsForUserByDate(
-                    dates = listOf(action.date),
-                    bookingsFilter = filtration
-                )
+                is Action.LoadBookings -> {
+
+                    val startCurrentWeek = action.date
+                    val fridayWeekNumber = 5
+                    val countDaysToFriday = fridayWeekNumber - startCurrentWeek.dayOfWeek.ordinal - 1
+                    val datePeriodForFriday = DatePeriod(days = countDaysToFriday)
+                    val endCurrentWeek = startCurrentWeek.plus(datePeriodForFriday)
+
+                    changeBookingsByDate(
+                        dates = listOf(startCurrentWeek, endCurrentWeek),
+                        bookingsFilter = filtration
+                    )
+                }
             }
         }
 
@@ -248,6 +249,40 @@ internal class MainStoreFactory(
             }
         }
 
+        private fun refreshBookings(dates: List<LocalDate>, bookingsFilter: BookingsFilter) {
+            if (dates.isEmpty()) return
+
+            val beginDate = dates.first()
+            val endDate = dates.last()
+
+            val beginDateTime = LocalDateTime(date = beginDate, time = LocalTime.Min)
+            val endDateTime = LocalDateTime(date = endDate, time = LocalTime.Max)
+
+            dispatch(Msg.UpdateRefreshing(true))
+
+            scope.launch(Dispatchers.IO) {
+                bookingInteract
+                    .getForUser(
+                        beginDateTime = beginDateTime,
+                        endDateTime = endDateTime,
+                        bookingsFilter = bookingsFilter
+                    )
+                    .collect { bookings ->
+                        withContext(Dispatchers.Main) {
+                            when (bookings) {
+                                is Either.Error -> {
+                                    // TODO show error on UI
+                                }
+
+                                is Either.Success -> {
+                                    dispatch(Msg.UpdateSeatsReservation(reservedSeats = bookings.data))
+                                    dispatch(Msg.UpdateRefreshing(false))
+                                }
+                            }
+                        }
+                    }
+            }
+        }
         fun getBookingsForUserByDate(dates: List<LocalDate>, bookingsFilter: BookingsFilter) {
 
             if (dates.isEmpty()) return
@@ -265,7 +300,7 @@ internal class MainStoreFactory(
             }
 
             scope.launch(Dispatchers.IO) {
-                bookingInteractor
+                bookingInteract
                     .getForUser(
                         beginDateTime = beginDateTime,
                         endDateTime = endDateTime,
@@ -291,8 +326,9 @@ internal class MainStoreFactory(
 
             if (dates.isEmpty()) return
 
-            val beginDate = dates.first()
-            val endDate = dates.last()
+            val sortedDates = dates.sorted()
+            val beginDate = sortedDates.first()
+            val endDate = sortedDates.last()
 
             val beginDateTime = LocalDateTime(date = beginDate, time = LocalTime.Min)
             val endDateTime = LocalDateTime(date = endDate, time = LocalTime.Max)
@@ -305,7 +341,7 @@ internal class MainStoreFactory(
 
             scope.launch {
                 withContext(Dispatchers.IO) {
-                    bookingInteractor
+                    bookingInteract
                         .getForUser(
                             beginDateTime = beginDateTime,
                             endDateTime = endDateTime,
@@ -325,7 +361,6 @@ internal class MainStoreFactory(
                                                 beginDate = beginDate,
                                                 endDate = if (beginDate == endDate) null else endDate,
                                                 reservedSeats = bookings.data,
-                                                dateFiltrationOnReserves = updatedList
                                             )
                                         )
                                     }
@@ -354,7 +389,6 @@ internal class MainStoreFactory(
                         beginDate = message.beginDate,
                         endDate = message.endDate,
                         reservedSeats = message.reservedSeats,
-                        dateFiltrationOnReserves = message.dateFiltrationOnReserves,
                         isLoading = false
                     )
                 }
@@ -362,6 +396,7 @@ internal class MainStoreFactory(
                 is Msg.UpdateBookingSelectedId -> copy(idSelectedBooking = message.bookingId)
                 is Msg.UpdateBookingLoadingState -> copy(isLoading = message.isLoading)
                 is Msg.UpdateCallElevator -> copy(enableCallElevator = message.newValue)
+                is Msg.UpdateRefreshing -> copy(isRefreshing = message.newValue)
             }
     }
 }

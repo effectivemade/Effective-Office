@@ -12,6 +12,7 @@ import com.google.auth.oauth2.GoogleCredentials
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
+import java.util.StringJoiner
 import java.util.UUID
 import java.util.function.Function
 
@@ -27,30 +28,32 @@ class Handler : Function<Unit, Unit> {
  */
 fun main (): Unit = subscribeOnNotifications()
 
+val logger : Logger = LoggerFactory.getLogger(JsonFactory::class.java)
+
 /**
- * Subscribe to all owned calendars. Should be called every 7 days.
+ * Subscribe to specified calendars. Should be called every 7 days.
  */
 fun subscribeOnNotifications() {
-    val logger : Logger = LoggerFactory.getLogger(JsonFactory::class.java)
 
-    val calendarService : Calendar = createCalendarService()
+    val calendar : Calendar = createCalendarService()
 
-    val calendars = calendarService.calendarList().list().execute().items
+    subscribeServerToNotifications(calendar, AppConstants.APPLICATION_URL, AppConstants.CALENDARS)
+    subscribeServerToNotifications(calendar, AppConstants.TEST_APPLICATION_URL, AppConstants.TEST_CALENDARS)
+}
 
-    val appAddress: String = AppConstants.APPLICATION_URL
-    for (calendar in calendars) {
-        if (calendar.accessRole == "owner") {
-            val channel = Channel().apply {
-                id = UUID.randomUUID().toString()
-                type = "web_hook"
-                address = "$appAddress/notifications"
-            }
-            try {
-                calendarService.events().watch(calendar.id, channel).execute()
-                logger.info("Subscribed on notifications from ${calendar.id} calendar")
-            } catch (e: Exception) {
-                logger.error("Can't subscribe on notifications from ${calendar.id} calendar", e)
-            }
+private fun subscribeServerToNotifications(calendarService : Calendar, serverUrl: String, calendarIds: List<String>) {
+    for (calendarId in calendarIds) {
+        val channelUid = UUID.randomUUID().toString()
+        val channel = Channel().apply {
+            id = channelUid
+            type = "web_hook"
+            address = "$serverUrl/notifications"
+        }
+        try {
+            calendarService.events().watch(calendarId, channel).execute()
+            logger.info("Server with url $serverUrl was subscribed on notifications from $calendarId calendar. Channel id: $channelUid")
+        } catch (e: Exception) {
+            logger.error("Can't subscribe server with url $serverUrl on notifications from $calendarId calendar", e)
         }
     }
 }

@@ -18,7 +18,8 @@ class AutoplayMenuViewModel @Inject constructor(
     val autoplayController: AutoplayController,
     private val timer: TimerSlideShow
 ) : ViewModel() {
-    private var mutableState = MutableStateFlow(AutoplayMenuState.defaultState)
+    private var mutableState =
+        MutableStateFlow(AutoplayMenuState.defaultState.copy(screenList = autoplayController.state.value.screensList))
     val state = mutableState.asStateFlow()
 
     //TODO(Maksim Mishenko) inject controller

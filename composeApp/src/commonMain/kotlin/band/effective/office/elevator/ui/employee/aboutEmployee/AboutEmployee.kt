@@ -47,7 +47,6 @@ import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.EffectiveOutlinedButton
 import band.effective.office.elevator.components.InfoAboutUserUIComponent
 import band.effective.office.elevator.components.LoadingIndicator
-import band.effective.office.elevator.components.ModalCalendar
 import band.effective.office.elevator.components.ModalCalendarDateRange
 import band.effective.office.elevator.components.TitlePage
 import band.effective.office.elevator.components.generateImageLoader
@@ -61,7 +60,6 @@ import band.effective.office.elevator.ui.main.components.CalendarTitle
 import band.effective.office.elevator.ui.main.components.FilterButton
 import band.effective.office.elevator.ui.models.ReservedSeat
 import com.seiko.imageloader.model.ImageRequest
-import com.seiko.imageloader.rememberAsyncImagePainter
 import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -299,8 +297,7 @@ private fun AboutEmployeeContent(
                                     onClickOpenCalendar = onClickOpenCalendar,
                                     fromMainScreen = false,
                                     beginDate = beginDate,
-                                    endDate = endDate,
-                                    dateFiltration = dateFiltrationOnReserves
+                                    endDate = endDate
                                 )
                                 FilterButton(
                                     onClickOpenBottomSheetDialog = onClickOpenBottomDialog

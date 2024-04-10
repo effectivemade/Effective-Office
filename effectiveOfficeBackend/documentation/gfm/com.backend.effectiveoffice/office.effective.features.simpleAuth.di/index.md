@@ -1,4 +1,4 @@
-//[com.backend.effectiveoffice](../../index.md)/[office.effective.features.simpleAuth.di](index.md)
+//[com.backend.effectiveoffice](../../index.md)/[office.effective.features.auth.di](index.md)
 
 # Package-level declarations
 

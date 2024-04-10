@@ -26,7 +26,7 @@ kotlin {
     val iosSimulatorArm64 = iosSimulatorArm64()
 
     cocoapods {
-        version = "2.0.0"
+        version = "2.0.2"
         summary = "Compose application framework"
         homepage = "https://github.com/Radch-enko"
         ios.deploymentTarget = "11.0"
@@ -161,7 +161,7 @@ android {
 
         applicationId = "band.effective.office.elevator"
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "1.0.2"
     }
     sourceSets["main"].apply {
         manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -201,7 +201,7 @@ android {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
             isDebuggable = false
-            isMinifyEnabled = true
+            isMinifyEnabled = false
         }
     }
 }
@@ -221,11 +221,11 @@ buildConfig {
     useKotlinOutput { internalVisibility = true }
     buildConfigField(
         "String",
-        "integrationPhoneId","\"13c80c3d-4278-45cf-8d2a-e281004d3ff9\""
+        "integrationPhoneId", "\"13c80c3d-4278-45cf-8d2a-e281004d3ff9\""
     )
     buildConfigField(
         "String",
-        "integrationTelegramId","\"15f1fa52-7656-4457-a1ce-42063b0f2b39\""
+        "integrationTelegramId", "\"15f1fa52-7656-4457-a1ce-42063b0f2b39\""
     )
     buildConfigField(
         "String",

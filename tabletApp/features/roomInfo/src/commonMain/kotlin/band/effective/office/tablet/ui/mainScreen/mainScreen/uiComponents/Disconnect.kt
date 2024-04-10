@@ -34,14 +34,13 @@ fun Disconnect(visible: Boolean) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 40.dp)
                 .background(
                     color = disconnectColor,
                     shape = RoundedCornerShape(
                         bottomEnd = 16.dp,
                         bottomStart = 16.dp
                     )
-                ).padding(vertical = 10.dp),
+                ).padding(vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {

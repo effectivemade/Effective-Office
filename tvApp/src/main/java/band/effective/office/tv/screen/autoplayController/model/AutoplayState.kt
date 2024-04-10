@@ -12,10 +12,10 @@ data class AutoplayState(
 ) {
     companion object {
         val default = AutoplayState(
-            isLoading = true,
-            isData = false,
+            isLoading = false,
+            isData = true,
             isError = false,
-            screensList = listOf(),
+            screensList = listOf(Screen.Stories, Screen.BestPhoto, Screen.Events),
             currentScreenNumber = 0,
             screenState = ScreenState.default
         )

@@ -2,7 +2,7 @@
     <string name="app_name">effective TV</string>
     <string name="welcome_string">Не знаете, что посмотреть?</string>
     <string name="autoplay_menu_title">Выбор категорий</string>
-    <string name="autoplay_button">Автоплей</string>
+    <string name="autoplay_button">Запустить автоплей</string>
     <string name="autoplay_menu_button">Запустить автоплей</string>
     <string name="story_screen_title">Истории</string>
     <string name="event_screen_title">Мероприятия</string>
@@ -14,7 +14,7 @@
     <string name="with_us">с нами</string>
     <string name="month">месяц</string>
     <string name="for_years">года</string>
-    <string name="welcome_to_the_team">добро пожаловать в команду</string>
+    <string name="welcome_to_the_team">теперь в комаде</string>
     <string name="error_occurred">Произошла ошибка, подробнее:</string>
     <string name="today_no_stories">На сегодня Stories нет</string>
     <string name="back">Назад</string>
@@ -33,4 +33,9 @@
     <string name="photo_title">Best Photo</string>
     <string name="autoplay_button_text">autoplay</string>
     <string name="autoplay_zero_select">Выберите минимум одну категорию</string>
+    <string name="main_menu_text">Бесконечный поток историй, фотографий и анонсов мероприятий в Точке Кипения</string>
+    <string name="autoplay">Автоплей</string>
+    <string name="photo">Фото</string>
+    <string name="video">Видео</string>
+    <string name="autoplay_settings">Настроить автоплей</string>
 </resources>

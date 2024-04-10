@@ -14,7 +14,6 @@ fun NavigationHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.Menu.name) {
         composable(Screen.Menu.name) {
             MenuScreen(
-                itemsList = NavigationModel.screensList,
                 navController = navController
             )
         }

@@ -1,4 +1,4 @@
-//[com.backend.effectiveoffice](../../index.md)/[office.effective.features.simpleAuth.di](index.md)/[authDiModule](auth-di-module.md)
+//[com.backend.effectiveoffice](../../index.md)/[office.effective.features.auth.di](index.md)/[authDiModule](auth-di-module.md)
 
 # authDiModule
 

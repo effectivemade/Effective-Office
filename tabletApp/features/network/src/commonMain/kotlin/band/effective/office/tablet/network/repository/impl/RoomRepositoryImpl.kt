@@ -25,6 +25,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
 
+//NOTE(Maksim Mishenko) old implementation
 class RoomRepositoryImpl(
     private val api: Api,
     private val organizerRepository: OrganizerRepository
@@ -43,7 +44,7 @@ class RoomRepositoryImpl(
                 errorMapper = { it },
                 successMapper = { eventList -> eventList.filter { it.workspace.id == roomId } })
 
-    override suspend fun getRoomInfo(room: String): Either<ErrorWithData<RoomInfo>, RoomInfo> =
+    suspend fun getRoomInfo(room: String): Either<ErrorWithData<RoomInfo>, RoomInfo> =
         getRoomsInfo().run {
             when (this) {
                 is Either.Error -> {
@@ -117,7 +118,7 @@ class RoomRepositoryImpl(
             }
         }
 
-    override fun subscribeOnUpdates(
+    fun subscribeOnUpdates(
         roomId: String,
         scope: CoroutineScope
     ): Flow<Either<ErrorWithData<RoomInfo>, RoomInfo>> =
@@ -136,6 +137,17 @@ class RoomRepositoryImpl(
             launch {
                 api.subscribeOnBookingsList(roomId, scope).collect {
                     updateCashe()
+                }
+            }
+            awaitClose()
+        }
+
+    override fun subscribeOnUpdates(scope: CoroutineScope): Flow<Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>> =
+        channelFlow {
+            send(getRoomsInfo())
+            launch {
+                roomInfo.collect {
+                    send(getRoomsInfo())
                 }
             }
             awaitClose()

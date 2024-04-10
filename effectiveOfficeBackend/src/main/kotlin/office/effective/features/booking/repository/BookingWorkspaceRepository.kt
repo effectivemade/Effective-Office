@@ -4,10 +4,10 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.Event
+import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
 import office.effective.common.exception.WorkspaceUnavailableException
-import office.effective.config
 import office.effective.features.booking.converters.GoogleCalendarConverter
 import office.effective.features.user.repository.UserRepository
 import office.effective.features.workspace.repository.WorkspaceEntity
@@ -29,8 +29,7 @@ class BookingWorkspaceRepository(
     private val userRepository: UserRepository
 ) : IBookingRepository {
     private val calendarEvents = calendar.Events()
-    private val workspaceCalendar = config.propertyOrNull("calendar.workspaceCalendar")?.getString()
-        ?: throw Exception("Config file does not contain workspace Google calendar id")
+    private val workspaceCalendar: String = BookingConstants.WORKSPACE_CALENDAR
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     /**

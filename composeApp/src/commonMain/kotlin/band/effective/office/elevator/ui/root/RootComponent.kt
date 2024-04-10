@@ -1,11 +1,11 @@
 package band.effective.office.elevator.ui.root
 
-import band.effective.office.elevator.data.database.DBSource
 import band.effective.office.elevator.ui.authorization.AuthorizationComponent
 import band.effective.office.elevator.ui.content.ContentComponent
 import band.effective.office.elevator.ui.root.store.RootStore
 import band.effective.office.elevator.ui.root.store.RootStoreImplFactory
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
@@ -19,7 +19,6 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
-import org.koin.core.component.inject
 
 class RootComponent internal constructor(
     componentContext: ComponentContext,
@@ -36,9 +35,8 @@ class RootComponent internal constructor(
 
     private val stack = childStack(
         source = navigation,
-        initialStack = { listOf(Config.Undefined) },
-        handleBackButton = true,
-        childFactory = ::child
+        childFactory = ::child,
+        initialConfiguration = Config.Undefined
     )
 
     val childStack: Value<ChildStack<*, Child>> = stack

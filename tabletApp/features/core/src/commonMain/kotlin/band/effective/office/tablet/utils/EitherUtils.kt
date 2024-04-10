@@ -20,3 +20,12 @@ fun <OldErrorType, oldDataType, ErrorType, DataType> Either<OldErrorType, oldDat
         is Either.Error -> Either.Error(errorMapper(error))
         is Either.Success -> Either.Success(successMapper(data))
     }
+
+suspend fun <OldErrorType, oldDataType, ErrorType, DataType> Either<OldErrorType, oldDataType>.asyncMap(
+    errorMapper: suspend (OldErrorType) -> ErrorType,
+    successMapper: suspend (oldDataType) -> DataType,
+): Either<ErrorType, DataType> =
+    when (this) {
+        is Either.Error -> Either.Error(errorMapper(error))
+        is Either.Success -> Either.Success(successMapper(data))
+    }

@@ -7,12 +7,12 @@
 object Plugins {
 
     object Android {
-        const val implementation = "com.android.tools.build:gradle:8.0.2"
+        const val implementation = "com.android.tools.build:gradle:8.1.0"
         const val plugin = "com.android.application"
     }
 
     object AndroidLib{
-        const val implementation = "com.android.tools.build:gradle:7.3.1"
+        const val implementation = "com.android.tools.build:gradle:8.1.0"
         const val plugin = "com.android.library"
     }
 

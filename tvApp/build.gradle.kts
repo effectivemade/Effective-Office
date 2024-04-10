@@ -103,6 +103,7 @@ dependencies {
 
     //coil
     implementation(libs.coil)
+    implementation(libs.coil.svg)
 
     //notion
     implementation(libs.notion)

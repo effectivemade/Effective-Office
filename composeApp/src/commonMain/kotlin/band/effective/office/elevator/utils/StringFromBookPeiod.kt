@@ -35,49 +35,54 @@ fun stringFromBookPeriod(
 
     val startYear = startDate.year
     val finishYear = finishDate.year
-    val str = stringResource(repeatBooking)
-    Napier.d {
-        "seleted day of week ${if (bookingPeriod is BookingPeriod.Week) bookingPeriod.selectedDayOfWeek else ""}"
-    }
+
     val repeatBookingsOnShow = when (repeatBooking) {
         MainRes.strings.every_work_day -> stringResource(repeatBooking) + " "
         MainRes.strings.every_week -> stringResource(repeatBooking) + " "
-        MainRes.strings.every_month -> stringResource(repeatBooking) + " ${startDate.dayOfMonth} числа "
+        MainRes.strings.every_month -> stringResource(repeatBooking) + stringResource(MainRes.strings.number_with_parametr, "${startDate.dayOfMonth}") + " "
         else -> ""
     }
+
     val period =
         when (bookingPeriod) {
-            is BookingPeriod.Week -> "неделю(и) "
-            is BookingPeriod.Month -> "месяц(ев) "
-            is BookingPeriod.Year -> "лет "
+            is BookingPeriod.Week -> stringResource(MainRes.strings.weekly)
+            is BookingPeriod.Month -> stringResource(MainRes.strings.monthly)
+            is BookingPeriod.Year -> stringResource(MainRes.strings.yearly)
             else -> ""
-        }
+        } + " "
 
     val periodicity = when (bookingPeriod) {
-        is BookingPeriod.Week -> "раз в ${bookingPeriod.durationPeriod} $period ${bookingPeriod.selectedDayOfWeek.listToString()} c "
-        is BookingPeriod.Month -> "раз в ${bookingPeriod.monthPeriod} $period"
-        is BookingPeriod.Year -> "раз в ${bookingPeriod.yearPeriod} $period"
+        is BookingPeriod.Week -> stringResource(MainRes.strings.once_per_from, "${bookingPeriod.durationPeriod} $period ${bookingPeriod.selectedDayOfWeek.listToString()}") + " "
+        is BookingPeriod.Month -> stringResource(MainRes.strings.once_per, "${bookingPeriod.monthPeriod} $period") + " "
+        is BookingPeriod.Year -> stringResource(MainRes.strings.once_per, "${bookingPeriod.yearPeriod} $period") + " "
         else -> ""
     }
 
     val extendedPeriodInfo = when (typeEndPeriodBooking) {
-        is TypeEndPeriodBooking.DatePeriodEnd -> " по ${dateFormat(typeEndPeriodBooking.date)}"
+        is TypeEndPeriodBooking.DatePeriodEnd -> stringResource(MainRes.strings.to_end_reccurense,
+            dateFormat(typeEndPeriodBooking.date)
+        )
         is TypeEndPeriodBooking.CountRepeat ->
-            "повторится ${typeEndPeriodBooking.count} раз(а)"
-
+            stringResource(MainRes.strings.repeate_times, " ${typeEndPeriodBooking.count}")
         else -> ""
+    } + " "
+
+    Napier.d {
+        "ext period  $extendedPeriodInfo"
     }
-
-
     return if (repeatBookingsOnShow == "")
         periodicity +
-        if (startYear == finishYear)
-            if (startMonth == finishMonth)
+        if (startYear == finishYear) {
+            if (startMonth == finishMonth) {
                 if (startDay == finishDay)
                     "$startDay $startMonth $startYear"
                 else "$startDay - $finishDay $startMonth $startYear"
-            else "$startDay $startMonth - $finishDay $finishMonth $startYear"
-        else "$startDay $startMonth $startYear - $finishDay $finishMonth $finishYear" +
-                extendedPeriodInfo
+            } else {
+                "$startDay $startMonth - $finishDay $finishMonth $startYear"
+            }
+        }
+        else {
+            "$startDay $startMonth $startYear - $finishDay $finishMonth $finishYear"
+        } + " $extendedPeriodInfo"
     else repeatBookingsOnShow
 }

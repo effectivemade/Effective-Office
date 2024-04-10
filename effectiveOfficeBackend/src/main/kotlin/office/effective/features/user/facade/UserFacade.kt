@@ -2,7 +2,6 @@ package office.effective.features.user.facade
 
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.utils.DatabaseTransactionManager
-import office.effective.features.user.ITokenVerifier
 import office.effective.features.user.converters.UserDTOModelConverter
 import office.effective.dto.UserDTO
 import office.effective.serviceapi.IUserService
@@ -15,7 +14,6 @@ import office.effective.model.UserModel
 class UserFacade(
     private val service: IUserService,
     private val converterDTO: UserDTOModelConverter,
-    private val verifier: ITokenVerifier,
     private val transactionManager: DatabaseTransactionManager
 ) {
     /**

@@ -71,5 +71,6 @@ actual fun pickSBP(phoneNumber: String) {
 
 actual fun ComponentRegistryBuilder.setupDefaultComponents() =
     this.setupDefaultComponents(AndroidApp.INSTANCE.applicationContext)
+
 actual fun getImageCacheDirectoryPath(): Path =
     AndroidApp.INSTANCE.applicationContext.cacheDir.absolutePath.toPath()

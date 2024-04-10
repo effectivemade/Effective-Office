@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import band.effective.office.elevator.MainRes
-import band.effective.office.elevator.domain.models.timePad
 import band.effective.office.elevator.utils.dateFormat
+import band.effective.office.elevator.utils.getCurrentDate
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.datetime.LocalDate
@@ -28,9 +28,9 @@ import kotlinx.datetime.LocalDate
 fun DateSelection(
     onClickOpenCalendar: () -> Unit,
     onClickOpenBottomDialog: () -> Unit,
+    currentDate: LocalDate = getCurrentDate(),
     beginDate: LocalDate,
     endDate: LocalDate?,
-    dateFiltration: Boolean
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -55,7 +55,7 @@ fun DateSelection(
                 fromMainScreen = true,
                 beginDate = beginDate,
                 endDate = endDate,
-                dateFiltration = dateFiltration
+                currentDate = currentDate
             )
             FilterButton(
                 onClickOpenBottomSheetDialog = onClickOpenBottomDialog
@@ -68,9 +68,9 @@ fun DateSelection(
 fun CalendarTitle(
     onClickOpenCalendar: () -> Unit,
     fromMainScreen: Boolean,
+    currentDate: LocalDate = getCurrentDate(),
     beginDate: LocalDate,
     endDate: LocalDate?,
-    dateFiltration: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -83,23 +83,13 @@ fun CalendarTitle(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text =
-            if(dateFiltration) {
-                if (endDate == null)
-                    dateFormat(beginDate)
-                else
-                    "${dateFormat(beginDate)} - ${dateFormat(endDate)}"
-            }
-            else{
-                stringResource(
-                    if (fromMainScreen) MainRes.strings.on_today
-                    else MainRes.strings.by_date
-                )
-            },
+            text = if (beginDate == endDate || endDate == null) dateFormat(beginDate)
+            else "${dateFormat(beginDate)} - ${dateFormat(endDate)}",
             color = MaterialTheme.colors.secondaryVariant,
             fontSize = 15.sp
         )
     }
 }
+
 
 

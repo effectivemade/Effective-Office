@@ -132,6 +132,10 @@
     <string name="phone_plus_seven">+7</string>
     <string name="telegram_symbol">@</string>
 
+
+    <string name="from_date">from %s</string>
+    <string name="to_date">to %s</string>
+
     <!-- Success messages -->
     <string name="elevator_called_successfully">Successfully!</string>
 
@@ -139,6 +143,17 @@
     <string name="exit">Exit</string>
     <string name="phone">Phone number</string>
     <string name="telegram">Telegram</string>
+
+    <!-- Booking title -->
+    <string name="number_with_parametr">%sth</string>
+    <string name="weekly">week(s)</string>
+    <string name="monthly">month(s)</string>
+    <string name="yearly">years</string>
+    <string name="once_per">once per %s</string>
+    <string name="once_per_from">once in %s from</string>
+    <string name="to_end_reccurense">by %s</string>
+    <string name="repeate_times">repeated %s times</string>
+    <string name="no_free_place">There are no places for this time. Choose another time</string>
 
     <!-- Edit Profile-->
     <string name="profile_data">Profile Data</string>

@@ -11,7 +11,7 @@ import band.effective.office.elevator.domain.useCase.EmployeeUseCase
 import band.effective.office.elevator.domain.useCase.ElevatorCallUseCase
 import band.effective.office.elevator.domain.useCase.GetBookingsUseCase
 import band.effective.office.elevator.domain.useCase.AuthorizationUseCase
-import band.effective.office.elevator.domain.entity.BookingInteractor
+import band.effective.office.elevator.domain.entity.BookingInteract
 import band.effective.office.elevator.domain.repository.AuthorizationRepository
 import band.effective.office.elevator.domain.repository.EmployeeRepository
 import band.effective.office.elevator.domain.repository.WorkspaceRepository
@@ -40,7 +40,7 @@ internal val domainModuleDI = module {
         )
     }
     single {
-        BookingInteractor(
+        BookingInteract(
             getBookingsUseCase = GetBookingsUseCase(repository = get()),
             changeBookingUseCase = ChangeBookingUseCase(repository = get()),
             createBookingUseCase = CreateBookingUseCase(repository = get()),

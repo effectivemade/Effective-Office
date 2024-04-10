@@ -7,7 +7,9 @@ import band.effective.mattermost.models.response.models.EmojiInfo
 import band.effective.synology.SynologyRepository
 import band.effective.utils.getEnv
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class BotManager(
     private val mattermost: MattermostRepository,
@@ -18,7 +20,7 @@ class BotManager(
         when (val filesIds = mattermost.getFilesIdsFromPosts()) {
             is Either.Success -> {
                 filesIds.data.forEach { fileInfo ->
-                    coroutineScope.async {
+                    coroutineScope.launch(Dispatchers.IO) {
                         sendFileToSynology(fileInfo)
                     }
                 }

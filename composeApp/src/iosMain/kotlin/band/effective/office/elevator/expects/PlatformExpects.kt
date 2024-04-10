@@ -42,6 +42,7 @@ actual fun pickSBP(phoneNumber: String) {
 }
 
 actual fun ComponentRegistryBuilder.setupDefaultComponents() = this.setupDefaultComponents()
+
 actual fun getImageCacheDirectoryPath(): Path {
     val cacheDir = NSSearchPathForDirectoriesInDomains(
         NSCachesDirectory,

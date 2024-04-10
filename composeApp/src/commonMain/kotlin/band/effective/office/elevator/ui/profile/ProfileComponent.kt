@@ -5,7 +5,9 @@ import band.effective.office.elevator.ui.profile.mainProfile.MainProfileComponen
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
@@ -24,7 +26,7 @@ class ProfileComponent(
 
     private val stack = childStack(
         source = navigation,
-        initialStack = { listOf(Config.MainProfile) },
+        initialConfiguration = Config.MainProfile,
         childFactory = ::child,
         handleBackButton = true
     )
@@ -54,14 +56,14 @@ class ProfileComponent(
 
     private fun editProfileOutput(output: ProfileEditComponent.Output) {
         when(output){
-           is ProfileEditComponent.Output.NavigationBack -> navigation.replaceAll(Config.MainProfile)
+           is ProfileEditComponent.Output.NavigationBack -> navigation.pop()
         }
     }
 
     private fun mainProfileOutput(output: MainProfileComponent.Output) {
         when(output){
             is MainProfileComponent.Output.OpenAuthorizationFlow -> openAuthorizationFlow()
-            is MainProfileComponent.Output.NavigateToEdit -> navigation.replaceAll(Config.EditProfile(output.userEdit))
+            is MainProfileComponent.Output.NavigateToEdit -> navigation.bringToFront(Config.EditProfile(output.userEdit))
         }
     }
 

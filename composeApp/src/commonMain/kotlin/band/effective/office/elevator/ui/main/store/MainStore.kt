@@ -28,6 +28,8 @@ interface MainStore : Store<MainStore.Intent, MainStore.State, MainStore.Label> 
 
         object OnClickDeleteBooking : Intent
 
+        object OnRefreshContent : Intent
+
     }
 
     sealed interface Label {
@@ -59,10 +61,10 @@ interface MainStore : Store<MainStore.Intent, MainStore.State, MainStore.Label> 
         val elevatorState: ElevatorState,
         val beginDate: LocalDate,
         val endDate: LocalDate?,
-        val dateFiltrationOnReserves: Boolean,
         val idSelectedBooking: String,
         val isLoading: Boolean,
-        val enableCallElevator: Boolean
+        val enableCallElevator: Boolean,
+        val isRefreshing: Boolean
     )
 
     data class ErrorState(val message: StringResource)

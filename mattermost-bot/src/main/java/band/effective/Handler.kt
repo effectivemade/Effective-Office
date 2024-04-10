@@ -24,7 +24,11 @@ suspend fun botLogic(coroutineScope: CoroutineScope) {
             coroutineScope = coroutineScope
     )
     val synologyRepository = SynologyRepositoryImpl()
-    val botManager = BotManager(mattermost = mattermostRepository, coroutineScope = coroutineScope, synology = synologyRepository)
+    val botManager = BotManager(
+        mattermost = mattermostRepository,
+        coroutineScope = coroutineScope,
+        synology = synologyRepository
+    )
     botManager.updatePhoto()
 }
 

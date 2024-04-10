@@ -3,20 +3,31 @@ package band.effective.office.tablet.ui.bookingComponents.pickerDateTime
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import band.effective.office.tablet.features.core.MainRes
 import band.effective.office.tablet.ui.common.CrossButtonView
 import band.effective.office.tablet.ui.theme.LocalCustomColorsPalette
 import band.effective.office.tablet.ui.theme.header8
@@ -27,17 +38,17 @@ import epicarchitect.calendar.compose.datepicker.state.EpicDatePickerState
 import epicarchitect.calendar.compose.datepicker.state.rememberEpicDatePickerState
 import epicarchitect.calendar.compose.pager.config.rememberEpicCalendarPagerConfig
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month
-import java.util.*
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateTimePickerModalView(
-    dateTimePickerComponent: DateTimePickerComponent,
-    currentDate: Calendar
+    dateTimePickerComponent: DateTimePickerComponent
 ) {
     val stateDateTime by dateTimePickerComponent.state.collectAsState()
-    val selectedDateTime by remember { mutableStateOf(stateDateTime.selectDate) }
 
     val epicDatePickerState = rememberEpicDatePickerState(
         config = rememberEpicDatePickerConfig(
@@ -52,34 +63,29 @@ fun DateTimePickerModalView(
         selectedDates =
         listOf(
             LocalDate(
-                year = currentDate[Calendar.YEAR],
-                monthNumber = currentDate[Calendar.MONTH] + 1,
-                dayOfMonth = currentDate[Calendar.DAY_OF_MONTH],
+                year = stateDateTime.currentDate[Calendar.YEAR],
+                monthNumber = stateDateTime.currentDate[Calendar.MONTH] + 1,
+                dayOfMonth = stateDateTime.currentDate[Calendar.DAY_OF_MONTH],
             )
         ),
         selectionMode = EpicDatePickerState.SelectionMode.Single(1),
         initialMonth = EpicMonth(
-            year = currentDate[Calendar.YEAR],
-            month = Month(currentDate[Calendar.MONTH] + 1)
+            year = stateDateTime.currentDate[Calendar.YEAR],
+            month = Month(stateDateTime.currentDate[Calendar.MONTH] + 1)
         )
     )
 
 
     DateTimePickerModalView(
-        currentDate = currentDate,
+        currentDate = stateDateTime.currentDate,
         epicDatePickerState = epicDatePickerState,
-        selectedDateTime = selectedDateTime,
-        onCloseRequest = { dateTimePickerComponent.sendIntent(DateTimePickerStore.Intent.CloseModal()) },
-        onSetDate = { day: Int, month: Int, year: Int, hour: Int, minute: Int ->
-            dateTimePickerComponent.sendIntent(
-                DateTimePickerStore.Intent.OnSetDate(
-                    day,
-                    month,
-                    year,
-                    hour,
-                    minute
-                )
-            )
+        selectedDateTime = stateDateTime.currentDate,
+        onCloseRequest = { dateTimePickerComponent.sendIntent(DateTimePickerStore.Intent.CloseModal) },
+        onChangeDate = {
+            dateTimePickerComponent.sendIntent(DateTimePickerStore.Intent.OnChangeDate(it))
+        },
+        onChangeTime = {
+            dateTimePickerComponent.sendIntent(DateTimePickerStore.Intent.OnChangeTime(it))
         }
     )
 }
@@ -91,7 +97,8 @@ fun DateTimePickerModalView(
     epicDatePickerState: EpicDatePickerState,
     selectedDateTime: Calendar,
     onCloseRequest: () -> Unit,
-    onSetDate: (changedDay: Int, changedMonth: Int, changedYear: Int, changedHour: Int, changedMinute: Int) -> Unit
+    onChangeDate: (LocalDate) -> Unit,
+    onChangeTime: (LocalTime) -> Unit
 ) {
     Dialog(
         onDismissRequest = onCloseRequest,
@@ -115,38 +122,25 @@ fun DateTimePickerModalView(
                     modifier = Modifier.fillMaxWidth(1f)
                 )
                 Row(
-                    modifier = Modifier.padding(10.dp),
+                    modifier = Modifier.padding(10.dp).fillMaxHeight(0.8f),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    DatePickerView(epicDatePickerState = epicDatePickerState)
-                    Spacer(modifier = Modifier.width(40.dp))
-                    TimePickerView(currentDate = currentDate, selectedTime = selectedDateTime)
+                    TimePickerView(
+                        modifier = Modifier.fillMaxWidth(0.3f).fillMaxHeight(),
+                        currentDate = currentDate,
+                        onSnap = onChangeTime
+                    )
+                    Spacer(Modifier.width(40.dp))
+                    DatePickerView(
+                        modifier = Modifier.fillMaxWidth(0.6f).fillMaxHeight(),
+                        epicDatePickerState = epicDatePickerState
+                    )
                 }
-                /*TODO LOGIC MUST BE IN COMPONENT OR STORE */
-                selectedDateTime.set(
-                    /* year = */  if (epicDatePickerState.selectedDates.isNotEmpty()) epicDatePickerState.selectedDates.first().year else selectedDateTime[Calendar.YEAR],
-                    /* month = */
-                    if (epicDatePickerState.selectedDates.isNotEmpty()) epicDatePickerState.selectedDates.first().monthNumber - 1 else selectedDateTime[Calendar.MONTH],
-                    /* date = */
-                    if (epicDatePickerState.selectedDates.isNotEmpty()) epicDatePickerState.selectedDates.first().dayOfMonth else selectedDateTime[Calendar.DATE],
-                    /* hourOfDay = */
-                    selectedDateTime[Calendar.HOUR_OF_DAY],
-                    /* minute = */
-                    selectedDateTime[Calendar.MINUTE]
-                )
-                Spacer(modifier = Modifier.height(10.dp))
                 Box(modifier = Modifier.fillMaxSize()) {
                     Button(
                         modifier = Modifier.align(Alignment.Center)
                             .fillMaxWidth(0.3f),
                         onClick = {
-                            onSetDate(
-                                selectedDateTime[Calendar.DATE],
-                                selectedDateTime[Calendar.MONTH],
-                                selectedDateTime[Calendar.YEAR],
-                                selectedDateTime[Calendar.HOUR_OF_DAY],
-                                selectedDateTime[Calendar.MINUTE]
-                            )
                             onCloseRequest()
                         },
                         colors = buttonColors(
@@ -154,13 +148,18 @@ fun DateTimePickerModalView(
                         )
                     ) {
                         Text(
-                            text = MainRes.string.apply_date_time_for_booking,
+                            text = SimpleDateFormat("dd MMMM HH:mm").format(currentDate.time), /*MainRes.string.apply_date_time_for_booking*/
                             style = header8,
                             color = LocalCustomColorsPalette.current.primaryTextAndIcon,
                         )
                     }
                 }
             }
+        }
+    }
+    LaunchedEffect(epicDatePickerState.selectedDates) {
+        if (epicDatePickerState.selectedDates.isNotEmpty()) {
+            onChangeDate(epicDatePickerState.selectedDates.first())
         }
     }
 }

@@ -1,7 +1,8 @@
 package band.effective.office.tablet.ui.freeSelectRoom.store
 
 import band.effective.office.network.model.Either
-import band.effective.office.tablet.domain.CurrentEventController
+import band.effective.office.tablet.domain.model.EventInfo
+import band.effective.office.tablet.domain.useCase.CancelUseCase
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -12,8 +13,11 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class FreeSelectStoreFactory(private val storeFactory: StoreFactory) : KoinComponent {
-    val currentEventController: CurrentEventController by inject()
+class FreeSelectStoreFactory(
+    private val storeFactory: StoreFactory,
+    private val eventInfo: EventInfo
+) : KoinComponent {
+    val cancelUseCase: CancelUseCase by inject()
 
     @OptIn(ExperimentalMviKotlinApi::class)
     fun create(): FreeSelectStore =
@@ -29,8 +33,8 @@ class FreeSelectStoreFactory(private val storeFactory: StoreFactory) : KoinCompo
     private sealed interface Message {
         object Success : Message
         object Load : Message
-        object Fail:Message
-        object Reset: Message
+        object Fail : Message
+        object Reset : Message
     }
 
     private inner class ExecutorImpl() :
@@ -51,12 +55,11 @@ class FreeSelectStoreFactory(private val storeFactory: StoreFactory) : KoinCompo
 
         private fun freeRoom() = scope.launch() {
             dispatch(Message.Load)
-            if (currentEventController.cancelCurrentEvent() is Either.Success) {
+            if (cancelUseCase(eventInfo) is Either.Success) {
                 publish(FreeSelectStore.Label.Close)
                 dispatch(Message.Success)
                 dispatch(Message.Reset)
-            }
-            else dispatch(Message.Fail)
+            } else dispatch(Message.Fail)
         }
     }
 

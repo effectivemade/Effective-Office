@@ -14,4 +14,5 @@ expect fun pickTelegram(telegramNick: String)
 expect fun pickSBP(phoneNumber: String)
 
 internal expect fun ComponentRegistryBuilder.setupDefaultComponents()
+
 internal expect fun getImageCacheDirectoryPath(): Path

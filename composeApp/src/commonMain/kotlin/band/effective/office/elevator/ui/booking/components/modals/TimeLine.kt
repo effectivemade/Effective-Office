@@ -25,11 +25,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.ExtendedThemeColors
+import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.common.compose.components.GrayText
 import band.effective.office.elevator.utils.MonthLocalizations
 import band.effective.office.elevator.utils.capitalizeFirstLetter
 import band.effective.office.elevator.utils.convertDateTimeToUiDateString
 import band.effective.office.elevator.utils.convertTimeToString
+import dev.icerock.moko.resources.compose.stringResource
 import epicarchitect.calendar.compose.basis.localized
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -102,7 +104,7 @@ private fun SingleTimeLine(
 
     if (selectTimeActive) {
         Text(
-            text = "c ${convertTimeToString(startTime)}",
+            text = stringResource(MainRes.strings.from_date, convertTimeToString(startTime)),
             modifier = Modifier.clickable { if (selectTimeActive) onPickStartTime() },
             style = MaterialTheme.typography.button.copy(
                 fontWeight = FontWeight(
@@ -113,7 +115,7 @@ private fun SingleTimeLine(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "до ${convertTimeToString(endTime)}",
+            text = stringResource(MainRes.strings.to_date, convertTimeToString(endTime)),
             modifier = Modifier.clickable { if (selectTimeActive) onPickEndTime() },
             style = MaterialTheme.typography.button.copy(
                 fontWeight = FontWeight(
@@ -124,7 +126,7 @@ private fun SingleTimeLine(
         )
     } else {
         GrayText(
-            text = "c ${convertTimeToString(startTime)}",
+            text = stringResource(MainRes.strings.from_date, convertTimeToString(startTime)),
             style = MaterialTheme.typography.button.copy(
                 fontWeight = FontWeight(
                     weight = 400
@@ -133,7 +135,7 @@ private fun SingleTimeLine(
         )
         Spacer(modifier = Modifier.width(8.dp))
         GrayText(
-            text = "до ${convertTimeToString(endTime)}",
+            text = stringResource(MainRes.strings.to_date, convertTimeToString(endTime)),
             style = MaterialTheme.typography.button.copy(
                 fontWeight = FontWeight(
                     weight = 400
@@ -171,7 +173,7 @@ private fun NonSingleTimeLine(
         Row {
             if (selectTimeActive) {
                 Text(
-                    text = "c ${convertTimeToString(startTime)}",
+                    text = stringResource(MainRes.strings.from_date, convertTimeToString(startTime)),
                     modifier = Modifier.clickable { if (selectTimeActive) onPickStartTime() },
                     style = MaterialTheme.typography.button.copy(
                         fontWeight = FontWeight(
@@ -182,7 +184,7 @@ private fun NonSingleTimeLine(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "до ${convertTimeToString(endTime)}",
+                    text = stringResource(MainRes.strings.to_date, convertTimeToString(endTime)),
                     modifier = Modifier.clickable { if (selectTimeActive) onPickEndTime() },
                     style = MaterialTheme.typography.button.copy(
                         fontWeight = FontWeight(
@@ -193,7 +195,7 @@ private fun NonSingleTimeLine(
                 )
             } else {
                 GrayText(
-                    text = "c ${convertTimeToString(startTime)}",
+                    text = stringResource(MainRes.strings.from_date, convertTimeToString(startTime)),
                     style = MaterialTheme.typography.button.copy(
                         fontWeight = FontWeight(
                             weight = 400
@@ -202,7 +204,7 @@ private fun NonSingleTimeLine(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 GrayText(
-                    text = "до ${convertTimeToString(endTime)}",
+                    text = stringResource(MainRes.strings.to_date, convertTimeToString(endTime)),
                     style = MaterialTheme.typography.button.copy(
                         fontWeight = FontWeight(
                             weight = 400

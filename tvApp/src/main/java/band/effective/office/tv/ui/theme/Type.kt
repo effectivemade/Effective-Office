@@ -17,9 +17,9 @@ val drukLCGWideMedium = FontFamily(Font(R.font.druktextwidelcg_medium))
 val Typography = Typography(
     defaultFontFamily = robotoFontFamily(),
     body1 = TextStyle(
-        fontFamily = robotoFontFamily(),
+        fontFamily = interFontFamily(),
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = 14.sp
     ),
     button = TextStyle(
         fontFamily = FontFamily.Default,
@@ -39,7 +39,7 @@ val Typography = Typography(
     h2 = TextStyle(
         fontFamily = robotoFontFamily(),
         fontWeight = FontWeight.Normal,
-        fontSize = 19.sp,
+        fontSize = 14.sp,
         color = Color.Black
     ),
     h3 = TextStyle(
@@ -51,9 +51,17 @@ val Typography = Typography(
 
 fun robotoFontFamily(): FontFamily =
     FontFamily(
-        Font(R.font.roboto_black),
+        Font(R.font.roboto_black, weight = FontWeight.Normal),
         Font(R.font.roboto_bold, weight = FontWeight.Bold),
         Font(R.font.roboto_light, weight = FontWeight.Light),
         Font(R.font.roboto_thin, weight = FontWeight.Thin),
         Font(R.font.roboto_italic, weight = FontWeight.Normal, style = FontStyle.Italic)
+    )
+
+fun interFontFamily(): FontFamily =
+    FontFamily(
+        Font(R.font.inter_black),
+        Font(R.font.inter_bold, weight = FontWeight.Bold),
+        Font(R.font.inter_light, weight = FontWeight.Light),
+        Font(R.font.inter_thin, weight = FontWeight.Thin)
     )

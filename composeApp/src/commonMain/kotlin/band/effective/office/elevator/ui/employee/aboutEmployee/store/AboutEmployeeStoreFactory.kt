@@ -212,8 +212,9 @@ class AboutEmployeeStoreFactory(
         ) {
             if (dates.isEmpty()) return
 
-            val beginDate = dates.first()
-            val endDate = dates.last()
+            val sortedDates = dates.sorted()
+            val beginDate = sortedDates.first()
+            val endDate = sortedDates.last()
 
             val beginDateTime = LocalDateTime(date = beginDate, time = LocalTime.Min)
             val endDateTime = LocalDateTime(date = endDate, time = LocalTime.Max)

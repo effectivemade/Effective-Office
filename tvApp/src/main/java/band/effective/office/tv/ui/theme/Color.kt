@@ -18,3 +18,8 @@ object IndependentColors {
     val StoryIndicatorGray = Color (0xFFB6B6B6)
     val StoryActiviteIndicatorGray = Color(0XFF979797)
 }
+
+object EffectiveColor{
+    val orange = Color(0xFFFE7B1C)
+    val purple = Color(0xFF5800CB)
+}

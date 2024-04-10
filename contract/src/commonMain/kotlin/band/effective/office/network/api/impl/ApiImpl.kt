@@ -10,6 +10,7 @@ import band.effective.office.network.dto.WorkspaceZoneDTO
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.utils.KtorEtherClient
+import band.effective.office.utils.buildUtils.params
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.appendPathSegments
@@ -27,7 +28,7 @@ class ApiImpl : Api {
 
     /**KtorEitherClient for safe request*/
     private val client = KtorEtherClient
-    private val baseUrl: String = "https://d5do2upft1rficrbubot.apigw.yandexcloud.net"
+    private val baseUrl: String = params().serverUrl
     override suspend fun getWorkspace(id: String): Either<ErrorResponse, WorkspaceDTO> =
         with(getWorkspaces("meeting")) {
             when (this) {
@@ -113,12 +114,22 @@ class ApiImpl : Api {
             }
         }
 
-    override suspend fun getBookingsByWorkspaces(workspaceId: String): Either<ErrorResponse, List<BookingDTO>> =
+    override suspend fun getBookingsByWorkspaces(
+        workspaceId: String,
+        from: Long?,
+        to: Long?
+    ): Either<ErrorResponse, List<BookingDTO>> =
         client.securityResponse(
             urlString = "$baseUrl/bookings",
         ) {
             url {
                 parameters.append("workspace_id", workspaceId)
+                if (from != null) {
+                    parameters.append("range_from", from.toString())
+                }
+                if (to != null) {
+                    parameters.append("range_to", to.toString())
+                }
             }
         }
 

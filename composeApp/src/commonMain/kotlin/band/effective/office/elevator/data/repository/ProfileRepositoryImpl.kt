@@ -48,7 +48,7 @@ class ProfileRepositoryImpl(
             bdSource.update(newUser)
             lastResponse.update { requestResult }
         }
-        val dateForEmit = bdSource.getCurrentUserInfo()!!.packageEither(requestResult)
+        val dateForEmit = bdSource.getCurrentUserInfo().packageEither(requestResult)
         emit(dateForEmit)
     }
 
@@ -65,12 +65,12 @@ class ProfileRepositoryImpl(
         else {
             val requestResult = api.getUser(cashedUser.id).convert(lastResponse.value)
             val userFromApi = requestResult.getData()
-            println("User : ${userFromApi}")
             if (userFromApi != null && userFromApi != cashedUser) {
                 bdSource.update(userFromApi)
                 lastResponse.update { requestResult }
             }
-            val dateForEmit = bdSource.getCurrentUserInfo()!!.packageEither(requestResult)
+
+            val dateForEmit = bdSource.getCurrentUserInfo().packageEither(requestResult)
             emit(dateForEmit)
         }
     }
@@ -81,9 +81,9 @@ class ProfileRepositoryImpl(
             is Either.Success -> data
         }
 
-    private fun User.packageEither(apiResponse: Either<ErrorWithData<User>, User>) =
+    private fun User?.packageEither(apiResponse: Either<ErrorWithData<User>, User>) =
         when (apiResponse) {
-            is Either.Success -> Either.Success(this)
+            is Either.Success -> Either.Success(this?:apiResponse.data)
             is Either.Error -> Either.Error(
                 ErrorWithData(
                     error = apiResponse.error.error,

@@ -30,5 +30,5 @@ fun Application.module() {
     configureValidation()
     configureExceptionHandling()
     configureSwagger()
-    install(VerificationPlugin)
+    install(CustomAuthorizationPlugin)
 }

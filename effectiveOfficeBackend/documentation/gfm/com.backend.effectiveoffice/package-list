@@ -248,20 +248,20 @@ $dokka.location:office.effective.features.calendar.repository/CalendarIdsReposit
 $dokka.location:office.effective.features.calendar.repository/CalendarIdsRepository/findWorkspaceById/#kotlin.String/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.calendar.repository/-calendar-ids-repository/find-workspace-by-id.md
 $dokka.location:office.effective.features.notifications.routes////PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.notifications.routes/index.md
 $dokka.location:office.effective.features.notifications.routes//calendarNotificationsRouting/io.ktor.server.routing.Route#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.notifications.routes/calendar-notifications-routing.md
-$dokka.location:office.effective.features.simpleAuth.di////PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.di/index.md
-$dokka.location:office.effective.features.simpleAuth.di//authDiModule/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.di/auth-di-module.md
-$dokka.location:office.effective.features.simpleAuth.repository////PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/index.md
-$dokka.location:office.effective.features.simpleAuth.repository//apikeys/org.ktorm.database.Database#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/apikeys.md
-$dokka.location:office.effective.features.simpleAuth.repository/ApiKeyEntity.Companion///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-api-key-entity/-companion/index.md
-$dokka.location:office.effective.features.simpleAuth.repository/ApiKeyEntity///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-api-key-entity/index.md
-$dokka.location:office.effective.features.simpleAuth.repository/ApiKeyEntity/id/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-api-key-entity/id.md
-$dokka.location:office.effective.features.simpleAuth.repository/ApiKeyEntity/keyValue/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-api-key-entity/key-value.md
-$dokka.location:office.effective.features.simpleAuth.repository/ApiKeys///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-api-keys/index.md
-$dokka.location:office.effective.features.simpleAuth.repository/ApiKeys/id/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-api-keys/id.md
-$dokka.location:office.effective.features.simpleAuth.repository/ApiKeys/value/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-api-keys/value.md
-$dokka.location:office.effective.features.simpleAuth.repository/AuthRepository///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-auth-repository/index.md
-$dokka.location:office.effective.features.simpleAuth.repository/AuthRepository/AuthRepository/#org.ktorm.database.Database/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-auth-repository/-auth-repository.md
-$dokka.location:office.effective.features.simpleAuth.repository/AuthRepository/findApiKey/#kotlin.String/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.simpleAuth.repository/-auth-repository/find-api-key.md
+$dokka.location:office.effective.features.auth.di////PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.di/index.md
+$dokka.location:office.effective.features.auth.di//authDiModule/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.di/auth-di-module.md
+$dokka.location:office.effective.features.auth.repository////PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/index.md
+$dokka.location:office.effective.features.auth.repository//apikeys/org.ktorm.database.Database#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/apikeys.md
+$dokka.location:office.effective.features.auth.repository/ApiKeyEntity.Companion///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-api-key-entity/-companion/index.md
+$dokka.location:office.effective.features.auth.repository/ApiKeyEntity///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-api-key-entity/index.md
+$dokka.location:office.effective.features.auth.repository/ApiKeyEntity/id/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-api-key-entity/id.md
+$dokka.location:office.effective.features.auth.repository/ApiKeyEntity/keyValue/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-api-key-entity/key-value.md
+$dokka.location:office.effective.features.auth.repository/ApiKeys///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-api-keys/index.md
+$dokka.location:office.effective.features.auth.repository/ApiKeys/id/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-api-keys/id.md
+$dokka.location:office.effective.features.auth.repository/ApiKeys/value/#/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-api-keys/value.md
+$dokka.location:office.effective.features.auth.repository/AuthRepository///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-auth-repository/index.md
+$dokka.location:office.effective.features.auth.repository/AuthRepository/AuthRepository/#org.ktorm.database.Database/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-auth-repository/-auth-repository.md
+$dokka.location:office.effective.features.auth.repository/AuthRepository/findApiKey/#kotlin.String/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.auth.repository/-auth-repository/find-api-key.md
 $dokka.location:office.effective.features.user.converters////PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.user.converters/index.md
 $dokka.location:office.effective.features.user.converters/IntegrationDTOModelConverter///PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.user.converters/-integration-d-t-o-model-converter/index.md
 $dokka.location:office.effective.features.user.converters/IntegrationDTOModelConverter/IntegrationDTOModelConverter/#office.effective.common.utils.UuidValidator/PointingToDeclaration/com.backend.effectiveoffice/office.effective.features.user.converters/-integration-d-t-o-model-converter/-integration-d-t-o-model-converter.md
@@ -569,8 +569,8 @@ office.effective.features.booking.routes
 office.effective.features.booking.service
 office.effective.features.calendar.repository
 office.effective.features.notifications.routes
-office.effective.features.simpleAuth.di
-office.effective.features.simpleAuth.repository
+office.effective.features.auth.di
+office.effective.features.auth.repository
 office.effective.features.user
 office.effective.features.user.converters
 office.effective.features.user.di

@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -59,71 +57,61 @@ fun FreeSelectRoomView(
         LocalCustomColorsPalette.current.pressedPrimaryButton else MaterialTheme.colors.primary
 
     Dialog(
-        onDismissRequest = {
-            onCloseRequest()
-        }
+        onDismissRequest = { onCloseRequest() }
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                //.size(518.dp, 304.dp)
-                .fillMaxWidth(0.9f)
-                .fillMaxHeight(0.6f)
                 .clip(RoundedCornerShape(5))
                 .background(LocalCustomColorsPalette.current.elevationBackground),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-
-            Column(
-                modifier = Modifier.matchParentSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                Spacer(modifier = Modifier.height(30.dp))
-                CrossButtonView(
-                    Modifier.width(518.dp).padding(end = 42.dp),
-                    onDismissRequest = {
-                        onCloseRequest()
-                    }
-                )
-                Spacer(modifier = Modifier.height(30.dp))
-                Box(
-                    modifier = Modifier.padding(0.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Text(
-                        text = MainRes.string.free_select_room,
-                        style = MaterialTheme.typography.h4,
-                        color = LocalCustomColorsPalette.current.primaryTextAndIcon
-                    )
+            Spacer(modifier = Modifier.height(30.dp))
+            CrossButtonView(
+                Modifier.width(518.dp).padding(end = 42.dp),
+                onDismissRequest = {
+                    onCloseRequest()
                 }
-                Spacer(modifier = Modifier.height(30.dp))
-                Button(
-                    modifier = Modifier.size(290.dp, 64.dp),
-                    colors = ButtonDefaults.buttonColors(colorButton),
-                    shape = shape,
-                    onClick = {
-                        isPressed.value = !isPressed.value
-                        onFreeRoomRequest()
-                    }
-                ) {
-                    Box(contentAlignment = Alignment.Center)
-                    {
-                        when {
-                            isLoading -> Loader()
-                            isFail -> Text(
-                                text = MainRes.string.try_again,
-                                style = MaterialTheme.typography.h6,
-                                color = textButton,
-                            )
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+            Box(
+                modifier = Modifier.padding(0.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = MainRes.string.free_select_room,
+                    style = MaterialTheme.typography.h4,
+                    color = LocalCustomColorsPalette.current.primaryTextAndIcon
+                )
+            }
+            Spacer(modifier = Modifier.height(30.dp))
+            Button(
+                modifier = Modifier.size(290.dp, 64.dp),
+                colors = ButtonDefaults.buttonColors(colorButton),
+                shape = shape,
+                onClick = {
+                    isPressed.value = !isPressed.value
+                    onFreeRoomRequest()
+                }
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    when {
+                        isLoading -> Loader()
+                        isFail -> Text(
+                            text = MainRes.string.try_again,
+                            style = MaterialTheme.typography.h6,
+                            color = textButton,
+                        )
 
-                            else -> Text(
-                                text = MainRes.string.free_select_room_button,
-                                style = MaterialTheme.typography.h6,
-                                color = textButton,
-                            )
-                        }
+                        else -> Text(
+                            text = MainRes.string.free_select_room_button,
+                            style = MaterialTheme.typography.h6,
+                            color = textButton,
+                        )
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(60.dp))
         }
     }
 }

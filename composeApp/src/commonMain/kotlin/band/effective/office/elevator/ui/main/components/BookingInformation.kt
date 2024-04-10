@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.ui.models.ReservedSeat
+import band.effective.office.elevator.utils.getCurrentDate
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -15,7 +16,7 @@ fun BookingInformation(
     reservedSeats: List<ReservedSeat>,
     beginDate: LocalDate,
     endDate: LocalDate?,
-    dateFiltrationOnReserves: Boolean,
+    currentDate: LocalDate = getCurrentDate(),
     onClickBook: () -> Unit,
     onClickOptionMenu: (String) -> Unit,
     onClickOpenCalendar: () -> Unit,
@@ -30,8 +31,7 @@ fun BookingInformation(
             onClickOpenCalendar = onClickOpenCalendar,
             onClickOpenBottomDialog = onClickOpenBottomDialog,
             beginDate = beginDate,
-            endDate = endDate,
-            dateFiltration = dateFiltrationOnReserves
+            endDate = endDate
         )
         Spacer(modifier = Modifier.height(24.dp))
         SeatsReservation(

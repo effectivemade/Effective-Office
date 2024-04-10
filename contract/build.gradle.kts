@@ -6,29 +6,25 @@ plugins {
     id(Plugins.Parcelize.plugin)
     id(Plugins.BuildConfig.plugin)
     id(Plugins.Serialization.plugin)
-}
-
-val apiKey: String = gradleLocalProperties(rootDir).getProperty("apiKey")
-buildConfig {
-    buildConfigField("String", "apiKey", apiKey)
+    id(Plugins.CocoaPods.plugin)
 }
 
 android {
     namespace = "band.effective.office.contract"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
     }
     sourceSets["main"].apply {
         manifest.srcFile("src/androidMain/AndroidManifest.xml")
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-
 }
 
 kotlin {
@@ -60,7 +56,7 @@ kotlin {
         }
 
         val androidMain by getting {
-            dependencies{
+            dependencies {
                 api(Dependencies.Ktor.Client.Android)
             }
         }
@@ -78,4 +74,24 @@ kotlin {
             }
         }
     }
+
+    cocoapods {
+        version = "2.0.0"
+    }
+
+}
+
+val apiKey: String = gradleLocalProperties(rootDir).getProperty("apiKey")
+buildConfig {
+    buildConfigField("String", "apiKey", apiKey)
+    buildConfigField(
+        "String",
+        "releaseServerUrl",
+        "\"https://d5do2upft1rficrbubot.apigw.yandexcloud.net\""
+    )
+    buildConfigField(
+        "String",
+        "debugServerUrl",
+        "\"https://d5dfk1qp766h8rfsjrdl.apigw.yandexcloud.net\""
+    )
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -11,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,7 +47,7 @@ fun BusyRoomInfoComponent(
     val colorButton = if (isPressed) roomInfoColor else correctBackgroundColor
     val colorTextButton = if (isPressed) correctBackgroundColor else roomInfoColor
 
-    Surface {
+    Column {
         CommonRoomInfoComponent(
             modifier = modifier,
             name = name,
@@ -57,7 +57,6 @@ fun BusyRoomInfoComponent(
             backgroundColor = backgroundColor,
             isError = isError
         ) {
-
             Text(
                 text = "${MainRes.string.room_occupancy_date.format(time = event.finishTime.time())} ${
                     if (timeToFinish > 0) MainRes.string.room_occupancy_time.format(
@@ -67,23 +66,23 @@ fun BusyRoomInfoComponent(
                 style = MaterialTheme.typography.h5,
                 color = roomInfoColor
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = event.organizer.fullName,
                 style = MaterialTheme.typography.h5,
                 color = roomInfoColor
             )
-            Spacer(modifier = Modifier.height(20.dp))
-
+            Spacer(modifier = Modifier.height(10.dp))
             Button(
                 modifier = Modifier
-                    .clip(shape = RoundedCornerShape(70.dp))
-                    .height(60.dp)
+                    .clip(shape = RoundedCornerShape(40.dp))
+                    .height(45.dp)
                     .width(150.dp)
-                    .background(color = backgroundColor).border(
+                    .background(color = backgroundColor)
+                    .border(
                         width = 3.dp,
                         color = roomInfoColor,
-                        shape = RoundedCornerShape(70.dp),
+                        shape = RoundedCornerShape(40.dp),
                     ),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = colorButton

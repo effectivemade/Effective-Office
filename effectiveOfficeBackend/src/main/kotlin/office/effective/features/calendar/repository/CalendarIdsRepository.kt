@@ -25,8 +25,6 @@ class CalendarIdsRepository(
 
     /**
      * @return String - id of calendar for specified workspace
-     *
-     * @author Danil Kiselev
      * */
     fun findByWorkspace(workspaceId: UUID): String {
         logger.debug("[findByWorkspace] retrieving a calendar id for workspace with id={}", workspaceId.toString())
@@ -38,7 +36,6 @@ class CalendarIdsRepository(
     /**
      * @param calendarId
      * @return [Workspace] model by calendar id (String)
-     * @author Danil Kiselev
      * */
     fun findWorkspaceById(calendarId: String): Workspace {
         logger.debug("[findWorkspaceById] retrieving a workspace with calendar id={}", calendarId)
@@ -59,16 +56,8 @@ class CalendarIdsRepository(
     /**
      * Finds all Google calendar ids
      * @return all calendar ids from database including default
-     * @author Danil Kiselev
      * */
     fun findAllCalendarsId(): List<String> {
-        val list = mutableListOf<String>()
-        list.add(
-            config.propertyOrNull("auth.app.defaultAppEmail")?.getString() ?: throw Exception(
-                "Config file does not contain default gmail value"
-            )
-        )
-        db.calendarIds.toList().forEach { list.add(it.calendarId) }
-        return list
+        return db.calendarIds.toList().map { it.calendarId }
     }
 }

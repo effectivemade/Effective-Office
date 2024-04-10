@@ -57,8 +57,6 @@ class AppActivity : ComponentActivity() {
                 componentContext = defaultComponentContext(),
                 storeFactory = DefaultStoreFactory(),
             )
-
-
         setContent {
             ContentView(rootComponent)
         }
