@@ -165,14 +165,15 @@ fun BookingMainContentScreen(
                         color = Color.Black,
                         fontWeight = FontWeight(500)
                     ),
-                    modifier = Modifier.weight(.45f)
+                    modifier = Modifier.weight(.4f)
                 )
-                Spacer(modifier = Modifier.weight(.1f))
+                Spacer(modifier = Modifier.weight(.2f))
 
                 when {
-                    isErrorLoadingWorkspaceZones -> WorkspaceZonesErrorButton(
+                    isErrorLoadingWorkspaceZones -> ErrorButton(
+                        purple_heart_600,
                         onClickWorkspaceZoneError,
-                        Modifier.weight(.45f)
+                        Modifier.weight(.4f)
                     )
                     isLoadingWorkspaceZones -> LinearProgressIndicator(
                         Modifier.width(64.dp),
@@ -186,7 +187,8 @@ fun BookingMainContentScreen(
             }
 
             when {
-                isErrorLoadingWorkspacesList -> WorkspacesErrorButton(
+                isErrorLoadingWorkspacesList -> ErrorButton(
+                    MaterialTheme.colors.primary,
                     onClickWorkspacesListError,
                     Modifier.fillMaxSize()
                 )
