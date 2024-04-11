@@ -2,8 +2,8 @@ package office.effective.features.booking.service
 
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
-import office.effective.features.booking.repository.BookingCalendarRepository
-import office.effective.features.booking.repository.BookingWorkspaceRepository
+import office.effective.features.booking.repository.BookingMeetingRepository
+import office.effective.features.booking.repository.BookingRegularRepository
 import office.effective.features.booking.repository.WorkspaceBookingEntity
 import office.effective.features.user.repository.UserEntity
 import office.effective.features.user.repository.UserRepository
@@ -16,12 +16,12 @@ import java.util.UUID
 /**
  * Class that implements the [IBookingService] methods
  *
- * Uses [BookingCalendarRepository] for operations with meeting rooms.
- * Uses [BookingWorkspaceRepository] for operations with workspaces.
+ * Uses [BookingMeetingRepository] for operations with meeting rooms.
+ * Uses [BookingRegularRepository] for operations with workspaces.
  */
 class BookingService(
-    private val bookingRepository: BookingCalendarRepository,
-    private val bookingWorkspaceRepository: BookingWorkspaceRepository,
+    private val bookingRepository: BookingMeetingRepository,
+    private val bookingWorkspaceRepository: BookingRegularRepository,
     private val userRepository: UserRepository,
     private val workspaceRepository: WorkspaceRepository,
 ) : IBookingService {

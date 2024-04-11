@@ -22,7 +22,7 @@ import java.util.*
  *
  * Filters out all events that have a start less than the calendar.minTime from application.conf
  */
-class BookingWorkspaceRepository(
+class BookingRegularRepository(
     private val calendar: Calendar,
     private val googleCalendarConverter: GoogleCalendarConverter,
     private val workspaceRepository: WorkspaceRepository,

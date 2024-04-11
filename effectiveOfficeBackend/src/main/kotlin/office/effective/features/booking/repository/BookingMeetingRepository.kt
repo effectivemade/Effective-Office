@@ -4,7 +4,6 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.Event
-import kotlinx.coroutines.*
 import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
@@ -25,7 +24,7 @@ import java.util.concurrent.Executors
  *
  * Filters out all events that have a start less than the calendar.minTime from application.conf
  */
-class BookingCalendarRepository(
+class BookingMeetingRepository(
     private val calendarIdsRepository: CalendarIdsRepository,
     private val userRepository: UserRepository,
     private val calendar: Calendar,
