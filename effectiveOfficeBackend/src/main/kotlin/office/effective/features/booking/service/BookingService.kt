@@ -56,6 +56,31 @@ class BookingService(
      * @return [Booking] with the given [id] or null if workspace with the given id doesn't exist
      * @author Daniil Zavyalov
      */
+    override fun findByIdV0(id: String): Booking? {
+        val booking = bookingRepository.findById(id)
+            ?: bookingWorkspaceRepository.findById(id)
+            ?: return null
+        val userIds = mutableSetOf<UUID>()
+        for (participant in booking.participants) {
+            participant.id?.let { userIds.add(it) }
+        }
+        booking.owner.id?.let { userIds.add(it) }
+        val integrations = userRepository.findAllIntegrationsByUserIds(userIds)
+        booking.workspace.utilities = findUtilities(booking.workspace)
+        booking.owner.integrations = integrations[booking.owner.id] ?: setOf()
+        for (participant in booking.participants) {
+            participant.integrations = integrations[participant.id] ?: setOf()
+        }
+        return booking
+    }
+
+    /**
+     * Retrieves a booking model by its id
+     *
+     * @param id - booking id
+     * @return [Booking] with the given [id] or null if workspace with the given id doesn't exist
+     * @author Daniil Zavyalov
+     */
     override fun findById(id: String): Booking? {
         val booking = bookingRepository.findById(id)
             ?: bookingWorkspaceRepository.findById(id)
