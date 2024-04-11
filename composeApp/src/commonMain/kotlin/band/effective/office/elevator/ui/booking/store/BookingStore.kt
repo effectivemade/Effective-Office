@@ -2,14 +2,12 @@ package band.effective.office.elevator.ui.booking.store
 
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.domain.models.BookingPeriod
-import band.effective.office.elevator.domain.models.CreatingBookModel
 import band.effective.office.elevator.domain.models.TypeEndPeriodBooking
-import band.effective.office.elevator.ui.booking.models.MockDataSpaces
 import band.effective.office.elevator.ui.booking.models.WorkSpaceType
 import band.effective.office.elevator.ui.booking.models.WorkSpaceUI
 import band.effective.office.elevator.ui.booking.models.WorkspaceZoneUI
+import band.effective.office.elevator.ui.booking.models.WorkspacesList
 import band.effective.office.elevator.ui.booking.models.sheetData.SelectedBookingPeriodState
-import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookPeriod.BookPeriodSheetComponent
 import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookPeriod.store.BookPeriodStore
 import band.effective.office.elevator.ui.models.TypesList
 import band.effective.office.elevator.utils.getCurrentDate
@@ -17,7 +15,6 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.commandiron.wheel_picker_compose.utils.getCurrentTime
 import dev.icerock.moko.resources.StringResource
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 
 interface BookingStore : Store<BookingStore.Intent, BookingStore.State, BookingStore.Label> {
@@ -39,6 +36,10 @@ interface BookingStore : Store<BookingStore.Intent, BookingStore.State, BookingS
         data class ApplyBookingPeriodFromSheet (val selectedState: SelectedBookingPeriodState) : Intent
 
         data class HandleLabelFromBookingPeriodSheet(val label: BookPeriodStore.Label) : Intent
+
+        data object ReloadWorkspacesList : Intent
+
+        data object ReloadWorkspaceZones : Intent
     }
 
     data class State(
@@ -47,7 +48,7 @@ interface BookingStore : Store<BookingStore.Intent, BookingStore.State, BookingS
         val currentDate: LocalDate,
         val workSpacesType: WorkSpaceType,
         val currentWorkspaceZones: List<WorkspaceZoneUI>,
-        val allZonesList: List<WorkspaceZoneUI>,
+        val allZonesList: WorkspacesList,
         val selectedStartDate: LocalDate,
         val selectedStartTime: LocalTime,
         val selectedFinishTime: LocalTime,
@@ -57,17 +58,20 @@ interface BookingStore : Store<BookingStore.Intent, BookingStore.State, BookingS
         val selectedType: TypesList,
         val selectedSeatName: String,
         val selectedWorkspaceId: String,
+        val isErrorLoadingWorkspacesList: Boolean,
         val isLoadingListWorkspaces: Boolean,
+        val isErrorLoadingWorkspaceZones: Boolean,
+        val isLoadingWorkspaceZones: Boolean,
         val typeOfEnd: TypeEndPeriodBooking,
         val dateOfEndPeriod: LocalDate,
     ) {
         companion object {
             val initState = State(
-                workSpaces = MockDataSpaces.workSpacesUI,
-                workSpacesAll = MockDataSpaces.workSpacesUI,
+                workSpaces = listOf(),
+                workSpacesAll = listOf(),
                 currentDate = getCurrentDate(),
                 workSpacesType = WorkSpaceType.WORK_PLACE,
-                currentWorkspaceZones = MockDataSpaces.allBookingZone,
+                currentWorkspaceZones = listOf(),
                 selectedStartDate = getCurrentDate(),
                 selectedStartTime = getCurrentTime(),
                 selectedFinishTime = getCurrentTime(),
@@ -82,9 +86,12 @@ interface BookingStore : Store<BookingStore.Intent, BookingStore.State, BookingS
                 selectedFinishDate = getCurrentDate(),
                 selectedWorkspaceId = "",
                 isLoadingListWorkspaces = true,
+                isLoadingWorkspaceZones = false,
+                isErrorLoadingWorkspaceZones = false,
+                isErrorLoadingWorkspacesList = false,
                 typeOfEnd = TypeEndPeriodBooking.CountRepeat(1),
                 dateOfEndPeriod = getCurrentDate(),
-                allZonesList = listOf(),
+                allZonesList = WorkspacesList(workspaces = mapOf()),
             )
         }
     }

@@ -21,10 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,21 +37,21 @@ import dev.icerock.moko.resources.compose.stringResource
 @Composable
 fun ChooseZone(
     sheetTile: String,
-    workSpacecZone: List<WorkspaceZoneUI>,
+    workSpacesZone: List<WorkspaceZoneUI>,
     onClickCloseChoseZone: () -> Unit,
     onClickConfirmSelectedZone: () -> Unit,
     onClickZone: (WorkspaceZoneUI) -> Unit
 ) {
     val countItemsInRow = 2
     val selectedZones: MutableList<WorkspaceZoneUI> = mutableListOf()
-    selectedZones.addAll(workSpacecZone)
+    selectedZones.addAll(workSpacesZone)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
     ) {
-        Spacer(modifier = Modifier.padding(vertical = 10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Divider(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
@@ -66,10 +62,13 @@ fun ChooseZone(
                     shape = RoundedCornerShape(size = 16.dp)
                 )
                 .padding(
-                    bottom = 8.dp
+                    vertical = 8.dp
                 )
         )
-        Row(modifier = Modifier.padding(top = 10.dp, start = 16.dp, end = 16.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp)
+        ) {
             IconButton(
                 onClick = onClickCloseChoseZone,
                 modifier = Modifier
@@ -78,16 +77,11 @@ fun ChooseZone(
                 Icon(
                     imageVector = Icons.Rounded.Close,
                     contentDescription = "Krestik",
-                    tint = Color.Black
                 )
             }
             Text(
                 text = sheetTile,
-                style = MaterialTheme.typography.subtitle1,
-                fontSize = 20.sp,
-                fontWeight = FontWeight(600),
-                color = Color.Black,
-                modifier = Modifier.padding(vertical = 10.dp)
+                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight(500)),
             )
         }
         Divider(
@@ -104,7 +98,7 @@ fun ChooseZone(
         HorizontalGirdItems(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             countItemsInRow = countItemsInRow,
-            listItems = workSpacecZone,
+            listItems = workSpacesZone,
             horizontalPaddingContent = 12.dp,
             verticalPaddingContent = 12.dp
         ) { workSpaceZone, _, _ ->

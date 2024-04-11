@@ -50,7 +50,7 @@ class BookingInteract(
         createBookingUseCase.execute(creatingBookModel = creatingBookModel)
 
 
-    suspend fun getZones() = workspaceUseCase.getZones()
+    suspend fun getZones() = workspaceUseCase.getAllWorkspaces()
 
 
     suspend fun getWorkspaces(
@@ -81,10 +81,12 @@ class BookingInteract(
             }
         }
 
+    // TODO: Переписать с использльзованием id вместо имени для фильтрации
     fun filterWorkspacesList(
         workspaces: List<WorkSpaceUI>,
         zones: List<WorkspaceZoneUI>
     ) : List<WorkSpaceUI> {
+        Napier.d{ "Zones: $zones"}
         val selectedZones = zones.filter { it.isSelected }
         return workspaces.filter { workspaces ->
             selectedZones.count { zone -> zone.name == workspaces.zoneName } > 0

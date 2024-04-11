@@ -2,10 +2,10 @@ package band.effective.office.elevator.ui.booking.store
 
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.domain.entity.BookingInteract
-import band.effective.office.elevator.ui.booking.models.MockDataSpaces
 import band.effective.office.elevator.ui.booking.models.WorkSpaceType
 import band.effective.office.elevator.ui.booking.models.WorkSpaceUI
 import band.effective.office.elevator.ui.booking.models.WorkspaceZoneUI
+import band.effective.office.elevator.ui.booking.models.WorkspacesList
 import band.effective.office.elevator.ui.booking.models.sheetData.SelectedBookingPeriodState
 import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookPeriod.store.BookPeriodStore
 import band.effective.office.elevator.ui.models.TypesList
@@ -48,7 +48,7 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
 
     private sealed interface Msg {
 
-        data class UpdateAllZones(val zones: List<WorkspaceZoneUI>) : Msg
+        data class UpdateAllZones(val zones: WorkspacesList) : Msg
 
         data class SelectedTypeList(val type: TypesList) : Msg
 
@@ -58,7 +58,9 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
 
         data class UpdateSelectedWorkspace(val workspaceId: String, val seatName: String) : Msg
 
-        data class ChangeLoadingWorkspace(val isLoading: Boolean) : Msg
+        data class ChangeLoadingWorkspace(val isLoading: Boolean, val isError: Boolean) : Msg
+
+        data class ChangeLoadingWorkspaceZones(val isLoading: Boolean, val isError: Boolean) : Msg
 
         data class UpdateSelectedBookingPeriodState(val selectedSate: SelectedBookingPeriodState) :
             Msg
@@ -131,10 +133,8 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
 
                 is BookingStore.Intent.ChangeSelectedType -> {
 
-                    val zones = when (intent.selectedType.type) {
-                        WorkSpaceType.WORK_PLACE -> getState().allZonesList
-                        WorkSpaceType.MEETING_ROOM -> MockDataSpaces.allMeetingRooms
-                    }
+                    val zones = getState().allZonesList.workspaces[intent.selectedType.type]?: listOf()
+
                     scope.launch {
                         val state = getState()
                         getSpacesUI(
@@ -176,6 +176,26 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
 
                 is BookingStore.Intent.HandleLabelFromBookingPeriodSheet ->
                     handleLabelFromBookingPeriodSheet(intent.label)
+
+                is BookingStore.Intent.ReloadWorkspaceZones -> scope.launch {
+                    initZones()
+                }
+
+                is BookingStore.Intent.ReloadWorkspacesList -> scope.launch {
+                    val state = getState()
+                    getSpacesUI(
+                        workspaceZoneUI = state.currentWorkspaceZones,
+                        selectedStartTime = state.selectedStartTime,
+                        selectedFinishDate = state.selectedFinishDate,
+                        selectedStartDate = state.selectedStartDate,
+                        selectedFinishTime = state.selectedFinishTime,
+                        workSpacesType = state.workSpacesType,
+                        dispatch = {
+                            dispatch(Msg.UpdateAllWorkspaceList(it))
+                            dispatch(Msg.ChangeWorkSpacesUI(it))
+                        }
+                    )
+                }
             }
         }
 
@@ -211,17 +231,23 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
             }
         }
         private suspend fun initZones() {
+
+            dispatch(Msg.ChangeLoadingWorkspaceZones(true, isError = false))
+
             withContext(Dispatchers.IO) {
                 bookingInteract.getZones().collect { zonesResponse ->
                     withContext(Dispatchers.Main) {
                         when (zonesResponse) {
                             is Either.Success -> {
-                                val zones: List<WorkspaceZoneUI> = zonesResponse.data
+                                val zones: WorkspacesList = zonesResponse.data
+                                dispatch(Msg.ChangeLoadingWorkspaceZones(false, isError = false))
                                 dispatch(Msg.UpdateAllZones(zones = zones))
                             }
 
                             is Either.Error -> {
-                                //TODO(Artem Gruzdev) schedule error
+                                dispatch(Msg.ChangeLoadingWorkspaceZones(false, isError = true))
+                                publish(BookingStore.Label.ShowToast(zonesResponse.error.message.toString()))
+                                Napier.e { zonesResponse.error.message.toString() }
                             }
                         }
                     }
@@ -245,7 +271,7 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
             dispatch: (List<WorkSpaceUI>) -> Unit,
         ) {
 
-            dispatch(Msg.ChangeLoadingWorkspace(isLoading = true))
+            dispatch(Msg.ChangeLoadingWorkspace(isLoading = true, false))
 
             withContext(Dispatchers.IO) {
                 bookingInteract.getWorkspaces(
@@ -264,12 +290,13 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
                         when (response) {
                             is Either.Success -> {
                                 dispatch(response.data)
-                                dispatch(Msg.ChangeLoadingWorkspace(false))
+                                dispatch(Msg.ChangeLoadingWorkspace(false, isError = false))
                             }
 
                             is Either.Error -> {
                                 dispatch(listOf())
-                                // TODO SHOW ERROR ON UI
+                                publish(BookingStore.Label.ShowToast(response.error.error.description))
+                                dispatch(Msg.ChangeLoadingWorkspace(false, isError = true))
                             }
                         }
                     }
@@ -300,10 +327,18 @@ class BookingStoreFactory(private val storeFactory: StoreFactory) : KoinComponen
                         selectedSeatName = msg.seatName
                     )
 
-                is Msg.ChangeLoadingWorkspace -> copy(isLoadingListWorkspaces = msg.isLoading)
+                is Msg.ChangeLoadingWorkspace -> copy(
+                    isLoadingListWorkspaces = msg.isLoading,
+                    isErrorLoadingWorkspacesList = msg.isError
+                )
+
+                is Msg.ChangeLoadingWorkspaceZones -> copy(
+                    isLoadingWorkspaceZones = msg.isLoading,
+                    isErrorLoadingWorkspaceZones = msg.isError
+                )
 
                 is Msg.UpdateAllZones -> copy(
-                    currentWorkspaceZones = msg.zones,
+                    currentWorkspaceZones = msg.zones.workspaces[workSpacesType]?: listOf(),
                     allZonesList = msg.zones
                 )
 

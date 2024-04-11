@@ -5,20 +5,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.bottomSheet.ChildSlotModalBottomSheetLayout
 import band.effective.office.elevator.domain.models.BookingPeriod
 import band.effective.office.elevator.domain.models.TypeEndPeriodBooking
@@ -76,17 +71,30 @@ fun BookingScreen(bookingComponent: BookingComponent) {
                 },
                 selectedTypesList = state.selectedType,
                 isLoadingWorkspacesList = state.isLoadingListWorkspaces,
+                isLoadingWorkspaceZones = state.isLoadingWorkspaceZones,
+                isErrorLoadingWorkspaceZones = state.isErrorLoadingWorkspaceZones,
+                isErrorLoadingWorkspacesList = state.isErrorLoadingWorkspacesList,
                 typeOfTypeEndPeriodBooking = state.typeOfEnd,
                 bookingPeriod = state.bookingPeriod,
-
-                )
+                onClickWorkspaceZoneError = {
+                    bookingComponent.onEvent(BookingStore.Intent.ReloadWorkspaceZones)
+                },
+                onClickWorkspacesListError = {
+                    bookingComponent.onEvent(BookingStore.Intent.ReloadWorkspacesList)
+                }
+            )
         }
     }
 }
 
 @Composable
 private fun BookingScreenContent(
+    isLoadingWorkspaceZones: Boolean,
     isLoadingWorkspacesList: Boolean,
+    isErrorLoadingWorkspaceZones: Boolean,
+    isErrorLoadingWorkspacesList: Boolean,
+    onClickWorkspaceZoneError: () -> Unit,
+    onClickWorkspacesListError: () -> Unit,
     workSpaces: List<WorkSpaceUI>,
     onClickOpenBookPeriod: () -> Unit,
     onClickOpenChoseZone: () -> Unit,
@@ -134,6 +142,11 @@ private fun BookingScreenContent(
         repeatBooking = repeatBookings,
         onClickChangeSelectedType = onClickChangeSelectedType,
         selectedTypesList = selectedTypesList,
-        isLoadingWorkspacesList = isLoadingWorkspacesList
+        isLoadingWorkspacesList = isLoadingWorkspacesList,
+        isLoadingWorkspaceZones = isLoadingWorkspaceZones,
+        isErrorLoadingWorkspaceZones = isErrorLoadingWorkspaceZones,
+        isErrorLoadingWorkspacesList = isErrorLoadingWorkspacesList,
+        onClickWorkspaceZoneError = onClickWorkspaceZoneError,
+        onClickWorkspacesListError = onClickWorkspacesListError
     )
 }

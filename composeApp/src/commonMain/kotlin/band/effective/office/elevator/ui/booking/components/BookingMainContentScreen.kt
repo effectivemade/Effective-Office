@@ -3,20 +3,24 @@ package band.effective.office.elevator.ui.booking.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -33,16 +37,13 @@ import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.ExtendedColors.purple_heart_600
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.TitlePage
-import band.effective.office.elevator.ui.booking.models.WorkSpaceType
 import band.effective.office.elevator.ui.booking.models.WorkSpaceUI
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import band.effective.office.elevator.ExtendedColors._66x
-import band.effective.office.elevator.ExtendedColors.purple_heart_500
 import band.effective.office.elevator.components.LoadingIndicator
 import band.effective.office.elevator.domain.models.BookingPeriod
 import band.effective.office.elevator.domain.models.TypeEndPeriodBooking
-import band.effective.office.elevator.ui.booking.models.Frequency
 import band.effective.office.elevator.ui.models.TypesList
 import dev.icerock.moko.resources.StringResource
 import kotlinx.datetime.LocalDate
@@ -53,6 +54,9 @@ fun BookingMainContentScreen(
     scrollState: LazyListState,
     isExpandedCard: Boolean,
     isLoadingWorkspacesList: Boolean,
+    isLoadingWorkspaceZones: Boolean,
+    isErrorLoadingWorkspaceZones: Boolean,
+    isErrorLoadingWorkspacesList: Boolean,
     isExpandedOptions: Boolean,
     iconRotationStateCard: Float,
     iconRotationStateOptions: Float,
@@ -67,6 +71,8 @@ fun BookingMainContentScreen(
     typeEndPeriodBooking: TypeEndPeriodBooking,
     repeatBooking: StringResource,
     onClickChangeSelectedType: (TypesList) -> Unit,
+    onClickWorkspaceZoneError: () -> Unit,
+    onClickWorkspacesListError: () -> Unit,
     selectedTypesList: TypesList
 ) {
     Scaffold(
@@ -146,45 +152,51 @@ fun BookingMainContentScreen(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
+                    .defaultMinSize(minHeight = 64.dp)
+                    .wrapContentHeight()
                     .background(MaterialTheme.colors.onBackground)
                     .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.Top
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    modifier = Modifier.padding(top = 16.dp),
                     text = stringResource(MainRes.strings.suitable_options),
                     style = MaterialTheme.typography.subtitle1.copy(
                         color = Color.Black,
                         fontWeight = FontWeight(500)
-                    )
+                    ),
+                    modifier = Modifier.weight(.4f)
                 )
-                Spacer(modifier = Modifier.weight(.1f))
-                IconButton(
-                    onClick = onClickOpenChoseZone, modifier = Modifier.padding(top = 3.dp),
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(MainRes.images.icon_location),
-                            tint = purple_heart_500,
-                            contentDescription = null
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 8.dp),
-                            text = stringResource(MainRes.strings.select_zones),
-                            style = MaterialTheme.typography.subtitle1.copy(
-                                color = purple_heart_600,
-                                fontWeight = FontWeight(400)
-                            )
-                        )
-                    }
+                Spacer(modifier = Modifier.weight(.2f))
+
+                when {
+                    isErrorLoadingWorkspaceZones -> ErrorButton(
+                        purple_heart_600,
+                        onClickWorkspaceZoneError,
+                        Modifier.weight(.4f)
+                    )
+                    isLoadingWorkspaceZones -> LinearProgressIndicator(
+                        Modifier.width(64.dp),
+                        color = purple_heart_600
+                    )
+                    else -> ZonesSelectionButton(
+                        onClickOpenChoseZone,
+                        Modifier.padding(top = 3.dp)
+                    )
                 }
             }
-            when(isLoadingWorkspacesList) {
-                true -> LoadingIndicator()
+
+            when {
+                isErrorLoadingWorkspacesList -> ErrorButton(
+                    MaterialTheme.colors.primary,
+                    onClickWorkspacesListError,
+                    Modifier.fillMaxSize()
+                )
+                isLoadingWorkspacesList -> LoadingIndicator()
                 else -> WorkSpaceList(
                     workSpaces = workSpaces,
                     scrollState = scrollState,
-                    onClickOpenBookAccept = onClickOpenBookAccept,
+                    onClickOpenBookAccept = onClickOpenBookAccept
                 )
             }
         }

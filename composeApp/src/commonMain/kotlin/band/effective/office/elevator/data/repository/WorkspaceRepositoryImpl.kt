@@ -6,6 +6,7 @@ import band.effective.office.elevator.domain.models.WorkspaceZone
 import band.effective.office.elevator.domain.models.toDomainZone
 import band.effective.office.elevator.domain.models.toDomain
 import band.effective.office.elevator.domain.repository.WorkspaceRepository
+import band.effective.office.elevator.ui.booking.models.WorkSpaceType
 import band.effective.office.elevator.utils.localDateTimeToUnix
 import band.effective.office.elevator.utils.map
 import band.effective.office.network.api.Api
