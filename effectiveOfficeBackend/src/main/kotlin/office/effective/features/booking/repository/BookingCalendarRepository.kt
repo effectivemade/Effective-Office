@@ -348,7 +348,7 @@ class BookingCalendarRepository(
         val workspaceCalendar = calendarIdsRepository.findByWorkspace(
             booking.workspace.id ?: throw MissingIdException("Missing workspace id")
         )
-        val event = googleCalendarConverter.toGoogleEvent(booking)
+        val event = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
 
         val savedEvent = calendar.Events().insert(defaultCalendar, event).execute()
         if (checkBookingAvailable(savedEvent, workspaceCalendar)) {
@@ -383,7 +383,7 @@ class BookingCalendarRepository(
             WorkspaceBookingEntity::class, "Booking with id $bookingId not wound"
         )
         logger.trace("[update] previous version of event: {}", previousVersionOfEvent)
-        val eventOnUpdate = googleCalendarConverter.toGoogleEvent(booking)
+        val eventOnUpdate = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
 
         val updatedEvent: Event = calendarEvents.update(defaultCalendar, bookingId, eventOnUpdate).execute()
 

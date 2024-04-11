@@ -1,7 +1,12 @@
 package office.effective.features.booking.converters
 
 import model.RecurrenceDTO
+import office.effective.common.constants.BookingConstants
+import office.effective.model.Ending
+import office.effective.model.Recurrence
 import office.effective.model.RecurrenceModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 //TODO: all converters should be classes
 /**
@@ -42,5 +47,24 @@ object RecurrenceConverter {
         return RecurrenceModel(
             dto.interval, dto.freq, dto.count, dto.until, dto.byDay, dto.byMonth, dto.byYearDay, dto.byHour
         )
+    }
+
+    fun recurrenceToModel(recurrence: Recurrence): RecurrenceModel {
+        return RecurrenceModel(
+            interval =recurrence.interval,
+            freq =recurrence.freq.toString(),
+            count = if (recurrence.ending is Ending.Count) recurrence.ending.value else null,
+            until = if (recurrence.ending is Ending.Until) parseUntil(recurrence.ending.value) else null,
+            byDay = recurrence.byDay,
+            byMonth = recurrence.byMonth,
+            byYearDay = recurrence.byYearDay,
+            byHour = recurrence.byHour
+        )
+    }
+
+    private fun parseUntil(untilStr: String): Long {
+        val date: Date = SimpleDateFormat(BookingConstants.UNTIL_FORMAT).parse(untilStr)
+        println("UNTIL: $untilStr")
+        return date.time
     }
 }
