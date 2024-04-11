@@ -7,6 +7,7 @@ import office.effective.common.utils.DatabaseTransactionManager
 import office.effective.common.utils.UuidValidator
 import office.effective.features.booking.converters.BookingFacadeConverter
 import office.effective.dto.BookingDTO
+import office.effective.dto.BookingResponseDTO
 import office.effective.model.Booking
 import office.effective.model.Workspace
 import office.effective.serviceapi.IBookingService
@@ -40,15 +41,15 @@ class BookingFacadeV1(
      * Retrieves a booking model by its id
      *
      * @param id id of requested booking
-     * @return [BookingDTO] with the given id
+     * @return [BookingResponseDTO] with the given id
      * @throws InstanceNotFoundException if booking with the given id doesn't exist in database
      * @author Daniil Zavyalov
      */
-    fun findById(id: String): BookingDTO {
-        val dto: BookingDTO = transactionManager.useTransaction({
+    fun findById(id: String): BookingResponseDTO {
+        val dto: BookingResponseDTO = transactionManager.useTransaction({
             val model = bookingService.findById(id)
                 ?: throw InstanceNotFoundException(Workspace::class, "Booking with id $id not found")
-            bookingConverter.modelToDto(model)
+            bookingConverter.modelToResponseDto(model)
         })
         return dto
     }
@@ -70,7 +71,7 @@ class BookingFacadeV1(
         workspaceId: String?,
         bookingRangeTo: Long?,
         bookingRangeFrom: Long = BookingConstants.MIN_SEARCH_START_TIME
-    ): List<BookingDTO> {
+    ): List<BookingResponseDTO> {
         if (bookingRangeTo != null && bookingRangeTo <= bookingRangeFrom) {
             throw BadRequestException("Max booking start time should be null or greater than min start time")
         }
@@ -82,8 +83,8 @@ class BookingFacadeV1(
                 bookingRangeFrom
             )
         })
-        return bookingList.map {
-            bookingConverter.modelToDto(it)
+        return bookingList.map { booking ->
+            bookingConverter.modelToResponseDto(booking)
         }
     }
 

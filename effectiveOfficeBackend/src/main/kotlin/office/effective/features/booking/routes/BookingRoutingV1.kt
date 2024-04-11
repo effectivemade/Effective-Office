@@ -10,10 +10,8 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import office.effective.common.notifications.INotificationSender
 import office.effective.common.swagger.SwaggerDocument
 import office.effective.dto.BookingDTO
-import office.effective.features.booking.facade.BookingFacade
 import office.effective.features.booking.facade.BookingFacadeV1
 import office.effective.features.booking.routes.swagger.*
 import org.koin.core.context.GlobalContext

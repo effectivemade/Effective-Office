@@ -17,6 +17,13 @@ import office.effective.serviceapi.IBookingService
  *
  * In case of an error, the database transaction will be rolled back.
  */
+@Deprecated(
+    message = "Deprecated since 1.0 api version",
+    replaceWith = ReplaceWith(
+        expression = "BookingFacadeV1",
+        imports = ["office.effective.features.booking.facade.BookingFacadeV1"]
+    )
+)
 class BookingFacade(
     private val bookingService: IBookingService,
     private val transactionManager: DatabaseTransactionManager,
