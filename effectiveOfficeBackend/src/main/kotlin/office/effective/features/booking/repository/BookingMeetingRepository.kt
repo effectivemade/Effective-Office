@@ -410,42 +410,56 @@ class BookingMeetingRepository(
             "[checkBookingAvailable] checking if workspace with calendar id={} available for event {}",
             workspaceCalendar,
             incomingEvent
-        )
-        var isAvailable = false;
+        )//TODO: нам не обязательно сохранять ивент перед коллизией, если он не циклический
 
+        var result = true
         if (incomingEvent.recurrence != null) {
             //TODO: Check, if we can receive instances without pushing this event into calendar
-            calendarEvents.instances(workspaceCalendar, incomingEvent.id).setMaxResults(50).execute().items.forEach { event ->
-                if (!checkSingleEventCollision(event, workspaceCalendar)) {
-                    return@checkBookingAvailable false
-                } else {
-                    isAvailable = true
+            val instances = calendarEvents.instances(workspaceCalendar, incomingEvent.id)
+                .setMaxResults(50)
+                .execute().items
+
+            for (instance in instances) {
+                if (singleEventHasCollision(instance, workspaceCalendar)) {
+                    result = false
                 }
             }
         } else {
-            isAvailable = checkSingleEventCollision(incomingEvent, workspaceCalendar)
+            result = !singleEventHasCollision(incomingEvent, workspaceCalendar)
         }
-        logger.debug("[checkBookingAvailable] result {}", true)
-        return isAvailable
+        logger.debug("[checkBookingAvailable] result {}", result)
+        return result
     }
 
     /**
-     * Contains collision condition. Checks collision between single event from param and all saved events from event.start (leftBorder) until event.end (rightBorder)
+     * Checks weather the saved event has collision with other events.
      *
-     * @param event: [Event] - Must take only SAVED event
+     * @param eventToVerify: [Event] - event for collision check. Must be saved before check
      * */
-    private fun checkSingleEventCollision(event: Event, workspaceCalendar: String): Boolean {
-        val savedEvents = basicQuery(event.start.dateTime.value, event.end.dateTime.value, true, workspaceCalendar)
-            .execute().items
-        for (i in savedEvents) {
-            if (
-                !((i.start.dateTime.value >= event.end.dateTime.value) || (i.end.dateTime.value <= event.start.dateTime.value))
-                && (i.id != event.id)
-            ) {
-                return false
+    private fun singleEventHasCollision(eventToVerify: Event, workspaceCalendar: String): Boolean {
+        val sameTimeEvents = basicQuery(
+            timeMin = eventToVerify.start.dateTime.value,
+            timeMax = eventToVerify.end.dateTime.value,
+            singleEvents = true,
+            calendarId = workspaceCalendar
+        ).execute().items
+
+        for (event in sameTimeEvents) {
+            if (areEventsOverlap(eventToVerify, event) && eventsIsNotSame(eventToVerify, event)) {
+                return true
             }
         }
+        return false
+    }
 
-        return true
+    private fun areEventsOverlap(firstEvent: Event, secondEvent: Event): Boolean {
+        return secondEvent.start.dateTime.value < firstEvent.end.dateTime.value
+                && secondEvent.end.dateTime.value > firstEvent.start.dateTime.value
+    }
+
+    private fun eventsIsNotSame(firstEvent: Event, secondEvent: Event): Boolean {
+        return firstEvent.id != secondEvent.id &&
+                firstEvent.id != secondEvent.recurringEventId &&
+                firstEvent.recurringEventId != secondEvent.id
     }
 }
