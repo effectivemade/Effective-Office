@@ -60,14 +60,18 @@ class BookingService(
         val booking = bookingMeetingRepository.findById(id)
             ?: bookingRegularRepository.findById(id)
             ?: return null
+
         val userIds = mutableSetOf<UUID>()
         for (participant in booking.participants) {
             participant.id?.let { userIds.add(it) }
         }
-        booking.owner.id?.let { userIds.add(it) }
-        val integrations = userRepository.findAllIntegrationsByUserIds(userIds)
+        booking.owner?.id?.let { userIds.add(it) }
+
         booking.workspace.utilities = findUtilities(booking.workspace)
-        booking.owner.integrations = integrations[booking.owner.id] ?: setOf()
+        val integrations = userRepository.findAllIntegrationsByUserIds(userIds)
+        if (booking.owner != null) {
+            booking.owner?.integrations = integrations[booking.owner?.id] ?: setOf()
+        }
         for (participant in booking.participants) {
             participant.integrations = integrations[participant.id] ?: setOf()
         }
@@ -187,7 +191,7 @@ class BookingService(
                     userIds.add(it)
                 }
             }
-            booking.owner.id?.let {
+            booking.owner?.id?.let {
                 userIds.add(it)
             }
             booking.workspace.id?.let {
@@ -215,7 +219,9 @@ class BookingService(
     ): List<Booking> {
         for (booking in bookingList) {
             booking.workspace.utilities = utilities[booking.workspace.id] ?: listOf()
-            booking.owner.integrations = integrations[booking.owner.id] ?: setOf()
+            if (booking.owner != null) {
+                booking.owner?.integrations = integrations[booking.owner?.id] ?: setOf()
+            }
             for (participant in booking.participants) {
                 participant.integrations = integrations[participant.id]
             }
