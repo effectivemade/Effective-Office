@@ -87,7 +87,7 @@ class BookingMeetingRepository(
     override fun findById(bookingId: String): Booking? {
         logger.debug("[findById] retrieving a booking with id={}", bookingId)
         val event: Event? = findByCalendarIdAndBookingId(bookingId)
-        return event?.let { googleCalendarConverter.toBookingModel(it) }
+        return event?.let { googleCalendarConverter.toBookingModelForMeetingWorkspace(it) }
     }
 
     /**
@@ -151,7 +151,7 @@ class BookingMeetingRepository(
         val eventsWithWorkspace = basicQuery(eventRangeFrom, eventRangeTo, getSingleEvents, workspaceCalendarId)
             .execute().items
 
-        return eventsWithWorkspace.toList().map { googleCalendarConverter.toBookingModel(it) }
+        return eventsWithWorkspace.toList().map { googleCalendarConverter.toBookingModelForMeetingWorkspace(it) }
     }
 
     /**
@@ -265,7 +265,7 @@ class BookingMeetingRepository(
         val result = mutableListOf<Booking>()
         for (event in eventsWithUser) {
             if (checkEventOrganizer(event, userEmail)) {
-                result.add(googleCalendarConverter.toBookingModel(event))
+                result.add(googleCalendarConverter.toBookingModelForMeetingWorkspace(event))
             } else {
                 logger.trace("[findAllByOwnerId] filtered out event: {}", event)
             }
@@ -306,7 +306,7 @@ class BookingMeetingRepository(
         val result = mutableListOf<Booking>()
         for (event in eventsWithUserAndWorkspace) {
             if (checkEventOrganizer(event, userEmail)) {
-                result.add(googleCalendarConverter.toBookingModel(event))
+                result.add(googleCalendarConverter.toBookingModelForMeetingWorkspace(event))
             }  else {
                 logger.trace("[findAllByOwnerAndWorkspaceId] filtered out event: {}", event)
             }
@@ -331,7 +331,7 @@ class BookingMeetingRepository(
         )
         val calendars: List<String> = calendarIdsRepository.findAllCalendarsId()
         val events: List<Event> = getAllEvents(calendars, eventRangeFrom, eventRangeTo)
-        return events.map { googleCalendarConverter.toBookingModel(it) }
+        return events.map { googleCalendarConverter.toBookingModelForMeetingWorkspace(it) }
     }
 
     /**
@@ -351,7 +351,7 @@ class BookingMeetingRepository(
 
         val savedEvent = calendar.Events().insert(defaultCalendar, event).execute()
         if (checkBookingAvailable(savedEvent, workspaceCalendar)) {
-            val savedBooking = googleCalendarConverter.toBookingModel(savedEvent)
+            val savedBooking = googleCalendarConverter.toBookingModelForMeetingWorkspace(savedEvent)
             logger.trace("[save] saved booking: {}", savedBooking)
             return savedBooking
         } else {
@@ -388,7 +388,7 @@ class BookingMeetingRepository(
 
         val sequence = updatedEvent.sequence
         if (checkBookingAvailable(updatedEvent, workspaceCalendar)) {
-            val updatedBooking = googleCalendarConverter.toBookingModel(updatedEvent)
+            val updatedBooking = googleCalendarConverter.toBookingModelForMeetingWorkspace(updatedEvent)
             logger.trace("[update] updated booking: {}", updatedBooking)
             return updatedBooking
         } else {
