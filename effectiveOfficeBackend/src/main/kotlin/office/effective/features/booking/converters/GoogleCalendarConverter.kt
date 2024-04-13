@@ -33,7 +33,7 @@ class GoogleCalendarConverter(
     private val userRepository: UserRepository,
     private val workspaceConverter: WorkspaceFacadeConverter,
     private val userConverter: UserDTOModelConverter,
-    private val bookingConverter: BookingFacadeConverter,
+    private val bookingConverter: BookingDtoModelConverter,
     private val verifier: UuidValidator,
     private val workspaceRepository: WorkspaceRepository
 ) {

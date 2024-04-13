@@ -5,7 +5,7 @@ import model.RecurrenceDTO
 
 @Serializable
 data class BookingResponseDTO (
-    val owner: UserDTO,
+    val owner: UserDTO?,
     val participants: List<UserDTO>,
     val workspace: WorkspaceDTO,
     val id: String,

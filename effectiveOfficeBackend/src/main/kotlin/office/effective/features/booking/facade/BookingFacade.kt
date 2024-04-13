@@ -5,7 +5,7 @@ import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.utils.DatabaseTransactionManager
 import office.effective.common.utils.UuidValidator
-import office.effective.features.booking.converters.BookingFacadeConverter
+import office.effective.features.booking.converters.BookingDtoModelConverter
 import office.effective.dto.BookingDTO
 import office.effective.model.Booking
 import office.effective.model.Workspace
@@ -28,7 +28,7 @@ class BookingFacade(
     private val bookingService: IBookingService,
     private val transactionManager: DatabaseTransactionManager,
     private val uuidValidator: UuidValidator,
-    private val bookingConverter: BookingFacadeConverter
+    private val bookingConverter: BookingDtoModelConverter
 ) {
 
     /**

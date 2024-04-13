@@ -11,6 +11,7 @@ import org.ktorm.dsl.*
 import org.ktorm.entity.*
 import org.slf4j.LoggerFactory
 import java.util.*
+import kotlin.collections.List
 
 /**
  * Perform database queries with users
@@ -111,6 +112,28 @@ class UserRepository(
         }
 
         return entity?.let { converter.entityToModel(entity, integrations) }
+    }
+
+    /**
+     * Retrieves users models with integrations by emails.
+     * If a user with one of the specified emails does not exist, that email will be ignored.
+     *
+     * @return users with integrations
+     * @author Daniil Zavyalov
+     */
+    fun findAllByEmails(emails: Collection<String>): List<UserModel> {
+        logger.debug("[findAllByEmails] retrieving users with emails {}", emails.joinToString())
+        val entities: List<UserEntity> = db.users.filter { it.email inList emails }.toList()
+
+        val ids : MutableList<UUID> = mutableListOf()
+        for (entity in entities) {
+            ids.add(entity.id)
+        }
+        val integrations = findAllIntegrationsByUserIds(ids)
+
+        return entities.map { entity ->
+            converter.entityToModel(entity, integrations[entity.id])
+        }
     }
 
     /**

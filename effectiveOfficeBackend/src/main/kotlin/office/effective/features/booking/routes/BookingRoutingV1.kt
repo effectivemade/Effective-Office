@@ -29,12 +29,12 @@ fun Route.bookingRoutingV1() {
         get(SwaggerDocument.returnBookingsV1()) {
             val userId: String? = call.request.queryParameters["user_id"]
             val workspaceId: String? = call.request.queryParameters["workspace_id"]
-            val bookingRangeTo: Long? = call.request.queryParameters["range_to"]?.let {
-                it.toLongOrNull()
+            val bookingRangeTo: Long? = call.request.queryParameters["range_to"]?.let { stringRangeTo ->
+                stringRangeTo.toLongOrNull()
                     ?: throw BadRequestException("range_to can't be parsed to Long")
             }
-            call.request.queryParameters["range_from"]?.let {
-                val bookingRangeFrom: Long = it.toLongOrNull()
+            call.request.queryParameters["range_from"]?.let { stringRangeFrom ->
+                val bookingRangeFrom: Long = stringRangeFrom.toLongOrNull()
                     ?: throw BadRequestException("range_from can't be parsed to Long")
                 call.respond(bookingFacade.findAll(userId, workspaceId, bookingRangeTo, bookingRangeFrom))
                 return@get

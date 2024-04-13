@@ -1,6 +1,6 @@
 package office.effective.features.booking.di
 
-import office.effective.features.booking.converters.BookingFacadeConverter
+import office.effective.features.booking.converters.BookingDtoModelConverter
 import office.effective.features.booking.converters.BookingRepositoryConverter
 import office.effective.features.booking.facade.BookingFacade
 import office.effective.features.booking.repository.BookingMeetingRepository
@@ -16,6 +16,6 @@ val bookingDiModule = module(createdAtStart = true) {
     single { BookingRegularRepository(get(), get(), get(), get()) }
     single { BookingMeetingRepository(get(), get(), get(), get()) }
     single<IBookingService> { BookingService(get(), get(), get(), get()) }
-    single { BookingFacadeConverter(get(), get(), get(), get()) }
+    single { BookingDtoModelConverter(get(), get(), get(), get(), get()) }
     single { BookingFacade(get(), get(), get(), get()) }
 }

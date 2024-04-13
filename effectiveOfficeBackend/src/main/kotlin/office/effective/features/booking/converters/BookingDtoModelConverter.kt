@@ -2,9 +2,12 @@ package office.effective.features.booking.converters
 
 import model.RecurrenceDTO
 import office.effective.common.exception.InstanceNotFoundException
+import office.effective.common.exception.MissingIdException
+import office.effective.common.utils.UuidValidator
 import office.effective.dto.BookingDTO
 import office.effective.dto.BookingRequestDTO
 import office.effective.dto.BookingResponseDTO
+import office.effective.dto.UserDTO
 import office.effective.features.user.converters.UserDTOModelConverter
 import office.effective.features.user.repository.UserRepository
 import office.effective.features.workspace.converters.WorkspaceFacadeConverter
@@ -18,11 +21,12 @@ import java.time.Instant
  *
  * Uses [UserDTOModelConverter] and [WorkspaceFacadeConverter] to convert contained users and workspaces
  */
-class BookingFacadeConverter(
+class BookingDtoModelConverter(
     private val userConverter: UserDTOModelConverter,
     private val workspaceConverter: WorkspaceFacadeConverter,
     private val userRepository: UserRepository,
-    private val workspaceRepository: WorkspaceRepository
+    private val workspaceRepository: WorkspaceRepository,
+    private val uuidValidator: UuidValidator
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -44,7 +48,8 @@ class BookingFacadeConverter(
             recurrenceDTO = RecurrenceConverter.modelToDto(booking.recurrence!!)
         }
         return BookingDTO(
-            owner = userConverter.modelToDTO(booking.owner),
+            owner = booking.owner?.let { userConverter.modelToDTO(it) }
+                ?: UserDTO("", "", true, "", "", listOf(), "", ""),
             participants = booking.participants.map { userConverter.modelToDTO(it) },
             workspace = workspaceConverter.modelToDto(booking.workspace),
             id = booking.id.toString(),
@@ -57,24 +62,31 @@ class BookingFacadeConverter(
     /**
      * Converts [Booking] to [BookingResponseDTO]
      *
+     * @throws [MissingIdException] if [booking] doesn't contain an id
      * @param booking [Booking] to be converted
      * @return The resulting [BookingResponseDTO] object
      * @author Daniil Zavyalov, Danil Kiselev
      */
     fun modelToResponseDto(booking: Booking): BookingResponseDTO {
         logger.trace("Converting booking model to response dto")
-        var recurrenceDTO : RecurrenceDTO? = null
-        if(booking.recurrence != null) {
-            recurrenceDTO = RecurrenceConverter.modelToDto(booking.recurrence!!)
+        val id = booking.id ?: throw MissingIdException("Booking response must contains an id, but it was missed")
+        val owner = booking.owner?.let {
+            owner -> userConverter.modelToDTO(owner)
+        }
+        val participants = booking.participants.map {
+            participant -> userConverter.modelToDTO(participant)
+        }
+        val recurrence = booking.recurrence?.let {
+            recurrenceModel -> RecurrenceConverter.modelToDto(recurrenceModel)
         }
         return BookingResponseDTO(
-            owner = userConverter.modelToDTO(booking.owner),
-            participants = booking.participants.map { userConverter.modelToDTO(it) },
+            owner = owner,
+            participants = participants,
             workspace = workspaceConverter.modelToDto(booking.workspace),
-            id = booking.id.toString(),
+            id = id,
             beginBooking = booking.beginBooking.toEpochMilli(),
             endBooking = booking.endBooking.toEpochMilli(),
-            recurrence = recurrenceDTO,
+            recurrence = recurrence,
             recurringBookingId = booking.recurringBookingId
         )
     }
@@ -108,28 +120,31 @@ class BookingFacadeConverter(
     }
 
     /**
-     * Converts [BookingDTO] to [Booking]
+     * Converts [BookingDTO] to [Booking]. Users and workspace will be retrieved from database
      *
-     * @param bookingDTO [BookingDTO] to be converted
+     * @param bookingDto [BookingDTO] to be converted
+     * @param id booking id
      * @return The resulting [Booking] object
+     * @throws [InstanceNotFoundException] if user with the given email or
+     * workspace with the given id doesn't exist in database
      * @author Daniil Zavyalov, Danil Kiselev
      */
     fun requestDtoToModel(bookingDto: BookingRequestDTO, id: String? = null): Booking {
         logger.trace("Converting booking response dto to model")
-        var recurrenceModel : RecurrenceModel? = null
-        if(bookingDto.recurrence != null) {
-            recurrenceModel = RecurrenceConverter.dtoToModel(bookingDto.recurrence)
+        val recurrence = bookingDto.recurrence?.let {
+            recurrenceDto -> RecurrenceConverter.dtoToModel(recurrenceDto)
         }
         val owner: UserModel? = findOwner(bookingDto.ownerEmail)
-        val participants = findParticipants()
+        val participants = findParticipants(bookingDto.participantEmails)
+        val workspace = findWorkspace(bookingDto.workspaceId)
         return Booking(
             owner = owner,
-            participants = bookingDto.participants.map { userConverter.dTOToModel(it) },
-            workspace = workspaceConverter.dtoToModel(bookingDto.workspace),
+            participants = participants,
+            workspace = workspace,
             id = id,
             beginBooking = Instant.ofEpochMilli(bookingDto.beginBooking),
             endBooking = Instant.ofEpochMilli(bookingDto.endBooking),
-            recurrence = recurrenceModel,
+            recurrence = recurrence,
         )
     }
 
@@ -138,10 +153,20 @@ class BookingFacadeConverter(
             return userRepository.findByEmail(ownerEmail)
                 ?: throw InstanceNotFoundException(UserModel::class, "User with email $ownerEmail not found")
         }
-        return null;
+        return null
     }
 
     private fun findParticipants(participantEmails: List<String>): List<UserModel> {
+        val users = userRepository.findAllByEmails(participantEmails)
+        if (users.size < participantEmails.size) {
+            throw InstanceNotFoundException(UserModel::class, "Participant not found")
+        }
+        return users
+    }
 
+    private fun findWorkspace(workspaceUuid: String): Workspace {
+        return workspaceRepository.findById(
+            uuidValidator.uuidFromString(workspaceUuid)
+        ) ?: throw InstanceNotFoundException(Workspace::class, "Workspace with id $workspaceUuid not found")
     }
 }
