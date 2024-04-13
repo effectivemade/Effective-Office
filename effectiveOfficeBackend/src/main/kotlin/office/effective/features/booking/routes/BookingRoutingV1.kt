@@ -12,6 +12,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import office.effective.common.swagger.SwaggerDocument
 import office.effective.dto.BookingDTO
+import office.effective.dto.BookingRequestDTO
 import office.effective.features.booking.facade.BookingFacadeV1
 import office.effective.features.booking.routes.swagger.*
 import org.koin.core.context.GlobalContext
@@ -42,16 +43,18 @@ fun Route.bookingRoutingV1() {
             call.respond(bookingFacade.findAll(userId, workspaceId, bookingRangeTo))
         }
         post(SwaggerDocument.postBookingV1()) {
-            val dto = call.receive<BookingDTO>()
+            val dto = call.receive<BookingRequestDTO>()
 
             call.response.status(HttpStatusCode.Created)
             val result = bookingFacade.post(dto)
             call.respond(result)
         }
-        put(SwaggerDocument.putBookingV1()) {
-            val dto = call.receive<BookingDTO>()
+        put("/{id}", SwaggerDocument.putBookingV1()) {
+            val id: String = call.parameters["id"]
+                ?: return@put call.respond(HttpStatusCode.BadRequest)
+            val dto = call.receive<BookingRequestDTO>()
 
-            val result = bookingFacade.put(dto)
+            val result = bookingFacade.put(dto, id)
             call.respond(result)
         }
         delete("{id}", SwaggerDocument.deleteBookingByIdV1()) {

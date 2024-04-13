@@ -203,6 +203,12 @@ fun SwaggerDocument.putBookingV1(): OpenApiRoute.() -> Unit = {
                 "Bookings", bookingExample1
             )
         }
+        pathParameter<String>("id") {
+            description = "Booking id"
+            example = "p0v9udrhk66cailnigi0qkrji4"
+            required = true
+            allowEmptyValue = false
+        }
     }
     response {
         HttpStatusCode.OK to {

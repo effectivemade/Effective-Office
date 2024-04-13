@@ -7,6 +7,7 @@ import office.effective.common.utils.DatabaseTransactionManager
 import office.effective.common.utils.UuidValidator
 import office.effective.features.booking.converters.BookingDtoModelConverter
 import office.effective.dto.BookingDTO
+import office.effective.dto.BookingRequestDTO
 import office.effective.dto.BookingResponseDTO
 import office.effective.model.Booking
 import office.effective.model.Workspace
@@ -91,15 +92,15 @@ class BookingFacadeV1(
     /**
      * Saves a given booking. Use the returned model for further operations
      *
-     * @param bookingDTO [BookingDTO] to be saved
-     * @return saved [BookingDTO]
+     * @param bookingDTO [BookingRequestDTO] to be saved
+     * @return saved [BookingResponseDTO]
      * @author Daniil Zavyalov
      */
-    fun post(bookingDTO: BookingDTO): BookingDTO {
-        val model = bookingConverter.dtoToModel(bookingDTO)
-        val dto: BookingDTO = transactionManager.useTransaction({
+    fun post(bookingDTO: BookingRequestDTO): BookingResponseDTO {
+        val model = bookingConverter.requestDtoToModel(bookingDTO)
+        val dto: BookingResponseDTO = transactionManager.useTransaction({
             val savedModel = bookingService.save(model)
-            bookingConverter.modelToDto(savedModel)
+            bookingConverter.modelToResponseDto(savedModel)
         })
         return dto
     }
@@ -108,16 +109,14 @@ class BookingFacadeV1(
      * Updates a given booking. Use the returned model for further operations
      *
      * @param bookingDTO changed booking
-     * @return [BookingDTO] after change saving
-     * @throws BadRequestException if booking id is null
+     * @return updated booking
      * @author Daniil Zavyalov
      */
-    fun put(bookingDTO: BookingDTO): BookingDTO {
-        if (bookingDTO.id == null) throw BadRequestException("Missing booking id")
-        val model = bookingConverter.dtoToModel(bookingDTO)
-        val dto: BookingDTO = transactionManager.useTransaction({
+    fun put(bookingDTO: BookingRequestDTO, bookingId: String): BookingResponseDTO {
+        val model = bookingConverter.requestDtoToModel(bookingDTO, bookingId)
+        val dto: BookingResponseDTO = transactionManager.useTransaction({
             val savedModel = bookingService.update(model)
-            bookingConverter.modelToDto(savedModel)
+            bookingConverter.modelToResponseDto(savedModel)
         })
         return dto
     }
