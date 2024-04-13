@@ -10,12 +10,14 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import office.effective.common.constants.BookingConstants
 import office.effective.common.swagger.SwaggerDocument
-import office.effective.dto.BookingDTO
 import office.effective.dto.BookingRequestDTO
 import office.effective.features.booking.facade.BookingFacadeV1
 import office.effective.features.booking.routes.swagger.*
 import org.koin.core.context.GlobalContext
+import java.time.LocalDate
+import java.time.ZoneId
 
 fun Route.bookingRoutingV1() {
     route("/v1/bookings") {
@@ -28,19 +30,24 @@ fun Route.bookingRoutingV1() {
         }
 
         get(SwaggerDocument.returnBookingsV1()) {
+            val todayEpoch = LocalDate.now()
+                .atStartOfDay(ZoneId.of(BookingConstants.DEFAULT_TIMEZONE_ID))
+                .toInstant()
+                .toEpochMilli()
+            val endOfDayEpoch = todayEpoch + 1000*60*60*24
+
             val userId: String? = call.request.queryParameters["user_id"]
             val workspaceId: String? = call.request.queryParameters["workspace_id"]
-            val bookingRangeTo: Long? = call.request.queryParameters["range_to"]?.let { stringRangeTo ->
+            val bookingRangeTo: Long = call.request.queryParameters["range_to"]?.let { stringRangeTo ->
                 stringRangeTo.toLongOrNull()
                     ?: throw BadRequestException("range_to can't be parsed to Long")
-            }
-            call.request.queryParameters["range_from"]?.let { stringRangeFrom ->
-                val bookingRangeFrom: Long = stringRangeFrom.toLongOrNull()
+            } ?: todayEpoch
+            val bookingRangeFrom: Long = call.request.queryParameters["range_from"]?.let { stringRangeFrom ->
+                stringRangeFrom.toLongOrNull()
                     ?: throw BadRequestException("range_from can't be parsed to Long")
-                call.respond(bookingFacade.findAll(userId, workspaceId, bookingRangeTo, bookingRangeFrom))
-                return@get
-            }
-            call.respond(bookingFacade.findAll(userId, workspaceId, bookingRangeTo))
+            } ?: endOfDayEpoch
+
+            call.respond(bookingFacade.findAll(userId, workspaceId, bookingRangeTo, bookingRangeFrom))
         }
         post(SwaggerDocument.postBookingV1()) {
             val dto = call.receive<BookingRequestDTO>()

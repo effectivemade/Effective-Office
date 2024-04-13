@@ -69,17 +69,15 @@ fun SwaggerDocument.returnBookingsV1(): OpenApiRoute.() -> Unit = {
         }
         queryParameter<Long>("range_from") {
             description = "Lower bound (exclusive) for a endBooking to filter by. Should be lover than range_to. " +
-                    "Default value: ${BookingConstants.MIN_SEARCH_START_TIME} " +
-                    "(${Instant.ofEpochMilli(BookingConstants.MIN_SEARCH_START_TIME)}). " +
-                    "Old Google calendar events may not appear correctly in the system and cause unexpected exceptions"
+                    "The default value is the beginning of today."
             example = 1692927200000
             required = false
             allowEmptyValue = false
 
         }
         queryParameter<Long>("range_to") {
-            description = "Upper bound (exclusive) for a beginBooking to filter by. Optional. " +
-                    "Should be greater than range_from."
+            description = "Upper bound (exclusive) for a beginBooking to filter by. " +
+                    "The default value is the end of today. Should be greater than range_from."
             example = 1697027200000
             required = false
             allowEmptyValue = false
