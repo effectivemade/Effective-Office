@@ -13,7 +13,7 @@ import office.effective.dto.WorkspaceZoneDTO
 /**
  * @suppress
  */
-fun SwaggerDocument.returnWorkspaceById(): OpenApiRoute.() -> Unit = {
+fun SwaggerDocument.returnWorkspaceByIdV1(): OpenApiRoute.() -> Unit = {
     description = "Return workspace by id"
     tags = listOf("workspaces")
     request {
@@ -60,7 +60,7 @@ fun SwaggerDocument.returnWorkspaceById(): OpenApiRoute.() -> Unit = {
 /**
  * @suppress
  */
-fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
+fun SwaggerDocument.returnWorkspaceByTagV1(): OpenApiRoute.() -> Unit = {
     description = "Return all workspaces by tag"
     tags = listOf("workspaces")
     request {
@@ -71,13 +71,39 @@ fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
             allowEmptyValue = false
         }
         queryParameter<Long>("free_from") {
-            description = "Timestamp from which the workspace should be free"
+            description = "Timestamp from which the workspace should be free."
             example = 1691591501000L
             required = false
             allowEmptyValue = false
         }
         queryParameter<Long>("free_until") {
-            description = "Timestamp before which the workspace should be free."
+            description = "Timestamp before which the workspace should be free. Should be greater than free_from."
+            example = 1691591578000L
+            required = false
+            allowEmptyValue = false
+        }
+        queryParameter<Long>("with_bookings") {
+            description = "Specify this parameter to get workspaces with their bookings for today. Optional. " +
+                    "Can't be specified together with free_from and free_until. " +
+                    "Requesting workspaces with their bookings significantly increases the response time."
+            example = true
+            required = false
+            allowEmptyValue = false
+        }
+        queryParameter<Long>("with_bookings_from") {
+            description = "Specify this parameter to get workspaces with their bookings for a certain period of time. " +
+                    "The default value is the beginning of today. " +
+                    "Should be greater than with_bookings_from. Can't be specified together with free_from and free_until. " +
+                    "Requesting workspaces with their bookings significantly increases the response time."
+            example = 1691591501000L
+            required = false
+            allowEmptyValue = false
+        }
+        queryParameter<Long>("with_bookings_until") {
+            description = "Specify this parameter to get workspaces with their bookings for a certain period of time. " +
+                    "The default value is the end of today. " +
+                    "Should be greater than with_bookings_from. Can't be specified together with free_from and free_until. " +
+                    "Requesting workspaces with their bookings significantly increases the response time."
             example = 1691591578000L
             required = false
             allowEmptyValue = false
@@ -132,7 +158,7 @@ fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
 /**
  * @suppress
  */
-fun SwaggerDocument.returnAllZones(): OpenApiRoute.() -> Unit = {
+fun SwaggerDocument.returnAllZonesV1(): OpenApiRoute.() -> Unit = {
     description = "Returns all workspace zones"
     tags = listOf("workspaces")
     response {
@@ -157,3 +183,10 @@ private val zoneExample1 = WorkspaceZoneDTO("3ca26fe0-f837-4939-b586-dd4195d2a50
  * @suppress
  */
 private val zoneExample2 = WorkspaceZoneDTO("6cb3c60d-3c29-4a45-80e6-fac14fb0569b","Sirius")
+
+/**
+ * @suppress
+ */
+enum class WorkspaceTag(val tagName: String) {
+    meeting("meeting"), regular("regular")
+}

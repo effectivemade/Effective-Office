@@ -1,6 +1,7 @@
 package office.effective.features.workspace.converters
 
 import office.effective.common.utils.UuidValidator
+import office.effective.dto.BookingResponseDTO
 import office.effective.dto.UtilityDTO
 import office.effective.dto.WorkspaceDTO
 import office.effective.dto.WorkspaceZoneDTO
@@ -22,13 +23,19 @@ class WorkspaceFacadeConverter(private val uuidValidator: UuidValidator) {
      * Converts [Workspace] with [WorkspaceZone] and [Utilities][Utility]
      * to [WorkspaceDTO] with [WorkspaceZoneDTO] and [UtilityDTO]s
      * @param model The [Workspace] object to be converted
+     * @param bookings bookings of this workspace
      * @return The resulting [WorkspaceDTO] object
      * @author Daniil Zavyalov
      */
-    fun modelToDto(model: Workspace): WorkspaceDTO {
+    fun modelToDto(model: Workspace, bookings: List<BookingResponseDTO>? = null): WorkspaceDTO {
         val utilities = model.utilities.map { utilityModelToDto(it) }
         return WorkspaceDTO(
-            model.id.toString(), model.name, utilities, model.zone?.let { zoneModelToDto(it) }, model.tag
+            id = model.id.toString(),
+            name = model.name,
+            utilities = utilities,
+            zone = model.zone?.let { zoneModelToDto(it) },
+            tag = model.tag,
+            bookings = bookings
         )
     }
 

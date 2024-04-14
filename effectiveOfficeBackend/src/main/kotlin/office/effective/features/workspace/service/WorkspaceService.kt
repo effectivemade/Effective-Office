@@ -1,5 +1,6 @@
 package office.effective.features.workspace.service
 
+import office.effective.features.booking.service.BookingService
 import office.effective.features.workspace.repository.WorkspaceRepository
 import office.effective.model.Workspace
 import office.effective.model.WorkspaceZone
@@ -10,7 +11,7 @@ import java.util.UUID
 /**
  * Class that implements the [IWorkspaceService] methods
  */
-class WorkspaceService(private val repository: WorkspaceRepository): IWorkspaceService {
+class WorkspaceService(private val workspaceRepository: WorkspaceRepository): IWorkspaceService {
 
     /**
      * Retrieves a Workspace model by its id
@@ -20,7 +21,7 @@ class WorkspaceService(private val repository: WorkspaceRepository): IWorkspaceS
      * @author Daniil Zavyalov
      */
     override fun findById(id: UUID): Workspace? {
-        return repository.findById(id)
+        return workspaceRepository.findById(id)
     }
 
     /**
@@ -31,7 +32,7 @@ class WorkspaceService(private val repository: WorkspaceRepository): IWorkspaceS
      * @author Daniil Zavyalov
      */
     override fun findAllByTag(tag: String): List<Workspace> {
-        return repository.findAllByTag(tag)
+        return workspaceRepository.findAllByTag(tag)
     }
 
     /**
@@ -44,7 +45,7 @@ class WorkspaceService(private val repository: WorkspaceRepository): IWorkspaceS
      * @author Daniil Zavyalov
      */
     override fun findAllFreeByPeriod(tag: String, beginTimestamp: Instant, endTimestamp: Instant): List<Workspace> {
-        return repository.findAllFreeByPeriod(tag, beginTimestamp, endTimestamp)
+        return workspaceRepository.findAllFreeByPeriod(tag, beginTimestamp, endTimestamp)
     }
 
     /**
@@ -54,6 +55,6 @@ class WorkspaceService(private val repository: WorkspaceRepository): IWorkspaceS
      * @author Daniil Zavyalov
      */
     override fun findAllZones(): List<WorkspaceZone> {
-        return repository.findAllZones()
+        return workspaceRepository.findAllZones()
     }
 }

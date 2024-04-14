@@ -20,7 +20,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 fun Route.bookingRoutingV1() {
-    route("/v1/bookings") {
+    route("/api/v1/bookings") {
         val bookingFacade: BookingFacadeV1 = GlobalContext.get().get()
 
         get("/{id}", SwaggerDocument.returnBookingByIdV1()) {
