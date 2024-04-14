@@ -242,12 +242,6 @@ class BookingRegularRepository(
     override fun save(booking: Booking): Booking {
         logger.debug("[save] saving booking of workspace with id {}", booking.workspace.id)
         val workspaceId = booking.workspace.id ?: throw MissingIdException("Missing booking workspace id")
-        val userId = booking.owner.id ?: throw MissingIdException("Missing booking owner id")
-        if (!userRepository.existsById(userId)) {
-            throw InstanceNotFoundException(
-                WorkspaceEntity::class, "User with id $workspaceId not wound"
-            )
-        }
         val event = googleCalendarConverter.toGoogleWorkspaceEvent(booking)
 
         logger.trace("[save] booking to save: {}", event)
