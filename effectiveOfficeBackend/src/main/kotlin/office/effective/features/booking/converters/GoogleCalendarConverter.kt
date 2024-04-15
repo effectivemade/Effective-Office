@@ -441,14 +441,14 @@ class GoogleCalendarConverter(
      */
     private fun Long.toGoogleDateTime(): EventDateTime {
         return EventDateTime().also {
-            it.dateTime = DateTime(this - TimeZone.getDefault().rawOffset)
+            it.dateTime = DateTime(this/* - TimeZone.getDefault().rawOffset*/)
             it.timeZone = TimeZone.getDefault().id
         }
     }
 
     private fun Instant.toGoogleDateTime():EventDateTime {
         return EventDateTime().also {
-            it.dateTime = DateTime(this.toEpochMilli() - TimeZone.getDefault().rawOffset)
+            it.dateTime = DateTime(this.toEpochMilli()/* - TimeZone.getDefault().rawOffset*/)
             it.timeZone = TimeZone.getDefault().id
         }
     }
