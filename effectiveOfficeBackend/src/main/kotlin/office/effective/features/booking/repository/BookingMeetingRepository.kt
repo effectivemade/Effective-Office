@@ -349,7 +349,7 @@ class BookingMeetingRepository(
         val event = googleCalendarConverter.toGoogleEvent(booking)
 
         val savedEvent = calendar.Events().insert(defaultCalendar, event).execute()
-        if (checkBookingAvailable(savedEvent, workspaceCalendar)) {
+        if (recurringEventHasCollision(savedEvent, workspaceCalendar)) {
             val savedBooking = googleCalendarConverter.toBookingModel(savedEvent)
             logger.trace("[save] saved booking: {}", savedBooking)
             return savedBooking
@@ -376,65 +376,65 @@ class BookingMeetingRepository(
         val workspaceCalendar = calendarIdsRepository.findByWorkspace(
             booking.workspace.id ?: throw MissingIdException("Missing workspace id")
         )
+        val updatedEvent: Event = if (booking.recurrence != null) {
+            updateRecurringEvent(booking, workspaceCalendar)
+        } else {
+            updateSingleEvent(booking, workspaceCalendar)
+        }
+        return googleCalendarConverter.toBookingModel(updatedEvent)
+            .also { updatedBooking ->
+                logger.trace("[update] updated booking: {}", updatedBooking)
+            }
+    }
+
+    /**
+     * Saving booking without recurrence. Checks collision before updating an event.
+     */
+    private fun updateSingleEvent(booking: Booking, workspaceCalendar: String): Event {
+        val eventOnUpdate = googleCalendarConverter.toGoogleEvent(booking)
+        if (singleEventHasCollision(eventOnUpdate, workspaceCalendar)) {
+            throw WorkspaceUnavailableException("Workspace ${booking.workspace.name} " +
+                    "unavailable at time between ${booking.beginBooking} and ${booking.endBooking}")
+        }
+
+        val eventId = eventOnUpdate.id
+        val prevEventVersion = findByCalendarIdAndBookingId(eventId) ?: throw InstanceNotFoundException(
+            WorkspaceBookingEntity::class, "Booking with id $eventId not wound"
+        )
+        logger.trace("[updateSingleEvent] previous version of event: {}", prevEventVersion)
+
+        return calendarEvents.update(defaultCalendar, eventId, eventOnUpdate).execute()
+    }
+
+    /**
+     * Saving booking with recurrence. Checks collision for all event instances after its update.
+     *
+     * @param booking updated booking to be saved
+     * @param workspaceCalendar calendar id for saving
+     */
+    private fun updateRecurringEvent(booking: Booking, workspaceCalendar: String): Event {
         val bookingId = booking.id ?: throw MissingIdException("Update model must have id")
-        val previousVersionOfEvent = findByCalendarIdAndBookingId(bookingId) ?: throw InstanceNotFoundException(
+        val prevEventVersion = findByCalendarIdAndBookingId(bookingId) ?: throw InstanceNotFoundException(
             WorkspaceBookingEntity::class, "Booking with id $bookingId not wound"
         )
-        logger.trace("[update] previous version of event: {}", previousVersionOfEvent)
+        logger.trace("[updateRecurringEvent] previous version of event: {}", prevEventVersion)
         val eventOnUpdate = googleCalendarConverter.toGoogleEvent(booking)
 
         val updatedEvent: Event = calendarEvents.update(defaultCalendar, bookingId, eventOnUpdate).execute()
 
         val sequence = updatedEvent.sequence
-        if (checkBookingAvailable(updatedEvent, workspaceCalendar)) {
-            val updatedBooking = googleCalendarConverter.toBookingModel(updatedEvent)
-            logger.trace("[update] updated booking: {}", updatedBooking)
-            return updatedBooking
-        } else {
-            previousVersionOfEvent.sequence = sequence
-            calendarEvents.update(defaultCalendar, bookingId, previousVersionOfEvent).execute()
-            throw WorkspaceUnavailableException("Workspace ${booking.workspace.name} " +
-                    "unavailable at time between ${booking.beginBooking} and ${booking.endBooking}")
+        if (recurringEventHasCollision(updatedEvent, workspaceCalendar)) {
+            prevEventVersion.sequence = sequence
+            calendarEvents.update(defaultCalendar, bookingId, prevEventVersion).execute()
+            throw WorkspaceUnavailableException("Workspace ${booking.workspace.name} unavailable at specified time.")
         }
-    }
-
-    /**
-     * Launch checkSingleEventCollision for non-cycle event
-     * or receive instances for recurrent event and checks all instances.
-     *
-     * @param incomingEvent: [Event] - Must take only SAVED event
-     * @return Boolean. True if booking available
-     * */
-    private fun checkBookingAvailable(incomingEvent: Event, workspaceCalendar: String): Boolean {
-        logger.debug(
-            "[checkBookingAvailable] checking if workspace with calendar id={} available for event {}",
-            workspaceCalendar,
-            incomingEvent
-        )//TODO: нам не обязательно сохранять ивент перед коллизией, если он не циклический
-
-        var result = true
-        if (incomingEvent.recurrence != null) {
-            //TODO: Check, if we can receive instances without pushing this event into calendar
-            val instances = calendarEvents.instances(workspaceCalendar, incomingEvent.id)
-                .setMaxResults(50)
-                .execute().items
-
-            for (instance in instances) {
-                if (singleEventHasCollision(instance, workspaceCalendar)) {
-                    result = false
-                }
-            }
-        } else {
-            result = !singleEventHasCollision(incomingEvent, workspaceCalendar)
-        }
-        logger.debug("[checkBookingAvailable] result {}", result)
-        return result
+        return updatedEvent
     }
 
     /**
      * Checks weather the saved event has collision with other events.
      *
-     * @param eventToVerify: [Event] - event for collision check. Must be saved before check
+     * @param eventToVerify event for collision check
      * */
     private fun singleEventHasCollision(eventToVerify: Event, workspaceCalendar: String): Boolean {
         val sameTimeEvents = basicQuery(
@@ -452,14 +452,50 @@ class BookingMeetingRepository(
         return false
     }
 
+    /**
+     * Launch checkSingleEventCollision for non-cycle event
+     * or receive instances for recurrent event and checks all instances.
+     *
+     * @param incomingEvent: [Event] - Must take only SAVED event
+     * @return Boolean. True if booking available
+     * */
+    private fun recurringEventHasCollision(incomingEvent: Event, workspaceCalendar: String): Boolean {
+        logger.debug(
+            "[checkBookingAvailable] checking if workspace with calendar id={} available for event {}",
+            workspaceCalendar,
+            incomingEvent
+        )
+
+        var result = false
+        //TODO: Check, if we can receive instances without pushing this event into calendar
+        val instances = calendarEvents.instances(workspaceCalendar, incomingEvent.id)
+            .setMaxResults(50)
+            .execute().items
+
+        for (instance in instances) {
+            if (singleEventHasCollision(instance, workspaceCalendar)) {
+                result = true
+            }
+        }
+        logger.debug("[recurringEventHasCollision] result: {}", result)
+        return result
+    }
+
+    /**
+     * Checks whether events has collision
+     */
     private fun areEventsOverlap(firstEvent: Event, secondEvent: Event): Boolean {
         return secondEvent.start.dateTime.value < firstEvent.end.dateTime.value
                 && secondEvent.end.dateTime.value > firstEvent.start.dateTime.value
     }
 
+    /**
+     * Checks whether events aren't the same event or instances of the same event
+     */
     private fun eventsIsNotSame(firstEvent: Event, secondEvent: Event): Boolean {
         return firstEvent.id != secondEvent.id &&
                 firstEvent.id != secondEvent.recurringEventId &&
-                firstEvent.recurringEventId != secondEvent.id
+                firstEvent.recurringEventId != secondEvent.id &&
+                (firstEvent.recurringEventId != firstEvent.recurringEventId || firstEvent.recurringEventId == null)
     }
 }

@@ -18,6 +18,7 @@ import java.time.ZoneId
 fun Route.workspaceRoutingV1() {
     route("/api/v1/workspaces") {
         val facade: WorkspaceFacadeV1 = GlobalContext.get().get()
+        val oneDayMillis: Long = 1000*60*60*24;
 
         get("/{id}", SwaggerDocument.returnWorkspaceByIdV1()) {
             val id: String = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
@@ -44,7 +45,7 @@ fun Route.workspaceRoutingV1() {
                         .atStartOfDay(ZoneId.of(BookingConstants.DEFAULT_TIMEZONE_ID))
                         .toInstant()
                         .toEpochMilli()
-                    val endOfDayEpoch = todayEpoch + 1000*60*60*24
+                    val endOfDayEpoch = todayEpoch + oneDayMillis
                     withBookingsFrom = withBookingsFromString?.let { paramString ->
                         paramString.toLongOrNull()
                             ?: throw BadRequestException("with_bookings_from can't be parsed to Long")

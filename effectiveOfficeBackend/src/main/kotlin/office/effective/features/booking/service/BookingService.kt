@@ -282,14 +282,10 @@ class BookingService(
      *
      * @param booking changed booking
      * @return [Booking] after change saving
-     * @throws InstanceNotFoundException if workspace with the given id not found
      * @author Daniil Zavyalov
      */
     override fun update(booking: Booking): Booking {
-        val workspaceId = booking.workspace.id ?: throw MissingIdException("Missing booking workspace id")
-        val workspace = workspaceRepository.findById(workspaceId)
-            ?: throw InstanceNotFoundException(WorkspaceBookingEntity::class, "Workspace with id $workspaceId not wound")
-        return if (workspace.tag == "meeting") {
+        return if (booking.workspace.tag == "meeting") {
             logger.error("Updating meeting room booking")
             bookingMeetingRepository.update(booking)
         } else {
