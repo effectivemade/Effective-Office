@@ -320,19 +320,19 @@ class GoogleCalendarConverter(
 //    }
 
     /**
-     * Converts regular workspace [BookingDTO] to [Event]. [Event.description] is used to indicate the booking author,
+     * Converts regular workspace [Booking] to [Event]. [Event.description] is used to indicate the booking author,
      * because [Event.organizer] is [defaultAccount] of application.
      * [Event.summary] is used to indicate the booking workspace.
      *
-     * @param model [BookingDTO] to be converted
+     * @param model [Booking] to be converted
      * @return The resulting [Event] object
      * @author Daniil Zavyalov
      */
     fun toGoogleWorkspaceRegularEvent(model: Booking): Event {
         logger.debug("[toGoogleWorkspaceEvent] converting workspace booking dto to calendar event")
         val event = Event().apply {
-            summary = "${model.workspace.id} - workspace id"
-            description = "${model.owner.id} - organizer id"
+            summary = "${model.workspace.id} - workspace id (${model.workspace.zone} - ${model.workspace.name})"
+            description = "${model.owner.id} - organizer id [ ${model.owner.email} ]"
             getRecurrenceFromRecurrenceModel(model)?.let{ recurrence = it }
             start = model.beginBooking.toGoogleDateTime()
             end = model.endBooking.toGoogleDateTime()
