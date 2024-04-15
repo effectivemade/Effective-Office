@@ -294,30 +294,30 @@ class GoogleCalendarConverter(
 //            }
 //        return userConverter.modelToDTO(userModel)
 //    }
-
-    /**
-     * Converts [BookingDTO] to [Event]. [Event.description] is used to indicate the booking author,
-     * because [Event.organizer] is [defaultAccount] of application
-     *
-     * @param dto [BookingDTO] to be converted
-     * @return The resulting [Event] object
-     * @author Danil Kiselev, Max Mishenko
-     */
-    fun toGoogleEvent(dto: BookingDTO): Event {
-        logger.debug("[toGoogleEvent] converting meeting room booking dto to calendar event")
-        val event = Event().apply {
-            summary = createDetailedEventSummary(dto)
-            description = "${dto.owner.email} - почта организатора"
-            organizer = dto.owner.toGoogleOrganizer()
-            attendees = dto.participants.map { it.toAttendee() } + dto.owner.toAttendee()
-                .apply { organizer = true } + dto.workspace.toAttendee()
-            if (dto.recurrence != null) recurrence = listOf(dto.recurrence.toRecurrence().rule())
-            start = dto.beginBooking.toGoogleDateTime()
-            end = dto.endBooking.toGoogleDateTime()
-        }
-        logger.trace("[toGoogleEvent] {}", event.toString())
-        return event
-    }
+//
+//    /**
+//     * Converts [BookingDTO] to [Event]. [Event.description] is used to indicate the booking author,
+//     * because [Event.organizer] is [defaultAccount] of application
+//     *
+//     * @param dto [BookingDTO] to be converted
+//     * @return The resulting [Event] object
+//     * @author Danil Kiselev, Max Mishenko
+//     */
+//    fun toGoogleEvent(dto: BookingDTO): Event {
+//        logger.debug("[toGoogleEvent] converting meeting room booking dto to calendar event")
+//        val event = Event().apply {
+//            summary = createDetailedEventSummary(dto)
+//            description = "${dto.owner.email} - почта организатора"
+//            organizer = dto.owner.toGoogleOrganizer()
+//            attendees = dto.participants.map { it.toAttendee() } + dto.owner.toAttendee()
+//                .apply { organizer = true } + dto.workspace.toAttendee()
+//            if (dto.recurrence != null) recurrence = listOf(dto.recurrence.toRecurrence().rule())
+//            start = dto.beginBooking.toGoogleDateTime()
+//            end = dto.endBooking.toGoogleDateTime()
+//        }
+//        logger.trace("[toGoogleEvent] {}", event.toString())
+//        return event
+//    }
 
     /**
      * Converts regular workspace [BookingDTO] to [Event]. [Event.description] is used to indicate the booking author,
@@ -442,14 +442,14 @@ class GoogleCalendarConverter(
     private fun Long.toGoogleDateTime(): EventDateTime {
         return EventDateTime().also {
             it.dateTime = DateTime(this/* - TimeZone.getDefault().rawOffset*/)
-            it.timeZone = TimeZone.getDefault().id
+            it.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID//TimeZone.getDefault().id
         }
     }
 
     private fun Instant.toGoogleDateTime():EventDateTime {
         return EventDateTime().also {
             it.dateTime = DateTime(this.toEpochMilli()/* - TimeZone.getDefault().rawOffset*/)
-            it.timeZone = TimeZone.getDefault().id
+            it.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID//TimeZone.getDefault().id
         }
     }
 
