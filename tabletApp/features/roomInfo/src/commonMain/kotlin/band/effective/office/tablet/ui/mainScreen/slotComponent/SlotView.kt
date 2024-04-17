@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,17 +47,19 @@ import band.effective.office.tablet.ui.mainScreen.slotComponent.store.SlotStore
 import band.effective.office.tablet.ui.theme.LocalCustomColorsPalette
 import band.effective.office.tablet.ui.theme.h7
 import band.effective.office.tablet.ui.theme.subslotColor
+import org.koin.core.component.getScopeId
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun SlotList(component: SlotComponent) {
+fun SlotList(component: SlotComponent, listState: LazyListState) {
     val state by component.state.collectAsState()
     SlotList(
         slots = state.slots,
         onClick = { component.sendIntent(SlotStore.Intent.ClickOnSlot(this)) },
-        onCancel = { component.sendIntent(SlotStore.Intent.OnCancelDelete(it)) }
+        onCancel = { component.sendIntent(SlotStore.Intent.OnCancelDelete(it)) },
+        state = listState
     )
 }
 
@@ -63,14 +67,16 @@ fun SlotList(component: SlotComponent) {
 private fun SlotList(
     slots: List<SlotUi>,
     onClick: SlotUi.() -> Unit,
-    onCancel: (SlotUi.DeleteSlot) -> Unit
+    onCancel: (SlotUi.DeleteSlot) -> Unit,
+    state: LazyListState
 ) {
     LazyColumn(
-        Modifier.padding(start = 30.dp, top = 0.dp, end = 30.dp, bottom = 30.dp)
+        Modifier.padding(start = 30.dp, top = 0.dp, end = 30.dp, bottom = 30.dp),
+        state = state,
     ) {
-        items(items = slots) {
-            SlotView(slotUi = it, onClick = onClick, onCancel = onCancel)
-            Spacer(Modifier.height(20.dp))
+        itemsIndexed(items = slots) { id, slot ->
+            SlotView(slotUi = slot, onClick = onClick, onCancel = onCancel)
+            Spacer(Modifier.height(if (id != slots.lastIndex) 20.dp else 90.dp))
         }
     }
 }
