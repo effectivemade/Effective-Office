@@ -16,7 +16,10 @@ class PhotoSynologyUseCase @Inject constructor(
             photoSynologyRepository.getPhotosUrl(sid = sid)
 
         eitherFlow.map { either ->
-            either.map { photos-> photos.shuffled()}
+            when (either) {
+                is Either.Failure -> either
+                is Either.Success -> either.map { photos-> photos.shuffled()}
+            }
         }
 
         return eitherFlow
