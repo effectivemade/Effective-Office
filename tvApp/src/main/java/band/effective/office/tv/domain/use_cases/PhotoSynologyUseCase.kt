@@ -11,17 +11,14 @@ import javax.inject.Inject
 class PhotoSynologyUseCase @Inject constructor(
     private val photoSynologyRepository: PhotoSynologyRepository
 ) {
-    suspend operator fun invoke(sid: String): Flow<Either<String, List<PhotoDomain>>> {
-        val eitherFlow: Flow<Either<String, List<PhotoDomain>>> =
-            photoSynologyRepository.getPhotosUrl(sid = sid)
-
-        eitherFlow.map { either ->
-            when (either) {
-                is Either.Failure -> either
-                is Either.Success -> either.map { photos-> photos.shuffled()}
+    suspend operator fun invoke(sid: String): Flow<Either<String, List<PhotoDomain>>> =
+        photoSynologyRepository.getPhotosUrl(sid = sid)
+            .map { either ->
+                when (either) {
+                    is Either.Failure -> either
+                    is Either.Success -> either.map { photos ->
+                        photos.shuffled()
+                    }
+                }
             }
-        }
-
-        return eitherFlow
-    }
 }
