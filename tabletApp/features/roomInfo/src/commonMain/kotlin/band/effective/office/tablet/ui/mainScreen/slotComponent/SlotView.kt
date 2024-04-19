@@ -53,13 +53,12 @@ import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun SlotList(component: SlotComponent, listState: LazyListState) {
+fun SlotList(component: SlotComponent) {
     val state by component.state.collectAsState()
     SlotList(
         slots = state.slots,
         onClick = { component.sendIntent(SlotStore.Intent.ClickOnSlot(this)) },
         onCancel = { component.sendIntent(SlotStore.Intent.OnCancelDelete(it)) },
-        state = listState
     )
 }
 
@@ -68,21 +67,19 @@ private fun SlotList(
     slots: List<SlotUi>,
     onClick: SlotUi.() -> Unit,
     onCancel: (SlotUi.DeleteSlot) -> Unit,
-    state: LazyListState
 ) {
     LazyColumn(
         Modifier.padding(start = 30.dp, top = 0.dp, end = 30.dp, bottom = 30.dp),
-        state = state,
     ) {
         itemsIndexed(items = slots) { id, slot ->
             SlotView(slotUi = slot, onClick = onClick, onCancel = onCancel)
-            Spacer(Modifier.height(if (id != slots.lastIndex) 20.dp else 90.dp))
+            Spacer(Modifier.height(20.dp))
         }
     }
 }
 
 @Composable
-private fun SlotView(
+fun SlotView(
     slotUi: SlotUi,
     onClick: SlotUi.() -> Unit,
     onCancel: (SlotUi.DeleteSlot) -> Unit

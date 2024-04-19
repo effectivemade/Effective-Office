@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,34 +18,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.features.roomInfo.MainRes
+import band.effective.office.tablet.ui.bookingComponents.DateTimeView
 import band.effective.office.tablet.ui.mainScreen.mainScreen.uiComponents.Disconnect
 import band.effective.office.tablet.ui.mainScreen.roomInfoComponents.RoomInfoComponent
 import band.effective.office.tablet.ui.mainScreen.roomInfoComponents.uiComponent.RoomProperty
 import band.effective.office.tablet.ui.mainScreen.slotComponent.SlotComponent
 import band.effective.office.tablet.ui.mainScreen.slotComponent.SlotList
+import band.effective.office.tablet.ui.mainScreen.slotComponent.SlotView
+import band.effective.office.tablet.ui.mainScreen.slotComponent.store.SlotStore
 import band.effective.office.tablet.ui.theme.LocalCustomColorsPalette
 import band.effective.office.tablet.ui.theme.textButton
 import java.util.Calendar
+import java.util.GregorianCalendar
 
+@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("NewApi", "StateFlowValueCalledInComposition", "UnrememberedMutableState")
 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 @Composable
@@ -64,11 +68,7 @@ fun MainScreenView(
     selectDate: Calendar,
     onResetDate: () -> Unit
 ) {
-
-    val listState = rememberLazyListState()
-    val fabVisibility by derivedStateOf {
-        listState.firstVisibleItemScrollOffset == 0 && listState.firstVisibleItemIndex == 0
-    }
+    val slotState by slotComponent.state.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background)) {
         /*NOTE(Maksim Mishenko):
@@ -78,21 +78,54 @@ fun MainScreenView(
         val infoViewWidth = 627f / 1133f
         Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(infoViewWidth)) {
-                Column(modifier = Modifier.fillMaxHeight().fillMaxWidth()) {
-                    RoomInfoComponent(
-                        modifier = Modifier,
-                        room = roomList[indexSelectRoom],
-                        onOpenFreeRoomModalRequest = { onCancelEventRequest() },
-                        onOpenDateTimePickerModalRequest = onOpenDateTimePickerModalRequest,
-                        onIncrementDate = onIncrementData,
-                        onDecrementDate = onDecrementData,
-                        selectDate = selectDate,
-                        timeToNextEvent = timeToNextEvent,
-                        isError = isDisconnect,
-                        onResetDate = onResetDate,
-                        visibleDataTimeView = fabVisibility
-                    )
-                    SlotList(slotComponent, listState)
+                LazyColumn(
+                    modifier = Modifier.fillMaxHeight().fillMaxWidth().padding(bottom = 30.dp)) {
+                    item {
+                        DateTimeView(
+                            modifier = Modifier.padding(
+                                start = 30.dp,
+                                top = 50.dp,
+                                end = 20.dp,
+                                bottom = 0.dp
+                            ).height(70.dp),
+                            selectDate = selectDate,
+                            increment = onIncrementData,
+                            decrement = onDecrementData,
+                            onOpenDateTimePickerModal = onOpenDateTimePickerModalRequest,
+                            currentDate = GregorianCalendar(),
+                            back = onResetDate,
+                        )
+                    }
+                    stickyHeader{
+                            RoomInfoComponent(
+                                modifier = Modifier.background(color = MaterialTheme.colors.background),
+                                room = roomList[indexSelectRoom],
+                                onOpenFreeRoomModalRequest = { onCancelEventRequest() },
+                                timeToNextEvent = timeToNextEvent,
+                                isError = isDisconnect,
+                            )
+                    }
+                    items(slotState.slots) {
+                        Box(modifier = Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp)) {
+                            SlotView(
+                                slotUi = it,
+                                onClick = { slotComponent.sendIntent(
+                                        SlotStore.Intent.ClickOnSlot(
+                                            this
+                                        )
+                                    )
+                                },
+                                onCancel = {
+                                    slotComponent.sendIntent(
+                                        SlotStore.Intent.OnCancelDelete(
+                                            it
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                        Spacer(Modifier.height(20.dp))
+                    }
                 }
                 Box(modifier = Modifier.padding(horizontal = 30.dp)) {
                     Disconnect(visible = isDisconnect)
