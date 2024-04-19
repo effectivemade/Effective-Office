@@ -41,10 +41,17 @@ interface IBookingRepository {
      * @param ownerId
      * @param eventRangeTo use to set an upper bound for filtering bookings by start time
      * @param eventRangeFrom lover bound for filtering bookings by start time
+     * @param returnInstances return recurring bookings as non-recurrent instances
+     *
      * @return List of all user [Booking]
      * @author Daniil Zavyalov, Danil Kiselev
      */
-    fun findAllByOwnerId(ownerId: UUID, eventRangeFrom: Long, eventRangeTo: Long? = null): List<Booking>
+    fun findAllByOwnerId(
+        ownerId: UUID,
+        eventRangeFrom: Long,
+        eventRangeTo: Long? = null,
+        returnInstances: Boolean = true,
+    ): List<Booking>
 
     /**
      * Returns all bookings with the given workspace id
@@ -52,13 +59,15 @@ interface IBookingRepository {
      * @param workspaceId
      * @param eventRangeFrom use to set an upper bound for filtering bookings by start time
      * @param eventRangeTo lover bound for filtering bookings by start time
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all workspace [Booking]
      * @author Daniil Zavyalov, Danil Kiselev
      */
     fun findAllByWorkspaceId(
         workspaceId: UUID,
         eventRangeFrom: Long,
-        eventRangeTo: Long? = null
+        eventRangeTo: Long? = null,
+        returnInstances: Boolean = true,
     ): List<Booking>
 
     /**
@@ -68,6 +77,7 @@ interface IBookingRepository {
      * @param workspaceId
      * @param eventRangeFrom use to set an upper bound for filtering bookings by start time
      * @param eventRangeTo lover bound for filtering bookings by start time
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all [Booking]s with the given workspace and owner id
      * @author Daniil Zavyalov, Danil Kiselev
      */
@@ -75,7 +85,8 @@ interface IBookingRepository {
         ownerId: UUID,
         workspaceId: UUID,
         eventRangeFrom: Long,
-        eventRangeTo: Long? = null
+        eventRangeTo: Long? = null,
+        returnInstances: Boolean = true,
     ): List<Booking>
 
     /**
@@ -83,10 +94,11 @@ interface IBookingRepository {
      *
      * @param eventRangeFrom use to set an upper bound for filtering bookings by start time
      * @param eventRangeTo lover bound for filtering bookings by start time
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @return All [Booking]s
      * @author Daniil Zavyalov, Danil Kiselev
      */
-    fun findAll(eventRangeFrom: Long, eventRangeTo: Long? = null): List<Booking>
+    fun findAll(eventRangeFrom: Long, eventRangeTo: Long? = null, returnInstances: Boolean = true): List<Booking>
 
     /**
      * Saves a given booking. If given model will have an id, it will be ignored.

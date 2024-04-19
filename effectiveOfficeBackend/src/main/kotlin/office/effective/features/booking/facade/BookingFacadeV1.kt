@@ -64,6 +64,7 @@ class BookingFacadeV1(
      * Should be greater than range_from.
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * Should be lover than [bookingRangeFrom]. Default value: [BookingConstants.MIN_SEARCH_START_TIME]
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @return [BookingDTO] list
      * @author Daniil Zavyalov
      */
@@ -71,7 +72,8 @@ class BookingFacadeV1(
         userId: String?,
         workspaceId: String?,
         bookingRangeTo: Long?,
-        bookingRangeFrom: Long = BookingConstants.MIN_SEARCH_START_TIME
+        bookingRangeFrom: Long = BookingConstants.MIN_SEARCH_START_TIME,
+        returnInstances: Boolean
     ): List<BookingResponseDTO> {
         if (bookingRangeTo != null && bookingRangeTo <= bookingRangeFrom) {
             throw BadRequestException("Max booking start time should be null or greater than min start time")
@@ -80,6 +82,7 @@ class BookingFacadeV1(
             bookingService.findAll(
                 userId?.let { uuidValidator.uuidFromString(it) },
                 workspaceId?.let { uuidValidator.uuidFromString(it) },
+                returnInstances,
                 bookingRangeTo,
                 bookingRangeFrom
             )

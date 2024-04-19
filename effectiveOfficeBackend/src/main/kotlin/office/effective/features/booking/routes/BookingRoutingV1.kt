@@ -38,6 +38,11 @@ fun Route.bookingRoutingV1() {
 
             val userId: String? = call.request.queryParameters["user_id"]
             val workspaceId: String? = call.request.queryParameters["workspace_id"]
+
+            val returnInstances: Boolean = call.request.queryParameters["return_instances"]?.let { stringRangeTo ->
+                stringRangeTo.toBooleanStrictOrNull()
+                    ?: throw BadRequestException("return_instances can't be parsed to Boolean")
+            } ?: true
             val bookingRangeTo: Long = call.request.queryParameters["range_to"]?.let { stringRangeTo ->
                 stringRangeTo.toLongOrNull()
                     ?: throw BadRequestException("range_to can't be parsed to Long")
@@ -47,7 +52,7 @@ fun Route.bookingRoutingV1() {
                     ?: throw BadRequestException("range_from can't be parsed to Long")
             } ?: endOfDayEpoch
 
-            call.respond(bookingFacade.findAll(userId, workspaceId, bookingRangeTo, bookingRangeFrom))
+            call.respond(bookingFacade.findAll(userId, workspaceId, bookingRangeTo, bookingRangeFrom, returnInstances))
         }
         post(SwaggerDocument.postBookingV1()) {
             val dto = call.receive<BookingRequestDTO>()

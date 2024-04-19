@@ -125,17 +125,23 @@ class BookingRegularRepository(
      * @param eventRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * Old Google calendar events may not appear correctly in the system and cause unexpected exceptions
      * @param eventRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all workspace [Booking]
      * @author Daniil Zavyalov
      */
-    override fun findAllByWorkspaceId(workspaceId: UUID, eventRangeFrom: Long, eventRangeTo: Long?): List<Booking> {
+    override fun findAllByWorkspaceId(
+        workspaceId: UUID,
+        eventRangeFrom: Long,
+        eventRangeTo: Long?,
+        returnInstances: Boolean
+    ): List<Booking> {
         logger.debug(
             "[findAllByWorkspaceId] retrieving all bookings for workspace with id={} in range from {} to {}",
             workspaceId,
             Instant.ofEpochMilli(eventRangeFrom),
             eventRangeTo?.let { Instant.ofEpochMilli(it) } ?: "infinity"
         )
-        val eventsWithWorkspace = basicQuery(eventRangeFrom, eventRangeTo)
+        val eventsWithWorkspace = basicQuery(eventRangeFrom, eventRangeTo, returnInstances)
             .setQ(workspaceId.toString())
             .execute().items
         logger.trace("[findAllByWorkspaceId] request to Google Calendar completed")
@@ -153,18 +159,24 @@ class BookingRegularRepository(
      * @param eventRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * Old Google calendar events may not appear correctly in the system and cause unexpected exceptions
      * @param eventRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all user [Booking]
      * @throws InstanceNotFoundException if user with the given id doesn't exist in database
      * @author Daniil Zavyalov
      */
-    override fun findAllByOwnerId(ownerId: UUID, eventRangeFrom: Long, eventRangeTo: Long?): List<Booking> {
+    override fun findAllByOwnerId(
+        ownerId: UUID,
+        eventRangeFrom: Long,
+        eventRangeTo: Long?,
+        returnInstances: Boolean
+    ): List<Booking> {
         logger.debug(
             "[findAllByOwnerId] retrieving all bookings for user with id={} in range from {} to {}",
             ownerId,
             Instant.ofEpochMilli(eventRangeFrom),
             eventRangeTo?.let { Instant.ofEpochMilli(it) } ?: "infinity"
         )
-        val eventsWithUser = basicQuery(eventRangeFrom, eventRangeTo)
+        val eventsWithUser = basicQuery(eventRangeFrom, eventRangeTo, returnInstances)
             .setQ(ownerId.toString())
             .execute().items
         logger.trace("[findAllByOwnerId] request to Google Calendar completed")
@@ -182,6 +194,7 @@ class BookingRegularRepository(
      * @param eventRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * Old Google calendar events may not appear correctly in the system and cause unexpected exceptions
      * @param eventRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all [Booking]s with the given workspace and owner id
      * @author Daniil Zavyalov
      */
@@ -189,7 +202,8 @@ class BookingRegularRepository(
         ownerId: UUID,
         workspaceId: UUID,
         eventRangeFrom: Long,
-        eventRangeTo: Long?
+        eventRangeTo: Long?,
+        returnInstances: Boolean
     ): List<Booking> {
         logger.debug(
             "[findAllByOwnerAndWorkspaceId] retrieving all bookings for a workspace with id={} created by user with id={} in range from {} to {}",
@@ -198,7 +212,7 @@ class BookingRegularRepository(
             Instant.ofEpochMilli(eventRangeFrom),
             eventRangeTo?.let { Instant.ofEpochMilli(it) } ?: "infinity"
         )
-        val eventsWithUserAndWorkspace = basicQuery(eventRangeFrom, eventRangeTo)
+        val eventsWithUserAndWorkspace = basicQuery(eventRangeFrom, eventRangeTo, returnInstances)
             .setQ("$workspaceId $ownerId")
             .execute().items
         logger.trace("[findAllByOwnerAndWorkspaceId] request to Google Calendar completed")
@@ -214,16 +228,17 @@ class BookingRegularRepository(
      * @param eventRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * Old Google calendar events may not appear correctly in the system and cause unexpected exceptions
      * @param eventRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @return All [Booking]s
      * @author Daniil Zavyalov
      */
-    override fun findAll(eventRangeFrom: Long, eventRangeTo: Long?): List<Booking> {
+    override fun findAll(eventRangeFrom: Long, eventRangeTo: Long?, returnInstances: Boolean): List<Booking> {
         logger.debug(
             "[findAll] retrieving all bookings in range from {} to {}",
             Instant.ofEpochMilli(eventRangeFrom),
             eventRangeTo?.let { Instant.ofEpochMilli(it) } ?: "infinity"
         )
-        val events = basicQuery(eventRangeFrom, eventRangeTo).execute().items
+        val events = basicQuery(eventRangeFrom, eventRangeTo, returnInstances).execute().items
         logger.trace("[findAll] request to Google Calendar completed")
 
         return events.map { event ->

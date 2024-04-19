@@ -19,11 +19,11 @@ import java.time.Instant
  */
 fun SwaggerDocument.returnBookingByIdV1(): OpenApiRoute.() -> Unit = {
     description = "Returns booking found by id"
-    tags = listOf("bookings")
+    tags = listOf("Bookings V1")
     request {
         pathParameter<String>("id") {
             description = "Booking id"
-            example = "c48c2a3d-bbfd-4801-b121-973ae3cf4cd9"
+            example = "p0v9udrhk66cailnigi0qkrji4"
             required = true
             allowEmptyValue = false
         }
@@ -53,7 +53,7 @@ fun SwaggerDocument.returnBookingsV1(): OpenApiRoute.() -> Unit = {
     description = "Return all bookings. Bookings can be filtered by booking owner id, workspace id and time range. " +
             "Returns only non-recurring bookings (recurring bookings are expanded into non-recurring ones). " +
             "Can return no more than 2500 bookings."
-    tags = listOf("bookings")
+    tags = listOf("Bookings V1")
     request {
         queryParameter<String>("user_id") {
             description = "Booking owner id"
@@ -108,7 +108,7 @@ fun SwaggerDocument.returnBookingsV1(): OpenApiRoute.() -> Unit = {
  */
 fun SwaggerDocument.postBookingV1(): OpenApiRoute.() -> Unit = {
     description = "Saves a given booking"
-    tags = listOf("bookings")
+    tags = listOf("Bookings V1")
     request {
         body<BookingDTO> {
             example(
@@ -194,7 +194,7 @@ fun SwaggerDocument.postBookingV1(): OpenApiRoute.() -> Unit = {
  */
 fun SwaggerDocument.putBookingV1(): OpenApiRoute.() -> Unit = {
     description = "Updates a given booking"
-    tags = listOf("bookings")
+    tags = listOf("Bookings V1")
     request {
         body<BookingDTO> {
             example(
@@ -232,7 +232,7 @@ fun SwaggerDocument.putBookingV1(): OpenApiRoute.() -> Unit = {
 fun SwaggerDocument.deleteBookingByIdV1(): OpenApiRoute.() -> Unit = {
     description =
         "Deletes a booking with the given id. If the booking is not found in the database it is silently ignored"
-    tags = listOf("bookings")
+    tags = listOf("Bookings V1")
     request {
         pathParameter<String>("id") {
             description = "Booking id"

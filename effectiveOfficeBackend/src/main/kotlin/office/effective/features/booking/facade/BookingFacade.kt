@@ -85,6 +85,7 @@ class BookingFacade(
             bookingService.findAll(
                 userId?.let { uuidValidator.uuidFromString(it) },
                 workspaceId?.let { uuidValidator.uuidFromString(it) },
+                true,
                 bookingRangeTo,
                 bookingRangeFrom
             )

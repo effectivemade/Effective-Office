@@ -83,6 +83,7 @@ class BookingService(
      *
      * @param userId use to filter by booking owner id
      * @param workspaceId use to filter by booking workspace id
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @param bookingRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * @throws InstanceNotFoundException if [UserModel] or [Workspace] with the given id doesn't exist in database
@@ -91,6 +92,7 @@ class BookingService(
     override fun findAll(
         userId: UUID?,
         workspaceId: UUID?,
+        returnInstances: Boolean,
         bookingRangeTo: Long?,
         bookingRangeFrom: Long
     ): List<Booking> {
@@ -106,17 +108,19 @@ class BookingService(
 
                 if (workspace.tag == "meeting") {
                     bookingMeetingRepository.findAllByOwnerAndWorkspaceId(
-                        userId,
-                        workspaceId,
-                        bookingRangeFrom,
-                        bookingRangeTo
+                        ownerId = userId,
+                        workspaceId = workspaceId,
+                        returnInstances = returnInstances,
+                        eventRangeFrom = bookingRangeFrom,
+                        eventRangeTo = bookingRangeTo
                     )
                 } else {
                     bookingRegularRepository.findAllByOwnerAndWorkspaceId(
-                        userId,
-                        workspaceId,
-                        bookingRangeFrom,
-                        bookingRangeTo
+                        ownerId = userId,
+                        workspaceId = workspaceId,
+                        returnInstances = returnInstances,
+                        eventRangeFrom = bookingRangeFrom,
+                        eventRangeTo = bookingRangeTo
                     )
                 }
             }
@@ -127,15 +131,17 @@ class BookingService(
                 )
 
                 val bookings = bookingMeetingRepository.findAllByOwnerId(
-                        userId,
-                        bookingRangeFrom,
-                        bookingRangeTo
-                    ).toMutableList()
+                    ownerId = userId,
+                    returnInstances = returnInstances,
+                    eventRangeFrom = bookingRangeFrom,
+                    eventRangeTo = bookingRangeTo
+                ).toMutableList()
                 bookings.addAll(
                     bookingRegularRepository.findAllByOwnerId(
-                        userId,
-                        bookingRangeFrom,
-                        bookingRangeTo
+                        ownerId = userId,
+                        returnInstances = returnInstances,
+                        eventRangeFrom = bookingRangeFrom,
+                        eventRangeTo = bookingRangeTo
                     )
                 )
                 bookings
@@ -149,23 +155,33 @@ class BookingService(
 
                 if (workspace.tag == "meeting") {
                     bookingMeetingRepository.findAllByWorkspaceId(
-                        workspaceId,
-                        bookingRangeFrom,
-                        bookingRangeTo
+                        workspaceId = workspaceId,
+                        returnInstances = returnInstances,
+                        eventRangeFrom = bookingRangeFrom,
+                        eventRangeTo = bookingRangeTo
                     )
                 } else {
                     bookingRegularRepository.findAllByWorkspaceId(
-                        workspaceId,
-                        bookingRangeFrom,
-                        bookingRangeTo
+                        workspaceId = workspaceId,
+                        returnInstances = returnInstances,
+                        eventRangeFrom = bookingRangeFrom,
+                        eventRangeTo = bookingRangeTo
                     )
                 }
 
             }
 
             else -> {
-                val bookings = bookingMeetingRepository.findAll(bookingRangeFrom, bookingRangeTo).toMutableList()
-                bookings.addAll(bookingRegularRepository.findAll(bookingRangeFrom, bookingRangeTo))
+                val bookings = bookingMeetingRepository.findAll(
+                    eventRangeFrom = bookingRangeFrom,
+                    eventRangeTo = bookingRangeTo,
+                    returnInstances = returnInstances
+                ).toMutableList()
+                bookings.addAll(bookingRegularRepository.findAll(
+                    eventRangeFrom = bookingRangeFrom,
+                    eventRangeTo = bookingRangeTo,
+                    returnInstances = returnInstances
+                ))
                 bookings
             }
         }

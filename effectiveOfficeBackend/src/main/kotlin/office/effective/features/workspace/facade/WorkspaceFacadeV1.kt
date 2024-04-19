@@ -73,6 +73,7 @@ class WorkspaceFacadeV1(
                 val bookings = bookingFacade.findAll(
                     userId = null,
                     workspaceId = workspace.id.toString(),
+                    returnInstances = true,
                     bookingRangeFrom = withBookingsFrom,
                     bookingRangeTo = withBookingsUntil
                 )
