@@ -63,5 +63,14 @@ fun Route.bookingRouting() {
             bookingFacade.deleteById(id)
             call.respond(HttpStatusCode.NoContent)
         }
+
+        get("/test/sync/{runs}"){
+            val runs: Int = call.parameters["runs"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            call.respond(bookingFacade.testSync(runs))
+        }
+        get("/test/parallel/{runs}"){
+            val runs: Int = call.parameters["runs"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            call.respond(bookingFacade.testParallel(runs))
+        }
     }
 }

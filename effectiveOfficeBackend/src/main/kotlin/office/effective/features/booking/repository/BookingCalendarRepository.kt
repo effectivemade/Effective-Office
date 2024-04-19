@@ -335,6 +335,17 @@ class BookingCalendarRepository(
         return events.map { googleCalendarConverter.toBookingModel(it) }
     }
 
+    fun findAllNoConverts(eventRangeFrom: Long, eventRangeTo: Long?, calendars: List<String>): List<Event> {
+        logger.debug(
+            "[findAll] retrieving all bookings in range from {} to {}",
+            Instant.ofEpochMilli(eventRangeFrom),
+            eventRangeTo?.let { Instant.ofEpochMilli(it) } ?: "infinity"
+        )
+
+        val events: List<Event> = getAllEvents(calendars, eventRangeFrom, eventRangeTo)
+        return events
+    }
+
     /**
      * Saves a given booking. If given model will have an id, it will be ignored.
      * Use the returned model for further operations

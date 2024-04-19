@@ -232,6 +232,18 @@ class BookingWorkspaceRepository(
         }
     }
 
+    fun findAllNoConverts(eventRangeFrom: Long, eventRangeTo: Long?): List<Event> {
+        logger.debug(
+            "[findAll] retrieving all bookings in range from {} to {}",
+            Instant.ofEpochMilli(eventRangeFrom),
+            eventRangeTo?.let { Instant.ofEpochMilli(it) } ?: "infinity"
+        )
+        val events = basicQuery(eventRangeFrom, eventRangeTo).execute().items
+        logger.trace("[findAll] request to Google Calendar completed")
+
+        return events
+    }
+
     /**
      * Saves a given booking. If given model will have an id, it will be ignored.
      * Use the returned model for further operations

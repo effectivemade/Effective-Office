@@ -1,5 +1,6 @@
 package office.effective.features.booking.facade
 
+import com.google.api.services.calendar.model.Event
 import io.ktor.server.plugins.*
 import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
@@ -7,9 +8,16 @@ import office.effective.common.utils.DatabaseTransactionManager
 import office.effective.common.utils.UuidValidator
 import office.effective.features.booking.converters.BookingFacadeConverter
 import office.effective.dto.BookingDTO
+import office.effective.features.booking.repository.BookingCalendarRepository
+import office.effective.features.booking.repository.BookingWorkspaceRepository
+import office.effective.features.calendar.repository.CalendarIdsRepository
 import office.effective.model.Booking
 import office.effective.model.Workspace
 import office.effective.serviceapi.IBookingService
+import org.koin.core.context.GlobalContext
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
+import kotlin.concurrent.thread
 
 /**
  * Class used in routes to handle bookings requests.
@@ -119,5 +127,46 @@ class BookingFacade(
             bookingConverter.modelToDto(savedModel)
         })
         return dto
+    }
+
+    private val calendarIdsRepository: CalendarIdsRepository = GlobalContext.get().get()
+
+    private val bookingRepository: BookingCalendarRepository = GlobalContext.get().get()
+    private val bookingWorkspaceRepository: BookingWorkspaceRepository = GlobalContext.get().get()
+    fun testSync(runs: Int): List<String> {
+        val calendars: List<String> = calendarIdsRepository.findAllCalendarsId()
+        val bookings = mutableListOf<Event>()
+        for (i in 1..runs){
+            println(i)
+            bookings.addAll(bookingRepository.findAllNoConverts(0, null, calendars).toMutableList())
+            bookings.addAll(bookingWorkspaceRepository.findAllNoConverts(0, null))
+        }
+        return bookings.map { it.toString() };
+    }
+
+    fun testParallel(runs: Int): List<String> {
+        val calendars: List<String> = calendarIdsRepository.findAllCalendarsId()
+        val executor = Executors.newFixedThreadPool(runs)
+        val result = mutableListOf<Event>()
+        val futures =  mutableListOf<CompletableFuture<List<Event>>>()
+        for (i in 1..runs){
+            futures.add(CompletableFuture.supplyAsync {
+                println(Thread.currentThread().id)
+                val bookings = mutableListOf<Event>()
+                bookings.addAll(bookingRepository.findAllNoConverts(0, null, calendars).toMutableList())
+                bookings.addAll(bookingWorkspaceRepository.findAllNoConverts(0, null))
+                bookings
+            })
+        }
+
+
+        val allEvents = CompletableFuture.allOf(*futures.toTypedArray())
+            .thenApply {
+                futures.map { it.get().map { it.toString() } }
+            }
+            .join()
+        executor.shutdown()
+
+        return allEvents.flatten()
     }
 }
