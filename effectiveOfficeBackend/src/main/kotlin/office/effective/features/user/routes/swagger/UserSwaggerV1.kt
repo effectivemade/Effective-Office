@@ -14,7 +14,7 @@ import office.effective.dto.UserDTO
  */
 fun SwaggerDocument.returnUsersV1(): OpenApiRoute.() -> Unit = {
     description = "Return all users, all users by tag or one user by email"
-    tags = listOf("users")
+    tags = listOf("Users V1")
     request{
         queryParameter<String>("user_tag"){
             description = "Name of the tag. Mutually exclusive with email"
@@ -119,7 +119,7 @@ fun SwaggerDocument.returnUsersV1(): OpenApiRoute.() -> Unit = {
  */
 fun SwaggerDocument.returnUserByIdV1(): OpenApiRoute.() -> Unit = {
     description = "Return user by id"
-    tags = listOf("users")
+    tags = listOf("Users V1")
     request {
         pathParameter<String>("user_id") {
             description = "User id"
@@ -172,7 +172,7 @@ fun SwaggerDocument.returnUserByIdV1(): OpenApiRoute.() -> Unit = {
  */
 fun SwaggerDocument.updateUserV1(): OpenApiRoute.() -> Unit = {
     description = "Changes user by id"
-    tags = listOf("users")
+    tags = listOf("Users V1")
     request {
         pathParameter<String>("user_id") {
             description = "User id"

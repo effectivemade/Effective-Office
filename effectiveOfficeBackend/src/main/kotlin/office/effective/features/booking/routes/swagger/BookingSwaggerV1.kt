@@ -7,11 +7,7 @@ import io.github.smiley4.ktorswaggerui.dsl.OpenApiRoute
 import io.ktor.http.*
 import office.effective.common.constants.BookingConstants
 import office.effective.common.swagger.SwaggerDocument
-import office.effective.dto.BookingDTO
-import office.effective.dto.IntegrationDTO
-import office.effective.dto.UserDTO
-import office.effective.dto.UtilityDTO
-import office.effective.dto.WorkspaceDTO
+import office.effective.dto.*
 import java.time.Instant
 
 /**
@@ -31,9 +27,9 @@ fun SwaggerDocument.returnBookingByIdV1(): OpenApiRoute.() -> Unit = {
     response {
         HttpStatusCode.OK to {
             description = "Returns booking found by id"
-            body<BookingDTO> {
+            body<BookingResponseDTO> {
                 example(
-                    "Bookings", bookingExample1
+                    "Bookings", bookingResponseExample1
                 ) {}
             }
         }
@@ -51,19 +47,28 @@ fun SwaggerDocument.returnBookingByIdV1(): OpenApiRoute.() -> Unit = {
  */
 fun SwaggerDocument.returnBookingsV1(): OpenApiRoute.() -> Unit = {
     description = "Return all bookings. Bookings can be filtered by booking owner id, workspace id and time range. " +
-            "Returns only non-recurring bookings (recurring bookings are expanded into non-recurring ones). " +
+            "By default returns only non-recurring bookings (recurring bookings are expanded into non-recurring ones). " +
             "Can return no more than 2500 bookings."
     tags = listOf("Bookings V1")
     request {
         queryParameter<String>("user_id") {
-            description = "Booking owner id"
+            description = "Booking owner UUID"
             example = "2c77feee-2bc1-11ee-be56-0242ac120002"
             required = false
             allowEmptyValue = false
         }
         queryParameter<String>("workspace_id") {
-            description = "Booked workspace id"
+            description = "Booked workspace UUID"
             example = "50d89406-2bc6-11ee-be56-0242ac120002"
+            required = false
+            allowEmptyValue = false
+        }
+        queryParameter<Boolean>("return_instances") {
+            description = "Whether to expand recurring bookings into instances " +
+                    "and only return single one-off bookings and instances of recurring bookings, but not the " +
+                    "underlying recurring bookings themselves." +
+                    "Default value is true"
+            example = true
             required = false
             allowEmptyValue = false
         }
@@ -73,7 +78,6 @@ fun SwaggerDocument.returnBookingsV1(): OpenApiRoute.() -> Unit = {
             example = 1692927200000
             required = false
             allowEmptyValue = false
-
         }
         queryParameter<Long>("range_to") {
             description = "Upper bound (exclusive) for a beginBooking to filter by. " +
@@ -86,16 +90,16 @@ fun SwaggerDocument.returnBookingsV1(): OpenApiRoute.() -> Unit = {
     response {
         HttpStatusCode.OK to {
             description = "Returns all bookings found by user id"
-            body<List<BookingDTO>> {
+            body<List<BookingResponseDTO>> {
                 example(
                     "Workspace", listOf(
-                        bookingExample1, bookingExample2
+                        bookingResponseExample1, bookingResponseExample2
                     )
                 ) {}
             }
         }
         HttpStatusCode.BadRequest to {
-            description = "range_to isn't greater then range_to, or one of them can't be parsed to Long"
+            description = "range_to isn't greater then range_to, or one of the parameters has an incorrect type"
         }
         HttpStatusCode.NotFound to {
             description = "User or workspace with the given id doesn't exist"
@@ -110,73 +114,16 @@ fun SwaggerDocument.postBookingV1(): OpenApiRoute.() -> Unit = {
     description = "Saves a given booking"
     tags = listOf("Bookings V1")
     request {
-        body<BookingDTO> {
-            example(
-                "Bookings", BookingDTO(
-                    owner = UserDTO(
-                        id = "2c77feee-2bc1-11ee-be56-0242ac120002",
-                        fullName = "Max",
-                        active = true,
-                        role = "Fullstack developer",
-                        avatarUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
-                        integrations = listOf(
-                            IntegrationDTO(
-                                "c717cf6e-28b3-4148-a469-032991e5d9e9",
-                                "phoneNumber",
-                                "89087659880"
-                            )
-                        ),
-                        email = "cool.fullstack.developer@effective.band",
-                        tag = "employee"
-                    ),
-                    participants = listOf(
-                        UserDTO(
-                            id = "2c77feee-2bc1-11ee-be56-0242ac120002",
-                            fullName = "Ivan Ivanov",
-                            active = true,
-                            role = "Android developer",
-                            avatarUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
-                            integrations = listOf(
-                                IntegrationDTO(
-                                    "c717cf6e-28b3-4148-a469-032991e5d9e9",
-                                    "phoneNumber",
-                                    "89236379887"
-                                )
-                            ),
-                            email = "cool.backend.developer@effective.band",
-                            tag = "employee"
-                        )
-                    ),
-                    workspace = WorkspaceDTO(
-                        id = "2561471e-2bc6-11ee-be56-0242ac120002", name = "Sun", tag = "meeting",
-                        utilities = listOf(
-                            UtilityDTO(
-                                id = "50d89406-2bc6-11ee-be56-0242ac120002",
-                                name = "Sockets",
-                                iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
-                                count = 8
-                            ), UtilityDTO(
-                                id = "a62a86c6-2bc6-11ee-be56-0242ac120002",
-                                name = "Projectors",
-                                iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
-                                count = 1
-                            )
-                        )
-                    ),
-                    id = null,
-                    beginBooking = 1691299526000,
-                    endBooking = 1691310326000,
-                    recurrence = null
-                )
-            )
+        body<BookingRequestDTO> {
+            example("Bookings", bookingRequestExample1)
         }
     }
     response {
         HttpStatusCode.Created to {
             description = "Returns saved booking"
-            body<BookingDTO> {
+            body<BookingResponseDTO> {
                 example(
-                    "Bookings", bookingExample2
+                    "Bookings", bookingResponseExample1
                 ) {}
             }
         }
@@ -193,27 +140,30 @@ fun SwaggerDocument.postBookingV1(): OpenApiRoute.() -> Unit = {
  * @suppress
  */
 fun SwaggerDocument.putBookingV1(): OpenApiRoute.() -> Unit = {
-    description = "Updates a given booking"
+    description = "Updates a given booking. " +
+            "Note that recurring bookings have different id's with their instances. " +
+            "If you have an instance and want to update a recurring booking " +
+            "you should request a recurring booking by recurringBookingId and then update the requested booking."
     tags = listOf("Bookings V1")
     request {
-        body<BookingDTO> {
+        body<BookingRequestDTO> {
             example(
-                "Bookings", bookingExample1
+                "Bookings", bookingRequestExample2
             )
         }
         pathParameter<String>("id") {
             description = "Booking id"
-            example = "p0v9udrhk66cailnigi0qkrji4"
+            example = "x9v0udreksdcailnigi0qkras4"
             required = true
             allowEmptyValue = false
         }
     }
     response {
         HttpStatusCode.OK to {
-            description = "Returns saved booking"
+            description = "Returns a saved booking"
             body<BookingDTO> {
                 example(
-                    "Bookings", bookingExample1
+                    "Bookings", bookingResponseExample2
                 ) {}
             }
         }
@@ -236,7 +186,7 @@ fun SwaggerDocument.deleteBookingByIdV1(): OpenApiRoute.() -> Unit = {
     request {
         pathParameter<String>("id") {
             description = "Booking id"
-            example = "c48c2a3d-bbfd-4801-b121-973ae3cf4cd9"
+            example = "x9v0udreksdcailnigi0qkras4"
             required = true
             allowEmptyValue = false
         }
@@ -254,7 +204,19 @@ fun SwaggerDocument.deleteBookingByIdV1(): OpenApiRoute.() -> Unit = {
 /**
  * @suppress
  */
-private val bookingExample1 = BookingDTO(
+private val bookingRequestExample1 = BookingRequestDTO(
+    ownerEmail = "cool.backend.developer@effective.band",
+    participantEmails = listOf("cool.backend.developer@effective.band", "email@yahoo.com"),
+    workspaceId = "2561471e-2bc6-11ee-be56-0242ac120002",
+    beginBooking = 1691299526000,
+    endBooking = 1691310326000,
+    recurrence = null,
+)
+
+/**
+ * @suppress
+ */
+private val bookingResponseExample1 = BookingResponseDTO(
     owner = UserDTO(
         id = "2c77feee-2bc1-11ee-be56-0242ac120002",
         fullName = "Ivan Ivanov",
@@ -310,27 +272,40 @@ private val bookingExample1 = BookingDTO(
         utilities = listOf(
             UtilityDTO(
                 id = "50d89406-2bc6-11ee-be56-0242ac120002",
-                name = "Sockets",
+                name = "Place",
                 iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
                 count = 8
             ), UtilityDTO(
                 id = "a62a86c6-2bc6-11ee-be56-0242ac120002",
-                name = "Projectors",
+                name = "Sockets",
                 iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
                 count = 1
             )
         )
     ),
-    id = "c48c2a3d-bbfd-4801-b121-973ae3cf4cd9",
+    id = "p0v9udrhk66cailnigi0qkrji4",
     beginBooking = 1691299526000,
     endBooking = 1691310326000,
-    recurrence = null
+    recurrence = null,
+    recurringBookingId = null
 )
 
 /**
  * @suppress
  */
-private val bookingExample2 = BookingDTO(
+private val bookingRequestExample2 = BookingRequestDTO(
+    ownerEmail = "cool.backend.developer@effective.band",
+    participantEmails = listOf("cool.backend.developer@effective.band"),
+    workspaceId = "2561471e-2bc6-11ee-be56-0242ac120002",
+    beginBooking = 1691299526000,
+    endBooking = 1691310326000,
+    recurrence = null,
+)
+
+/**
+ * @suppress
+ */
+private val bookingResponseExample2 = BookingResponseDTO(
     owner = UserDTO(
         id = "2c77feee-2bc1-11ee-be56-0242ac120002",
         fullName = "Ivan Ivanov",
@@ -370,19 +345,20 @@ private val bookingExample2 = BookingDTO(
         utilities = listOf(
             UtilityDTO(
                 id = "50d89406-2bc6-11ee-be56-0242ac120002",
-                name = "Sockets",
+                name = "Place",
                 iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
                 count = 8
             ), UtilityDTO(
                 id = "a62a86c6-2bc6-11ee-be56-0242ac120002",
-                name = "Projectors",
+                name = "Sockets",
                 iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
                 count = 1
             )
         )
     ),
-    id = "c48c2a3d-bbfd-4801-b121-973ae3cf4cd9",
+    id = "x9v0udreksdcailnigi0qkras4",
     beginBooking = 1691299526000,
     endBooking = 1691310326000,
-    recurrence = null
+    recurrence = null,
+    recurringBookingId = null
 )
