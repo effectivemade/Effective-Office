@@ -18,6 +18,7 @@ object BookingConstants {
     val WORKSPACE_CALENDAR: String = System.getenv("WORKSPACE_CALENDAR")
         ?: config.propertyOrNull("calendar.workspaceCalendar")?.getString()
         ?: throw Exception("Environment and config file does not contain workspace Google calendar id")
-
+    val DEFAULT_TIMEZONE_ID: String = config.propertyOrNull("calendar.defaultTimezone")?.getString()
+        ?: throw Exception("Config file does not contain default timezone id")
     const val UNTIL_FORMAT = "yyyyMMdd"
 }

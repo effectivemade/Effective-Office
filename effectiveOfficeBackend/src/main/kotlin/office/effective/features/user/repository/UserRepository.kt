@@ -114,6 +114,34 @@ class UserRepository(
     }
 
     /**
+     * Retrieves a user models by email list
+     *
+     * @return [UserModel]
+     * @throws InstanceNotFoundException if user with the given email doesn't exist in database
+     * @author Daniil Zavyalov
+     */
+    fun findAllByEmail(email: List<String>): List<UserModel> {
+        logger.debug("[findAllByEmail] retrieving a users with specified emails {}", email)
+        val userEntities: MutableList<UserEntity> = mutableListOf()
+        val usersIds: MutableList<UUID> = mutableListOf()
+        val result: MutableList<UserModel> = mutableListOf()
+        db.from(Users)
+            .innerJoin(right = UsersTags, on = UsersTags.id eq Users.tagId)
+            .select()
+            .where { Users.email inList email }
+            .forEach { raw ->
+                val user: UserEntity = Users.createEntity(raw)
+                usersIds.add(user.id)
+                userEntities.add(user)
+            }
+        val integrations = findAllIntegrationsByUserIds(usersIds)
+        userEntities.forEach { userEntity ->
+            result.add(converter.entityToModel(userEntity, integrations[userEntity.id]))
+        }
+        return result
+    }
+
+    /**
      * Returns Integration entity by id
      * @return [IntegrationEntity]
      * @throws InstanceNotFoundException([IntegrationEntity], "Integration with id ${id} not found")
@@ -178,7 +206,8 @@ class UserRepository(
         val result = hashMapOf<UUID, MutableSet<IntegrationModel>>()
         db.from(UsersIntegrations)
             .innerJoin(right = Integrations, on = UsersIntegrations.integrationId eq Integrations.id).select()
-            .where { UsersIntegrations.userId inList ids }.forEach { row ->
+            .where { UsersIntegrations.userId inList ids }
+            .forEach { row ->
                 val userId: UUID = row[UsersIntegrations.userId] ?: return@forEach
                 val integration = integrationConverter.entityToModel(
                     Integrations.createEntity(row), row[UsersIntegrations.valueStr] ?: ""

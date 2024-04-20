@@ -23,6 +23,7 @@ import office.effective.model.Workspace
  *
  * TODO: should implements IBookingRepository interface (add minStartTime and maxStartTime to queries)
  */
+@Deprecated("Used to store events inside database. We don't store events into database.",ReplaceWith("BookingCalendarRepository"), DeprecationLevel.ERROR)
 class BookingRepository(private val database: Database,
                         private val converter: BookingRepositoryConverter,
                         private val uuidValidator: UuidValidator){

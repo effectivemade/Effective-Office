@@ -1,8 +1,8 @@
 package office.effective.features.workspace.repository
 
 import office.effective.common.exception.InstanceNotFoundException
-import office.effective.features.booking.repository.BookingCalendarRepository
-import office.effective.features.booking.repository.BookingWorkspaceRepository
+import office.effective.features.booking.repository.BookingMeetingRepository
+import office.effective.features.booking.repository.BookingRegularRepository
 import office.effective.features.booking.repository.IBookingRepository
 import office.effective.features.workspace.converters.WorkspaceRepositoryConverter
 import office.effective.model.Booking
@@ -191,9 +191,9 @@ class WorkspaceRepository(private val database: Database, private val converter:
         )
 
         val googleRepository: IBookingRepository = if (tag == "meeting") {
-            GlobalContext.get().get<BookingCalendarRepository>() //TODO: Fix global context call
+            GlobalContext.get().get<BookingMeetingRepository>() //TODO: Fix global context call
         } else {
-            GlobalContext.get().get<BookingWorkspaceRepository>() //TODO: Fix global context call
+            GlobalContext.get().get<BookingRegularRepository>() //TODO: Fix global context call
         }
         val freeWorkspaces = mutableListOf<Workspace>()
         val bookings = googleRepository.findAll(beginTimestamp.toEpochMilli(), endTimestamp.toEpochMilli())
