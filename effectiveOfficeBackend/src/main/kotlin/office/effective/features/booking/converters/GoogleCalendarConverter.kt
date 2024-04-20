@@ -183,10 +183,14 @@ class GoogleCalendarConverter(
      */
     fun toGoogleWorkspaceRegularEvent(model: Booking): Event {
         logger.debug("[toGoogleWorkspaceRegularEvent] converting regular workspace booking to calendar event")
+        val attendeeList: MutableList<EventAttendee> = participantsAndOwnerToAttendees(model)
+
         val event = Event().apply {
+            id = model.id
             summary = eventSummaryForRegularBooking(model)
             description = eventDescriptionRegularBooking(model)
-            getRecurrenceFromRecurrenceModel(model)?.let{ recurrence = it }
+            attendees = attendeeList
+            recurrence = getRecurrenceFromRecurrenceModel(model)
             start = model.beginBooking.toGoogleDateTime()
             end = model.endBooking.toGoogleDateTime()
         }
@@ -218,6 +222,7 @@ class GoogleCalendarConverter(
         attendeeList.add(workspaceModelToAttendee(model.workspace))
 
         val event = Event().apply {
+            id = model.id
             summary = eventSummaryForMeetingBooking(model)
             description = eventDescriptionMeetingBooking(model)
             organizer =  userModelToGoogleOrganizer(model.owner)

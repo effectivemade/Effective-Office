@@ -374,7 +374,6 @@ class BookingMeetingRepository(
             .also { savedBooking ->
                 logger.trace("[save] saved booking: {}", savedBooking)
             }
-
     }
 
     /**
@@ -438,18 +437,19 @@ class BookingMeetingRepository(
      */
     private fun updateSingleEvent(booking: Booking, workspaceCalendar: String): Event {
         val eventOnUpdate = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
+
         if (singleEventHasCollision(eventOnUpdate, workspaceCalendar)) {
             throw WorkspaceUnavailableException("Workspace ${booking.workspace.name} " +
                     "unavailable at time between ${booking.beginBooking} and ${booking.endBooking}")
         }
 
-        val eventId = eventOnUpdate.id
-        val prevEventVersion = findByCalendarIdAndBookingId(eventId) ?: throw InstanceNotFoundException(
-            WorkspaceBookingEntity::class, "Booking with id $eventId not wound"
+        val bookingId = booking.id ?: throw MissingIdException("Booking model must have an id for update request")
+        val prevEventVersion = findByCalendarIdAndBookingId(bookingId) ?: throw InstanceNotFoundException(
+            WorkspaceBookingEntity::class, "Booking with id $bookingId not wound"
         )
         logger.trace("[updateSingleEvent] previous version of event: {}", prevEventVersion)
 
-        return calendarEvents.update(defaultCalendar, eventId, eventOnUpdate).execute()
+        return calendarEvents.update(defaultCalendar, bookingId, eventOnUpdate).execute()
     }
 
     /**
@@ -478,9 +478,10 @@ class BookingMeetingRepository(
     }
 
     /**
-     * Checks weather the saved event has collision with other events.
+     * Checks whether a non-recurring event has a collision with other events.
      *
      * @param eventToVerify event for collision check
+     * @return True if event has a collision
      * */
     private fun singleEventHasCollision(eventToVerify: Event, workspaceCalendar: String): Boolean {
         val sameTimeEvents = basicQuery(
@@ -499,11 +500,10 @@ class BookingMeetingRepository(
     }
 
     /**
-     * Launch checkSingleEventCollision for non-cycle event
-     * or receive instances for recurrent event and checks all instances.
+     * Checks whether the saved recurring event has a collision with other events.
      *
-     * @param incomingEvent: [Event] - Must take only SAVED event
-     * @return Boolean. True if booking available
+     * @param incomingEvent must take only SAVED event
+     * @return True if event has a collision and should be deleted
      * */
     private fun recurringEventHasCollision(incomingEvent: Event, workspaceCalendar: String): Boolean {
         logger.debug(
