@@ -6,7 +6,6 @@ import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.utils.DatabaseTransactionManager
 import office.effective.common.utils.UuidValidator
 import office.effective.features.booking.converters.BookingDtoModelConverter
-import office.effective.dto.BookingDTO
 import office.effective.dto.BookingRequestDTO
 import office.effective.dto.BookingResponseDTO
 import office.effective.model.Booking
@@ -65,7 +64,7 @@ class BookingFacadeV1(
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * Should be lover than [bookingRangeFrom]. Default value: [BookingConstants.MIN_SEARCH_START_TIME]
      * @param returnInstances return recurring bookings as non-recurrent instances
-     * @return [BookingDTO] list
+     * @return [BookingResponseDTO] list
      * @author Daniil Zavyalov
      */
     fun findAll(
@@ -112,6 +111,7 @@ class BookingFacadeV1(
      * Updates a given booking. Use the returned model for further operations
      *
      * @param bookingDTO changed booking
+     * @param bookingId booking id
      * @return updated booking
      * @author Daniil Zavyalov
      */

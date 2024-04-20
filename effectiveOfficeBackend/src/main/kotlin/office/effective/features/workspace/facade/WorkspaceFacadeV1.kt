@@ -49,10 +49,12 @@ class WorkspaceFacadeV1(
     }
 
     /**
-     * Returns all [WorkspaceDTO] with the given tag
+     * Returns all [WorkspaceDTO] with their bookings by tag
      *
      * @param tag tag name of requested workspaces
-     * @return List of [WorkspaceDTO] with the given [tag]
+     * @param withBookingsFrom lower bound (exclusive) for a booking.endBooking to filter by.
+     * @param withBookingsUntil upper bound (exclusive) for a booking.beginBooking to filter by.
+     * @return List of [WorkspaceDTO] with their bookings
      * @author Daniil Zavyalov
      */
     fun findAllByTag(
