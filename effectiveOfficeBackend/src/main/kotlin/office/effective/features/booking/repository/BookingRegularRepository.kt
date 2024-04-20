@@ -69,7 +69,7 @@ class BookingRegularRepository(
         logger.debug("[findById] retrieving a booking with id={}", bookingId)
         val event: Event? = findByCalendarIdAndBookingId(bookingId)
         logger.trace("[findById] request to Google Calendar completed")
-        return event?.let { googleCalendarConverter.toWorkspaceBooking(it) }
+        return event?.let { googleCalendarConverter.toRegularWorkspaceBooking(it) }
     }
 
     /**
@@ -142,7 +142,7 @@ class BookingRegularRepository(
         logger.trace("[findAllByWorkspaceId] request to Google Calendar completed")
 
         return eventsWithWorkspace.map { event ->
-            googleCalendarConverter.toWorkspaceBooking(event)
+            googleCalendarConverter.toRegularWorkspaceBooking(event)
         }
     }
 
@@ -177,7 +177,7 @@ class BookingRegularRepository(
         logger.trace("[findAllByOwnerId] request to Google Calendar completed")
 
         return eventsWithUser.map { event ->
-            googleCalendarConverter.toWorkspaceBooking(event)
+            googleCalendarConverter.toRegularWorkspaceBooking(event)
         }
     }
 
@@ -213,7 +213,7 @@ class BookingRegularRepository(
         logger.trace("[findAllByOwnerAndWorkspaceId] request to Google Calendar completed")
 
         return eventsWithUserAndWorkspace.map { event ->
-            googleCalendarConverter.toWorkspaceBooking(event)
+            googleCalendarConverter.toRegularWorkspaceBooking(event)
         }
     }
 
@@ -237,7 +237,7 @@ class BookingRegularRepository(
         logger.trace("[findAll] request to Google Calendar completed")
 
         return events.map { event ->
-            googleCalendarConverter.toWorkspaceBooking(event)
+            googleCalendarConverter.toRegularWorkspaceBooking(event)
         }
     }
 
@@ -256,7 +256,7 @@ class BookingRegularRepository(
         } else {
             saveSingleEvent(booking)
         }
-        return googleCalendarConverter.toWorkspaceBooking(savedEvent)
+        return googleCalendarConverter.toRegularWorkspaceBooking(savedEvent)
             .also { savedBooking ->
                 logger.trace("[save] saved booking: {}", savedBooking)
             }
@@ -267,7 +267,7 @@ class BookingRegularRepository(
      */
     private fun saveSingleEvent(booking: Booking): Event {
         val workspaceId = booking.workspace.id ?: throw MissingIdException("Missing booking workspace id")
-        val event = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
+        val event = googleCalendarConverter.toGoogleWorkspaceRegularEvent(booking)
         if (singleEventHasCollision(event, workspaceId)) {
             throw WorkspaceUnavailableException("Workspace ${booking.workspace.name} " +
                     "unavailable at time between ${booking.beginBooking} and ${booking.endBooking}")
@@ -282,7 +282,7 @@ class BookingRegularRepository(
      */
     private fun saveRecurringEvent(booking: Booking): Event {
         val workspaceId = booking.workspace.id ?: throw MissingIdException("Missing booking workspace id")
-        val event = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
+        val event = googleCalendarConverter.toGoogleWorkspaceRegularEvent(booking)
 
         val savedEvent = calendar.Events().insert(regularWorkspacesCalendar, event).execute()
 
@@ -311,7 +311,7 @@ class BookingRegularRepository(
         } else {
             updateSingleEvent(booking)
         }
-        return googleCalendarConverter.toBookingModelForMeetingWorkspace(updatedEvent)
+        return googleCalendarConverter.toRegularWorkspaceBooking(updatedEvent)
             .also { updatedBooking ->
                 logger.trace("[update] updated booking: {}", updatedBooking)
             }
