@@ -43,52 +43,6 @@ class GoogleCalendarConverter(
     private val defaultAccount: String = BookingConstants.DEFAULT_CALENDAR
 
     /**
-     * Converts [Event] to [BookingDTO]
-     *
-     * Creates placeholders if workspace, owner or participant doesn't exist in database
-     *
-     * @param event [Event] to be converted
-     * @return The resulting [BookingDTO] object
-     * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
-     */
-    fun toBookingDTO(event: Event): BookingDTO {
-        logger.debug("[toBookingDTO] converting an event to meeting room booking dto")
-        val organizer: String = event.organizer?.email ?: ""
-        val email = if (organizer != defaultAccount) {
-            logger.trace("[toBookingDTO] organizer email derived from event.organizer field")
-            organizer
-        } else {
-            logger.trace("[toBookingDTO] organizer email derived from event description")
-            event.description?.substringBefore(" ") ?: ""
-        }
-        val recurrence = event.recurrence?.toString()?.getRecurrence()?.toDto()
-        val dto = BookingDTO(
-            owner = getUserDto(email),
-            participants = getParticipantsDto(event),
-            workspace = getWorkspaceDto(getCalendarId(event)),
-            id = event.id ?: null,
-            beginBooking = event.start?.dateTime?.value ?: 0,
-            endBooking = event.end?.dateTime?.value ?: ((event.start?.dateTime?.value ?: 0) + 86400000),
-            recurrence = recurrence
-        )
-        logger.trace("[toBookingDTO] {}", dto.toString())
-        return dto
-    }
-
-    /**
-     * Gets the list of event participants, excluding resources, and returns a list of user DTOs.
-     *
-     * @param event The event for which participants need to be retrieved.
-     * @return List of user DTOs.
-     */
-    private fun getParticipantsDto(event: Event): List<UserDTO> {
-        val attendees = event.attendees
-            .filter { attendee -> !attendee.isResource }
-            .map { attendee -> attendee.email }
-        return getAllUserDto(attendees)
-    }
-
-    /**
      * Gets the list of event participants, excluding resources, and returns a list of user Models.
      *
      * @param event The event for which participants need to be retrieved.
@@ -102,26 +56,13 @@ class GoogleCalendarConverter(
     }
 
     /**
-     * Retrieves a list of users by email addresses and converts them to a list of user DTOs.
-     *
-     * @param emails List of user email addresses.
-     * @return List of user DTOs.
-     */
-    private fun getAllUserDto(emails: List<String>): List<UserDTO> {
-        return userRepository
-            .findAllByEmail(emails)
-            .map { userModel -> userConverter.modelToDTO(userModel) }
-    }
-
-    /**
      * Retrieves a list of users by email addresses and converts them to a list of user Models.
      *
      * @param emails List of user email addresses.
      * @return List of user Models.
      */
     private fun getAllUserModels(emails: List<String>): List<UserModel> {
-        return userRepository
-            .findAllByEmail(emails)
+        return userRepository.findAllByEmail(emails)
     }
 
     /**
