@@ -26,6 +26,7 @@ import java.util.*
  *
  * Performs own database queries to user and workspace entities
  */
+@Deprecated("Used to convert into db events. We don't store events into database.",ReplaceWith("GoogleCalendarConverter"), DeprecationLevel.WARNING)
 class BookingRepositoryConverter(private val database: Database,
                                  private val workspaceConverter: WorkspaceRepositoryConverter,
                                  private val userConverter: UserModelEntityConverter,

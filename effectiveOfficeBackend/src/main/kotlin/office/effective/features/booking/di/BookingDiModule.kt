@@ -13,7 +13,7 @@ import org.koin.dsl.module
 
 val bookingDiModule = module(createdAtStart = true) {
     single { BookingRepositoryConverter(get(), get(), get(),  get()) }
-    single { GoogleCalendarConverter(get(), get(), get(), get(), get(), get(), get()) }
+    single { GoogleCalendarConverter(get(), get(), get(), get()) }
     single { BookingRegularRepository(get(), get(), get(), get()) }
     single { BookingMeetingRepository(get(), get(), get(), get()) }
     single<IBookingService> { BookingService(get(), get(), get(), get()) }

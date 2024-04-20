@@ -123,6 +123,7 @@ class UserRepository(
      */
     fun findAllByEmails(emails: Collection<String>): List<UserModel> {
         logger.debug("[findAllByEmails] retrieving users with emails {}", emails.joinToString())
+        if (emails.isEmpty()) return listOf()
         val entities: List<UserEntity> = db.users.filter { it.email inList emails }.toList()
 
         val ids : MutableList<UUID> = mutableListOf()
@@ -201,7 +202,8 @@ class UserRepository(
         val result = hashMapOf<UUID, MutableSet<IntegrationModel>>()
         db.from(UsersIntegrations)
             .innerJoin(right = Integrations, on = UsersIntegrations.integrationId eq Integrations.id).select()
-            .where { UsersIntegrations.userId inList ids }.forEach { row ->
+            .where { UsersIntegrations.userId inList ids }
+            .forEach { row ->
                 val userId: UUID = row[UsersIntegrations.userId] ?: return@forEach
                 val integration = integrationConverter.entityToModel(
                     Integrations.createEntity(row), row[UsersIntegrations.valueStr] ?: ""

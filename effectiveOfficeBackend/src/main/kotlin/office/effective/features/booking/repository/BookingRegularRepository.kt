@@ -18,7 +18,7 @@ import java.time.Instant
 import java.util.*
 
 /**
- * Class that executes Google calendar queries for booking workspaces
+ * Class that executes Google calendar queries for booking regular workspaces
  *
  * Filters out all events that have a start less than the calendar.minTime from application.conf
  */
@@ -257,7 +257,7 @@ class BookingRegularRepository(
     override fun save(booking: Booking): Booking {
         logger.debug("[save] saving booking of workspace with id {}", booking.workspace.id)
         val workspaceId = booking.workspace.id ?: throw MissingIdException("Missing booking workspace id")
-        val event = googleCalendarConverter.toGoogleWorkspaceEvent(booking)
+        val event = googleCalendarConverter.toGoogleWorkspaceRegularEvent(booking)
 
         logger.trace("[save] booking to save: {}", event)
         val savedEvent = calendar.Events().insert(workspaceCalendar, event).execute()
@@ -293,7 +293,7 @@ class BookingRegularRepository(
             WorkspaceBookingEntity::class, "Booking with id $bookingId not wound"
         )
         logger.trace("[update] previous version of event: {}", previousVersionOfEvent)
-        val eventOnUpdate = googleCalendarConverter.toGoogleWorkspaceEvent(booking)
+        val eventOnUpdate = googleCalendarConverter.toGoogleWorkspaceRegularEvent(booking)
 
         logger.trace("[update] new version of event: {}", eventOnUpdate)
         val updatedEvent: Event = calendarEvents.update(workspaceCalendar, bookingId, eventOnUpdate).execute()

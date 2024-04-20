@@ -86,7 +86,7 @@ class BookingMeetingRepository(
     override fun findById(bookingId: String): Booking? {
         logger.debug("[findById] retrieving a booking with id={}", bookingId)
         val event: Event? = findByCalendarIdAndBookingId(bookingId)
-        return event?.let { googleCalendarConverter.toBookingModel(it) }
+        return event?.let { googleCalendarConverter.toBookingModelForMeetingWorkspace(it) }
     }
 
     /**
@@ -158,7 +158,7 @@ class BookingMeetingRepository(
         val eventsWithWorkspace = basicQuery(eventRangeFrom, eventRangeTo, returnInstances, workspaceCalendarId)
             .execute().items
 
-        return eventsWithWorkspace.toList().map { googleCalendarConverter.toBookingModel(it) }
+        return eventsWithWorkspace.toList().map { googleCalendarConverter.toBookingModelForMeetingWorkspace(it) }
     }
 
     /**
@@ -280,7 +280,7 @@ class BookingMeetingRepository(
         val result = mutableListOf<Booking>()
         for (event in eventsWithUser) {
             if (checkEventOrganizer(event, userEmail)) {
-                result.add(googleCalendarConverter.toBookingModel(event))
+                result.add(googleCalendarConverter.toBookingModelForMeetingWorkspace(event))
             } else {
                 logger.trace("[findAllByOwnerId] filtered out event: {}", event)
             }
@@ -323,7 +323,7 @@ class BookingMeetingRepository(
         val result = mutableListOf<Booking>()
         for (event in eventsWithUserAndWorkspace) {
             if (checkEventOrganizer(event, userEmail)) {
-                result.add(googleCalendarConverter.toBookingModel(event))
+                result.add(googleCalendarConverter.toBookingModelForMeetingWorkspace(event))
             }  else {
                 logger.trace("[findAllByOwnerAndWorkspaceId] filtered out event: {}", event)
             }
@@ -349,7 +349,7 @@ class BookingMeetingRepository(
         )
         val calendars: List<String> = calendarIdsRepository.findAllCalendarsId()
         val events: List<Event> = getAllEvents(calendars, returnInstances, eventRangeFrom, eventRangeTo)
-        return events.map { googleCalendarConverter.toBookingModel(it) }
+        return events.map { googleCalendarConverter.toBookingModelForMeetingWorkspace(it) }
     }
 
     /**
@@ -365,19 +365,46 @@ class BookingMeetingRepository(
         val workspaceCalendar = calendarIdsRepository.findByWorkspace(
             booking.workspace.id ?: throw MissingIdException("Missing workspace id")
         )
-        val event = googleCalendarConverter.toGoogleEvent(booking)
-
-        val savedEvent = calendar.Events().insert(defaultCalendar, event).execute()
-        if (recurringEventHasCollision(savedEvent, workspaceCalendar)) {
-            val savedBooking = googleCalendarConverter.toBookingModel(savedEvent)
-            logger.trace("[save] saved booking: {}", savedBooking)
-            return savedBooking
+        val savedEvent: Event = if (booking.recurrence != null) {
+            saveRecurringEvent(booking, workspaceCalendar)
         } else {
-            deleteById(savedEvent.id)
+            saveSingleEvent(booking, workspaceCalendar)
+        }
+        return googleCalendarConverter.toBookingModelForMeetingWorkspace(savedEvent)
+            .also { savedBooking ->
+                logger.trace("[save] saved booking: {}", savedBooking)
+            }
+
+    }
+
+    /**
+     * Saving booking without recurrence. Checks collision before saving an event.
+     */
+    private fun saveSingleEvent(booking: Booking, workspaceCalendar: String): Event {
+        val event = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
+        if (singleEventHasCollision(event, workspaceCalendar)) {
             throw WorkspaceUnavailableException("Workspace ${booking.workspace.name} " +
                     "unavailable at time between ${booking.beginBooking} and ${booking.endBooking}")
         }
+        return calendar.Events().insert(defaultCalendar, event).execute()
+    }
 
+    /**
+     * Saving booking with recurrence. Checks collision for all event instances after its saving.
+     *
+     * @param booking updated booking to be saved
+     * @param workspaceCalendar calendar id for saving
+     */
+    private fun saveRecurringEvent(booking: Booking, workspaceCalendar: String): Event {
+        val event = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
+
+        val savedEvent = calendar.Events().insert(defaultCalendar, event).execute()
+
+        if (recurringEventHasCollision(savedEvent, workspaceCalendar)) {
+            deleteById(savedEvent.id)
+            throw WorkspaceUnavailableException("Workspace ${booking.workspace.name} unavailable at specified time.")
+        }
+        return savedEvent
     }
 
     /**
@@ -400,17 +427,17 @@ class BookingMeetingRepository(
         } else {
             updateSingleEvent(booking, workspaceCalendar)
         }
-        return googleCalendarConverter.toBookingModel(updatedEvent)
+        return googleCalendarConverter.toBookingModelForMeetingWorkspace(updatedEvent)
             .also { updatedBooking ->
                 logger.trace("[update] updated booking: {}", updatedBooking)
             }
     }
 
     /**
-     * Saving booking without recurrence. Checks collision before updating an event.
+     * Updating booking without recurrence. Checks collision before updating an event.
      */
     private fun updateSingleEvent(booking: Booking, workspaceCalendar: String): Event {
-        val eventOnUpdate = googleCalendarConverter.toGoogleEvent(booking)
+        val eventOnUpdate = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
         if (singleEventHasCollision(eventOnUpdate, workspaceCalendar)) {
             throw WorkspaceUnavailableException("Workspace ${booking.workspace.name} " +
                     "unavailable at time between ${booking.beginBooking} and ${booking.endBooking}")
@@ -426,7 +453,7 @@ class BookingMeetingRepository(
     }
 
     /**
-     * Saving booking with recurrence. Checks collision for all event instances after its update.
+     * Updating booking with recurrence. Checks collision for all event instances after its update.
      *
      * @param booking updated booking to be saved
      * @param workspaceCalendar calendar id for saving
@@ -437,7 +464,7 @@ class BookingMeetingRepository(
             WorkspaceBookingEntity::class, "Booking with id $bookingId not wound"
         )
         logger.trace("[updateRecurringEvent] previous version of event: {}", prevEventVersion)
-        val eventOnUpdate = googleCalendarConverter.toGoogleEvent(booking)
+        val eventOnUpdate = googleCalendarConverter.toGoogleWorkspaceMeetingEvent(booking)
 
         val updatedEvent: Event = calendarEvents.update(defaultCalendar, bookingId, eventOnUpdate).execute()
 
