@@ -51,8 +51,8 @@ class GoogleCalendarConverter(
             participants = emptyList(),
             workspace = getWorkspaceModel(event),
             id = event.id ?: null,
-            beginBooking = Instant.ofEpochMilli(event.start?.dateTime?.value ?: 0),
-            endBooking = Instant.ofEpochMilli(event.end?.dateTime?.value ?: 1),
+            beginBooking = toLocalInstant(event.start),
+            endBooking = toLocalInstant(event.end),
             recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) },
             recurringBookingId = event.recurringEventId
         )
@@ -129,13 +129,13 @@ class GoogleCalendarConverter(
      * @author Danil Kiselev, Max Mishenko
      */
     fun toMeetingWorkspaceBooking(event: Event): Booking {
-        logger.debug("[toGoogleEvent] converting calendar event to meeting room booking model")
+        logger.debug("[toMeetingWorkspaceBooking] converting calendar event to meeting room booking model")
         val organizer: String = event.organizer?.email ?: ""
         val email = if (organizer != defaultAccount) {
-            logger.trace("[toBookingModel] organizer email derived from event.organizer field")
+            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event.organizer field")
             organizer
         } else {
-            logger.trace("[toBookingModel] organizer email derived from event description")
+            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event description")
             event.description?.substringBefore(" ") ?: ""
         }
         val recurrence = event.recurrence?.toString()?.getRecurrence()
@@ -145,11 +145,11 @@ class GoogleCalendarConverter(
             participants = getParticipantsModels(event),
             workspace = getWorkspaceModel(getCalendarId(event)),
             id = event.id ?: null,
-            beginBooking = Instant.ofEpochMilli(event.start?.dateTime?.value ?: 0),
-            endBooking = Instant.ofEpochMilli(event.end?.dateTime?.value ?: 1),
+            beginBooking = toLocalInstant(event.start),
+            endBooking = toLocalInstant(event.end),
             recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) }
         )
-        logger.trace("[toBookingModel] {}", booking.toString())
+        logger.trace("[toMeetingWorkspaceBooking] {}", booking.toString())
         return booking
     }
 
@@ -163,7 +163,7 @@ class GoogleCalendarConverter(
     private fun getUserModel(email: String): UserModel {
         val userModel: UserModel = userRepository.findByEmail(email)
             ?: run {
-                logger.warn("[getUser] can't find a user with email ${email}. Creating placeholder.")
+                logger.warn("[getUserModel] can't find a user with email ${email}. Creating placeholder.")
                 UserModel(
                     id = null,
                     fullName = "Unregistered user",
@@ -314,11 +314,22 @@ class GoogleCalendarConverter(
     }
 
     /**
+     * Converts [EventDateTime] to [Instant]. Returns placeholder if [googleDateTime] is null
+     *
+     * @return [Instant]
+     */
+    private fun toLocalInstant(googleDateTime: EventDateTime?) : Instant {
+        val gmtEpoch: Long? = googleDateTime?.dateTime?.value
+        val localEpoch = gmtEpoch?.let { it + BookingConstants.DEFAULT_TIMEZONE_OFFSET_MILLIS } ?: 0
+        return Instant.ofEpochMilli(localEpoch)
+    }
+
+    /**
      * Converts [Instant] to [EventDateTime]
      *
      * @return [EventDateTime]
      */
-    private fun Instant.toGoogleEventDateTime():EventDateTime {
+    private fun Instant.toGoogleEventDateTime() : EventDateTime {
         val googleEventDateTime = EventDateTime()
         googleEventDateTime.dateTime = this.toEpochMilli().toGoogleDateTime()
         googleEventDateTime.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID
