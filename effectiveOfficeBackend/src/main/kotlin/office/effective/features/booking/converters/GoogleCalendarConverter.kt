@@ -21,6 +21,8 @@ import office.effective.features.workspace.repository.WorkspaceRepository
 import office.effective.model.RecurrenceModel.Companion.toRecurrence
 import org.slf4j.LoggerFactory
 import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.List as List
 
@@ -242,7 +244,7 @@ class GoogleCalendarConverter(
             start = model.beginBooking.toGoogleDateTime()
             end = model.endBooking.toGoogleDateTime()
         }
-        logger.trace("[toGoogleWorkspaceEvent] {}", event.toString())
+        logger.trace("[toGoogleWorkspaceEvent] {}", event)
         return event
     }
 
@@ -280,7 +282,7 @@ class GoogleCalendarConverter(
             end = model.endBooking.toGoogleDateTime()
         }
         logger.debug("[toGoogleWorkspaceEvent] converting workspace booking model to calendar event")
-        return event;
+        return event
     }
 
     private fun eventSummaryForMeetingBooking(model: Booking): String {
@@ -322,8 +324,10 @@ class GoogleCalendarConverter(
      * @author Danil Kiselev, Max Mishenko
      */
     private fun Instant.toGoogleDateTime():EventDateTime {
+        val timeMillis = this.toEpochMilli()
+        val millisZoneOffset = TimeZone.getTimeZone(BookingConstants.DEFAULT_TIMEZONE_ID).getOffset(timeMillis)
         return EventDateTime().also {
-            it.dateTime = DateTime(this.toEpochMilli())
+            it.dateTime = DateTime(timeMillis - millisZoneOffset)
             it.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID
         }
     }
