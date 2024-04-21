@@ -545,7 +545,7 @@ class BookingMeetingRepository(
         if (firstEvent.recurringEventId != null || secondEvent.recurringEventId != null) {
             eventsDoNotBelongToSameRecurringEvent = firstEvent.id != secondEvent.recurringEventId &&
                     firstEvent.recurringEventId != secondEvent.id &&
-                    firstEvent.recurringEventId != firstEvent.recurringEventId
+                    firstEvent.recurringEventId != secondEvent.recurringEventId
         }
         return firstEvent.id != secondEvent.id && eventsDoNotBelongToSameRecurringEvent
     }
