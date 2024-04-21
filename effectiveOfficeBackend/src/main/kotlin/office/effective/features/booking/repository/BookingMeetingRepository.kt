@@ -10,6 +10,7 @@ import office.effective.common.exception.MissingIdException
 import office.effective.common.exception.WorkspaceUnavailableException
 import office.effective.features.calendar.repository.CalendarIdsRepository
 import office.effective.features.booking.converters.GoogleCalendarConverter
+import office.effective.features.booking.converters.toGoogleDateTime
 import office.effective.features.user.repository.UserRepository
 import office.effective.model.Booking
 import office.effective.features.user.repository.UserEntity
@@ -114,9 +115,12 @@ class BookingMeetingRepository(
      * Request template containing all required parameters
      *
      * @param timeMin lover bound for filtering bookings by start time.
-     * Old Google calendar events may not appear correctly in the system and cause unexpected exceptions
-     * @param timeMax
-     * @param singleEvents
+     * Old Google calendar events may not appear correctly in the system and cause unexpected exceptions.
+     * Should be a time in the default timezone.
+     * @param timeMax upper bound (exclusive) for an event's start time to filter by.
+     * Should be a time in the default timezone.
+     * @param singleEvents Whether to expand recurring events into instances and only return single one-off
+     * events and instances of recurring events, but not the underlying recurring events themselves.
      * @param calendarId
      */
     private fun basicQuery(
@@ -127,8 +131,8 @@ class BookingMeetingRepository(
     ): Calendar.Events.List {
         return calendarEvents.list(calendarId)
             .setSingleEvents(singleEvents)
-            .setTimeMin(DateTime(timeMin))
-            .setTimeMax(timeMax?.let { DateTime(it) })
+            .setTimeMin(timeMin.toGoogleDateTime())
+            .setTimeMax(timeMax?.toGoogleDateTime())
     }
 
     /**
@@ -483,12 +487,11 @@ class BookingMeetingRepository(
      * @return True if event has a collision
      * */
     private fun singleEventHasCollision(eventToVerify: Event, workspaceCalendar: String): Boolean {
-        val sameTimeEvents = basicQuery(
-            timeMin = eventToVerify.start.dateTime.value,
-            timeMax = eventToVerify.end.dateTime.value,
-            singleEvents = true,
-            calendarId = workspaceCalendar
-        ).execute().items
+        val sameTimeEvents = calendarEvents.list(workspaceCalendar)
+            .setSingleEvents(true)
+            .setTimeMin(eventToVerify.start.dateTime)
+            .setTimeMax(eventToVerify.end.dateTime)
+            .execute().items
 
         for (event in sameTimeEvents) {
             if (areEventsOverlap(eventToVerify, event) && eventsIsNotSame(eventToVerify, event)) {
@@ -538,9 +541,12 @@ class BookingMeetingRepository(
      * Checks whether events aren't the same event or instances of the same event
      */
     private fun eventsIsNotSame(firstEvent: Event, secondEvent: Event): Boolean {
-        return firstEvent.id != secondEvent.id &&
-                firstEvent.id != secondEvent.recurringEventId &&
-                firstEvent.recurringEventId != secondEvent.id &&
-                (firstEvent.recurringEventId != firstEvent.recurringEventId || firstEvent.recurringEventId == null)
+        var eventsDoNotBelongToSameRecurringEvent = true
+        if (firstEvent.recurringEventId != null || secondEvent.recurringEventId != null) {
+            eventsDoNotBelongToSameRecurringEvent = firstEvent.id != secondEvent.recurringEventId &&
+                    firstEvent.recurringEventId != secondEvent.id &&
+                    firstEvent.recurringEventId != firstEvent.recurringEventId
+        }
+        return firstEvent.id != secondEvent.id && eventsDoNotBelongToSameRecurringEvent
     }
 }

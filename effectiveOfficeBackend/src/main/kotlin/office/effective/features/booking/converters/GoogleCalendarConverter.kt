@@ -1,6 +1,5 @@
 package office.effective.features.booking.converters
 
-import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.model.Event
 import com.google.api.services.calendar.model.Event.Organizer
 import com.google.api.services.calendar.model.EventAttendee
@@ -8,7 +7,6 @@ import com.google.api.services.calendar.model.EventDateTime
 import office.effective.common.constants.BookingConstants
 import office.effective.common.utils.UuidValidator
 import office.effective.dto.BookingDTO
-import office.effective.dto.UserDTO
 import office.effective.dto.WorkspaceDTO
 import office.effective.features.calendar.repository.CalendarIdsRepository
 import office.effective.features.user.repository.UserRepository
@@ -21,8 +19,6 @@ import office.effective.features.workspace.repository.WorkspaceRepository
 import office.effective.model.RecurrenceModel.Companion.toRecurrence
 import org.slf4j.LoggerFactory
 import java.time.Instant
-import java.time.ZoneId
-import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.List as List
 
@@ -241,8 +237,8 @@ class GoogleCalendarConverter(
             description = eventDescriptionRegularBooking(model)
             attendees = attendeeList
             recurrence = getRecurrenceFromRecurrenceModel(model)
-            start = model.beginBooking.toGoogleDateTime()
-            end = model.endBooking.toGoogleDateTime()
+            start = model.beginBooking.toGoogleEventDateTime()
+            end = model.endBooking.toGoogleEventDateTime()
         }
         logger.trace("[toGoogleWorkspaceEvent] {}", event)
         return event
@@ -278,8 +274,8 @@ class GoogleCalendarConverter(
             organizer =  userModelToGoogleOrganizer(model.owner)
             attendees = attendeeList
             recurrence = getRecurrenceFromRecurrenceModel(model)
-            start = model.beginBooking.toGoogleDateTime()
-            end = model.endBooking.toGoogleDateTime()
+            start = model.beginBooking.toGoogleEventDateTime()
+            end = model.endBooking.toGoogleEventDateTime()
         }
         logger.debug("[toGoogleWorkspaceEvent] converting workspace booking model to calendar event")
         return event
@@ -321,15 +317,12 @@ class GoogleCalendarConverter(
      * Converts [Instant] to [EventDateTime]
      *
      * @return [EventDateTime]
-     * @author Danil Kiselev, Max Mishenko
      */
-    private fun Instant.toGoogleDateTime():EventDateTime {
-        val timeMillis = this.toEpochMilli()
-        val millisZoneOffset = TimeZone.getTimeZone(BookingConstants.DEFAULT_TIMEZONE_ID).getOffset(timeMillis)
-        return EventDateTime().also {
-            it.dateTime = DateTime(timeMillis - millisZoneOffset)
-            it.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID
-        }
+    private fun Instant.toGoogleEventDateTime():EventDateTime {
+        val googleEventDateTime = EventDateTime()
+        googleEventDateTime.dateTime = this.toEpochMilli().toGoogleDateTime()
+        googleEventDateTime.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID
+        return googleEventDateTime
     }
 
     private fun userModelToAttendee(model: UserModel): EventAttendee {

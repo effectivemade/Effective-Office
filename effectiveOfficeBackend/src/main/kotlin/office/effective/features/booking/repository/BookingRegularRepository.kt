@@ -9,6 +9,7 @@ import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
 import office.effective.common.exception.WorkspaceUnavailableException
 import office.effective.features.booking.converters.GoogleCalendarConverter
+import office.effective.features.booking.converters.toGoogleDateTime
 import office.effective.model.Booking
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -109,8 +110,8 @@ class BookingRegularRepository(
     ): Calendar.Events.List {
         return calendarEvents.list(calendarId)
             .setSingleEvents(singleEvents)
-            .setTimeMin(DateTime(timeMin))
-            .setTimeMax(timeMax?.let { DateTime(it) })
+            .setTimeMin(timeMin.toGoogleDateTime())
+            .setTimeMax(timeMax?.toGoogleDateTime())
     }
 
     /**
@@ -369,12 +370,13 @@ class BookingRegularRepository(
      * @return True if event has a collision and can't be saved
      * */
     private fun singleEventHasCollision(eventToVerify: Event, workspaceId: UUID): Boolean {
-        val sameTimeEvents = basicQuery(
-            timeMin = eventToVerify.start.dateTime.value,
-            timeMax = eventToVerify.end.dateTime.value,
-            singleEvents = true,
-        ).setQ(workspaceId.toString())
+        val sameTimeEvents = calendarEvents.list(regularWorkspacesCalendar)
+            .setSingleEvents(true)
+            .setTimeMin(eventToVerify.start.dateTime)
+            .setTimeMax(eventToVerify.end.dateTime)
+            .setQ(workspaceId.toString())
             .execute().items
+
         for (event in sameTimeEvents) {
             if (areEventsOverlap(eventToVerify, event) && eventsIsNotSame(eventToVerify, event)) {
                 return true
@@ -424,9 +426,12 @@ class BookingRegularRepository(
      * Checks whether events aren't the same event or instances of the same event
      */
     private fun eventsIsNotSame(firstEvent: Event, secondEvent: Event): Boolean {
-        return firstEvent.id != secondEvent.id &&
-                firstEvent.id != secondEvent.recurringEventId &&
-                firstEvent.recurringEventId != secondEvent.id &&
-                (firstEvent.recurringEventId != firstEvent.recurringEventId || firstEvent.recurringEventId == null)
+        var eventsDoNotBelongToSameRecurringEvent = true
+        if (firstEvent.recurringEventId != null || secondEvent.recurringEventId != null) {
+            eventsDoNotBelongToSameRecurringEvent = firstEvent.id != secondEvent.recurringEventId &&
+                    firstEvent.recurringEventId != secondEvent.id &&
+                    firstEvent.recurringEventId != firstEvent.recurringEventId
+        }
+        return firstEvent.id != secondEvent.id && eventsDoNotBelongToSameRecurringEvent
     }
 }
