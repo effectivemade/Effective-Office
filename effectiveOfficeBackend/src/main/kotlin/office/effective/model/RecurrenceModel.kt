@@ -1,10 +1,9 @@
 package office.effective.model
 
-import model.RecurrenceDTO
 import office.effective.common.constants.BookingConstants
-import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 data class RecurrenceModel (
     val interval: Int? = null,
@@ -37,10 +36,12 @@ data class RecurrenceModel (
          *
          * @param millisDate - date in milliseconds ([Long])
          * @return [String] - date in DATE-TIME (RFC5545). Example: [BookingConstants.UNTIL_FORMAT]
-         * @author Kiselev Danil
          * */
         private fun toDateRfc5545(millisDate: Long): String {
-            val time = GregorianCalendar().apply { timeInMillis = millisDate + 86400000 }
+            val time = GregorianCalendar().apply {
+                timeZone = TimeZone.getTimeZone("GMT")
+                timeInMillis = millisDate
+            }
             return SimpleDateFormat(BookingConstants.UNTIL_FORMAT).format(time.time)
         }
     }
