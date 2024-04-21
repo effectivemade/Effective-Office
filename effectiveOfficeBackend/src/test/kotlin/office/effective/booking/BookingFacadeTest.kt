@@ -119,7 +119,7 @@ class BookingFacadeTest {
         val expectedList = listOf(bookingMockDto, bookingMockDto)
 
         setUpMockTransactionManager()
-        whenever(service.findAll(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(existingList)
+        whenever(service.findAll(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(existingList)
         whenever(bookingDtoModelConverter.modelToDto(anyOrNull())).thenReturn(expectedList[0], expectedList[1])
 
         val result = facade.findAll(

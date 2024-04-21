@@ -373,8 +373,12 @@ class BookingMeetingRepository(
         } else {
             saveSingleEvent(booking, workspaceCalendar)
         }
-        return googleCalendarConverter.toMeetingWorkspaceBooking(savedEvent)
-            .also { savedBooking ->
+        return googleCalendarConverter.toMeetingWorkspaceBooking(
+            event = savedEvent,
+            owner = booking.owner,
+            workspace = booking.workspace,
+            participants = booking.participants
+        ).also { savedBooking ->
                 logger.trace("[save] saved booking: {}", savedBooking)
             }
     }
@@ -429,8 +433,12 @@ class BookingMeetingRepository(
         } else {
             updateSingleEvent(booking, workspaceCalendar)
         }
-        return googleCalendarConverter.toMeetingWorkspaceBooking(updatedEvent)
-            .also { updatedBooking ->
+        return googleCalendarConverter.toMeetingWorkspaceBooking(
+            event = updatedEvent,
+            owner = booking.owner,
+            workspace = booking.workspace,
+            participants = booking.participants
+        ).also { updatedBooking ->
                 logger.trace("[update] updated booking: {}", updatedBooking)
             }
     }

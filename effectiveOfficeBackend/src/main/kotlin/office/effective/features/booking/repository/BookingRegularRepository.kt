@@ -257,8 +257,12 @@ class BookingRegularRepository(
         } else {
             saveSingleEvent(booking)
         }
-        return googleCalendarConverter.toRegularWorkspaceBooking(savedEvent)
-            .also { savedBooking ->
+        return googleCalendarConverter.toRegularWorkspaceBooking(
+            event = savedEvent,
+            owner = booking.owner,
+            workspace = booking.workspace,
+            participants = booking.participants
+        ).also { savedBooking ->
                 logger.trace("[save] saved booking: {}", savedBooking)
             }
     }
@@ -312,8 +316,12 @@ class BookingRegularRepository(
         } else {
             updateSingleEvent(booking)
         }
-        return googleCalendarConverter.toRegularWorkspaceBooking(updatedEvent)
-            .also { updatedBooking ->
+        return googleCalendarConverter.toRegularWorkspaceBooking(
+            event = updatedEvent,
+            owner = booking.owner,
+            workspace = booking.workspace,
+            participants = booking.participants
+        ).also { updatedBooking ->
                 logger.trace("[update] updated booking: {}", updatedBooking)
             }
     }

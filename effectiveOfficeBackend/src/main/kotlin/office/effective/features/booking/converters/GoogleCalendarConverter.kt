@@ -40,16 +40,27 @@ class GoogleCalendarConverter(
      * Creates placeholders if workspace or owner doesn't exist in database
      *
      * @param event [Event] to be converted
+     * @param owner specify this parameter to reduce the number
+     * of database queries if the owner has already been retrieved
+     * @param participants specify this parameter to reduce the number
+     * of database queries if participants have already been retrieved
+     * @param workspace specify this parameter to reduce the number
+     * of database queries if workspace have already been retrieved
      * @return The resulting [Booking] object
      */
-    fun toRegularWorkspaceBooking(event: Event): Booking {
+    fun toRegularWorkspaceBooking(
+        event: Event,
+        owner: UserModel? = null,
+        workspace: Workspace? = null,
+        participants: List<UserModel>? = null,
+    ): Booking {
         logger.debug("[toRegularWorkspaceBooking] converting an event to workspace booking dto")
         val recurrence = event.recurrence?.toString()?.getRecurrence()
 
         val model = Booking(
-            owner = getUserModel(event),
-            participants = emptyList(),
-            workspace = getWorkspaceModel(event),
+            owner = owner ?: getUserModel(event),
+            participants = participants ?: emptyList(),
+            workspace = workspace ?: getWorkspaceModel(event),
             id = event.id ?: null,
             beginBooking = toLocalInstant(event.start),
             endBooking = toLocalInstant(event.end),
@@ -125,10 +136,21 @@ class GoogleCalendarConverter(
      * Converts meeting [Event] to [Booking]
      *
      * @param event [Event] to be converted
+     * @param owner specify this parameter to reduce the number
+     * of database queries if the owner has already been retrieved
+     * @param participants specify this parameter to reduce the number
+     * of database queries if participants have already been retrieved
+     * @param workspace specify this parameter to reduce the number
+     * of database queries if workspace have already been retrieved
      * @return The resulting [BookingDTO] object
      * @author Danil Kiselev, Max Mishenko
      */
-    fun toMeetingWorkspaceBooking(event: Event): Booking {
+    fun toMeetingWorkspaceBooking(
+        event: Event,
+        owner: UserModel? = null,
+        workspace: Workspace? = null,
+        participants: List<UserModel>? = null,
+    ): Booking {
         logger.debug("[toMeetingWorkspaceBooking] converting calendar event to meeting room booking model")
         val organizer: String = event.organizer?.email ?: ""
         val email = if (organizer != defaultAccount) {
@@ -141,9 +163,9 @@ class GoogleCalendarConverter(
         val recurrence = event.recurrence?.toString()?.getRecurrence()
 
         val booking = Booking(
-            owner = getUserModel(email),
-            participants = getParticipantsModels(event),
-            workspace = getWorkspaceModel(getCalendarId(event)),
+            owner = owner ?: getUserModel(email),
+            participants = participants ?: getParticipantsModels(event),
+            workspace = workspace ?: getWorkspaceModel(getCalendarId(event)),
             id = event.id ?: null,
             beginBooking = toLocalInstant(event.start),
             endBooking = toLocalInstant(event.end),
