@@ -44,7 +44,7 @@ fun Route.workspaceRoutingV1() {
                     val todayEpoch = LocalDate.now()
                         .atStartOfDay(ZoneId.of(BookingConstants.DEFAULT_TIMEZONE_ID))
                         .toInstant()
-                        .toEpochMilli()
+                        .toEpochMilli() + BookingConstants.DEFAULT_TIMEZONE_OFFSET_MILLIS
                     val endOfDayEpoch = todayEpoch + oneDayMillis
                     withBookingsFrom = withBookingsFromString?.let { paramString ->
                         paramString.toLongOrNull()

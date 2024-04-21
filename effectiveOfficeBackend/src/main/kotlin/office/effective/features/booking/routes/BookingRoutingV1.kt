@@ -22,6 +22,7 @@ import java.time.ZoneId
 fun Route.bookingRoutingV1() {
     route("/api/v1/bookings") {
         val bookingFacade: BookingFacadeV1 = GlobalContext.get().get()
+        val oneDayMillis = 1000*60*60*24
 
         get("/{id}", SwaggerDocument.returnBookingByIdV1()) {
             val id: String = call.parameters["id"]
@@ -33,8 +34,8 @@ fun Route.bookingRoutingV1() {
             val todayEpoch = LocalDate.now()
                 .atStartOfDay(ZoneId.of(BookingConstants.DEFAULT_TIMEZONE_ID))
                 .toInstant()
-                .toEpochMilli()
-            val endOfDayEpoch = todayEpoch + 1000*60*60*24
+                .toEpochMilli() + BookingConstants.DEFAULT_TIMEZONE_OFFSET_MILLIS
+            val endOfDayEpoch = todayEpoch + oneDayMillis
 
             val userId: String? = call.request.queryParameters["user_id"]
             val workspaceId: String? = call.request.queryParameters["workspace_id"]
@@ -46,11 +47,11 @@ fun Route.bookingRoutingV1() {
             val bookingRangeTo: Long = call.request.queryParameters["range_to"]?.let { stringRangeTo ->
                 stringRangeTo.toLongOrNull()
                     ?: throw BadRequestException("range_to can't be parsed to Long")
-            } ?: todayEpoch
+            } ?: endOfDayEpoch
             val bookingRangeFrom: Long = call.request.queryParameters["range_from"]?.let { stringRangeFrom ->
                 stringRangeFrom.toLongOrNull()
                     ?: throw BadRequestException("range_from can't be parsed to Long")
-            } ?: endOfDayEpoch
+            } ?: todayEpoch
 
             call.respond(bookingFacade.findAll(userId, workspaceId, bookingRangeTo, bookingRangeFrom, returnInstances))
         }
