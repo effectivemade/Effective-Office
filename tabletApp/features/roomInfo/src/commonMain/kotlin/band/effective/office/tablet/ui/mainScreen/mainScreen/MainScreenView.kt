@@ -77,9 +77,14 @@ fun MainScreenView(
         * where infoViewFrame, mainScreenFrame is frames from figma and all width I get from figma*/
         val infoViewWidth = 627f / 1133f
         Row(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(infoViewWidth)) {
+            Box(modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(infoViewWidth)) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxHeight().fillMaxWidth().padding(bottom = 30.dp)) {
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth().
+                        padding(bottom = 30.dp)) {
                     item {
                         DateTimeView(
                             modifier = Modifier.padding(
@@ -98,7 +103,8 @@ fun MainScreenView(
                     }
                     stickyHeader{
                             RoomInfoComponent(
-                                modifier = Modifier.background(color = MaterialTheme.colors.background),
+                                modifier = Modifier
+                                    .background(color = MaterialTheme.colors.background),
                                 room = roomList[indexSelectRoom],
                                 onOpenFreeRoomModalRequest = { onCancelEventRequest() },
                                 timeToNextEvent = timeToNextEvent,
@@ -106,7 +112,9 @@ fun MainScreenView(
                             )
                     }
                     items(slotState.slots) {
-                        Box(modifier = Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp)) {
+                        Box(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 30.dp, end = 30.dp)) {
                             SlotView(
                                 slotUi = it,
                                 onClick = { slotComponent.sendIntent(
