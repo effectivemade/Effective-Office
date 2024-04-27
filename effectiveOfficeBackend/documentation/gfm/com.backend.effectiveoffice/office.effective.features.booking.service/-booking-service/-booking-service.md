@@ -3,4 +3,4 @@
 # BookingService
 
 [jvm]\
-constructor(bookingRepository: [BookingCalendarRepository](../../office.effective.features.booking.repository/-booking-calendar-repository/index.md), bookingWorkspaceRepository: [BookingWorkspaceRepository](../../office.effective.features.booking.repository/-booking-workspace-repository/index.md), userRepository: [UserRepository](../../office.effective.features.user.repository/-user-repository/index.md), workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md))
+constructor(bookingMeetingRepository: [BookingMeetingRepository](../../office.effective.features.booking.repository/-booking-meeting-repository/index.md), bookingRegularRepository: [BookingRegularRepository](../../office.effective.features.booking.repository/-booking-regular-repository/index.md), userRepository: [UserRepository](../../office.effective.features.user.repository/-user-repository/index.md), workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md))

@@ -30,4 +30,4 @@ data class [RecurrenceDTO](index.md)(val interval: [Int](https://kotlinlang.org/
 
 | Name | Summary |
 |---|---|
-| [toRecurrence](../-recurrence/-companion/to-recurrence.md) | [jvm]<br>fun [RecurrenceDTO](index.md).[toRecurrence](../-recurrence/-companion/to-recurrence.md)(): [Recurrence](../-recurrence/index.md) |
+| [toRecurrence](../../office.effective.model/-recurrence/-companion/to-recurrence.md) | [jvm]<br>fun [RecurrenceDTO](index.md).[toRecurrence](../../office.effective.model/-recurrence/-companion/to-recurrence.md)(): [Recurrence](../../office.effective.model/-recurrence/index.md) |

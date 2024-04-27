@@ -3,7 +3,18 @@
 # BookingRepository
 
 [jvm]\
-class [BookingRepository](index.md)(database: Database, converter: [BookingRepositoryConverter](../../office.effective.features.booking.converters/-booking-repository-converter/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md))
+class [~~BookingRepository~~](index.md)(database: Database, converter: [BookingRepositoryConverter](../../office.effective.features.booking.converters/-booking-repository-converter/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md))---
+
+### Deprecated (with error)
+
+Used to store events inside database. We don't store events into database.
+
+#### Replace with
+
+```kotlin
+BookingCalendarRepository
+```
+---
 
 Class that executes database queries with bookings
 

@@ -11,6 +11,12 @@ data class [RecurrenceModel](index.md)(val interval: [Int](https://kotlinlang.or
 |---|---|
 | [RecurrenceModel](-recurrence-model.md) | [jvm]<br>constructor(interval: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)? = null, freq: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), count: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)? = null, until: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)? = null, byDay: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)&gt; = listOf(), byMonth: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)&gt; = listOf(), byYearDay: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)&gt; = listOf(), byHour: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)&gt; = listOf()) |
 
+## Types
+
+| Name | Summary |
+|---|---|
+| [Companion](-companion/index.md) | [jvm]<br>object [Companion](-companion/index.md) |
+
 ## Properties
 
 | Name | Summary |
@@ -23,3 +29,9 @@ data class [RecurrenceModel](index.md)(val interval: [Int](https://kotlinlang.or
 | [freq](freq.md) | [jvm]<br>val [freq](freq.md): [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [interval](interval.md) | [jvm]<br>val [interval](interval.md): [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)? = null |
 | [until](until.md) | [jvm]<br>val [until](until.md): [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)? = null |
+
+## Functions
+
+| Name | Summary |
+|---|---|
+| [toRecurrence](-companion/to-recurrence.md) | [jvm]<br>fun [RecurrenceModel](index.md).[toRecurrence](-companion/to-recurrence.md)(): [Recurrence](../-recurrence/index.md) |

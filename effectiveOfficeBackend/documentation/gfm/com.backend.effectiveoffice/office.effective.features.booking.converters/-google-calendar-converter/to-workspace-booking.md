@@ -5,7 +5,7 @@
 [jvm]\
 fun [toWorkspaceBooking](to-workspace-booking.md)(event: Event): [Booking](../../office.effective.model/-booking/index.md)
 
-Converts Event to [Booking](../../office.effective.model/-booking/index.md)
+Converts regular Event to [Booking](../../office.effective.model/-booking/index.md)
 
 Creates placeholders if workspace or owner doesn't exist in database
 

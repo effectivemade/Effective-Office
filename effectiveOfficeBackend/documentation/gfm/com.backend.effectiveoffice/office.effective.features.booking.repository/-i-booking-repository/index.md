@@ -10,8 +10,8 @@ Interface of repository to manipulate with workspace bookings
 
 | |
 |---|
-| [BookingCalendarRepository](../-booking-calendar-repository/index.md) |
-| [BookingWorkspaceRepository](../-booking-workspace-repository/index.md) |
+| [BookingMeetingRepository](../-booking-meeting-repository/index.md) |
+| [BookingRegularRepository](../-booking-regular-repository/index.md) |
 
 ## Functions
 

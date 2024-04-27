@@ -4,7 +4,7 @@
 
 # Effective-Office-EffectiveBackend
 
-[See documentation](documentation/gfm/index.md) :point_left:
+[See GFM documentation](documentation/gfm/index.md) :point_left:
 
 # Goal :dart:
 
@@ -36,7 +36,9 @@ Provides the ability to authenticate via work email, add information about emplo
 
 # Swagger :sparkles:
 
-[Link](https://d5do2upft1rficrbubot.apigw.yandexcloud.net/swagger/index.html)
+[Production server](https://d5do2upft1rficrbubot.apigw.yandexcloud.net/swagger/index.html)
+
+[Test server](https://d5dfk1qp766h8rfsjrdl.apigw.yandexcloud.net/swagger)
 
 ## Used libraries 📚
 

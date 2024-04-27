@@ -3,7 +3,7 @@
 # UserFacade
 
 [jvm]\
-class [UserFacade](index.md)(service: [IUserService](../../office.effective.serviceapi/-i-user-service/index.md), converterDTO: [UserDTOModelConverter](../../office.effective.features.user.converters/-user-d-t-o-model-converter/index.md), verifier: [ITokenVerifier](../../office.effective.features.user/-i-token-verifier/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md))
+class [UserFacade](index.md)(service: [IUserService](../../office.effective.serviceapi/-i-user-service/index.md), converterDTO: [UserDTOModelConverter](../../office.effective.features.user.converters/-user-d-t-o-model-converter/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md))
 
 Class used in routes to handle user-related requests. Provides business transaction, data conversion and validation.
 
@@ -11,7 +11,7 @@ Class used in routes to handle user-related requests. Provides business transact
 
 | | |
 |---|---|
-| [UserFacade](-user-facade.md) | [jvm]<br>constructor(service: [IUserService](../../office.effective.serviceapi/-i-user-service/index.md), converterDTO: [UserDTOModelConverter](../../office.effective.features.user.converters/-user-d-t-o-model-converter/index.md), verifier: [ITokenVerifier](../../office.effective.features.user/-i-token-verifier/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md)) |
+| [UserFacade](-user-facade.md) | [jvm]<br>constructor(service: [IUserService](../../office.effective.serviceapi/-i-user-service/index.md), converterDTO: [UserDTOModelConverter](../../office.effective.features.user.converters/-user-d-t-o-model-converter/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md)) |
 
 ## Functions
 

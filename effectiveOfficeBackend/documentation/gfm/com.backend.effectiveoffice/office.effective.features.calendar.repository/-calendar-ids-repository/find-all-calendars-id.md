@@ -10,7 +10,3 @@ Finds all Google calendar ids
 #### Return
 
 all calendar ids from database including default
-
-#### Author
-
-Danil Kiselev

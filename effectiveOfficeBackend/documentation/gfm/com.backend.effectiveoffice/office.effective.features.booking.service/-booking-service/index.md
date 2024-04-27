@@ -3,17 +3,17 @@
 # BookingService
 
 [jvm]\
-class [BookingService](index.md)(bookingRepository: [BookingCalendarRepository](../../office.effective.features.booking.repository/-booking-calendar-repository/index.md), bookingWorkspaceRepository: [BookingWorkspaceRepository](../../office.effective.features.booking.repository/-booking-workspace-repository/index.md), userRepository: [UserRepository](../../office.effective.features.user.repository/-user-repository/index.md), workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md)) : [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md)
+class [BookingService](index.md)(bookingMeetingRepository: [BookingMeetingRepository](../../office.effective.features.booking.repository/-booking-meeting-repository/index.md), bookingRegularRepository: [BookingRegularRepository](../../office.effective.features.booking.repository/-booking-regular-repository/index.md), userRepository: [UserRepository](../../office.effective.features.user.repository/-user-repository/index.md), workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md)) : [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md)
 
 Class that implements the [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md) methods
 
-Uses [BookingCalendarRepository](../../office.effective.features.booking.repository/-booking-calendar-repository/index.md) for operations with meeting rooms. Uses [BookingWorkspaceRepository](../../office.effective.features.booking.repository/-booking-workspace-repository/index.md) for operations with workspaces.
+Uses [BookingMeetingRepository](../../office.effective.features.booking.repository/-booking-meeting-repository/index.md) for operations with meeting rooms. Uses [BookingRegularRepository](../../office.effective.features.booking.repository/-booking-regular-repository/index.md) for operations with workspaces.
 
 ## Constructors
 
 | | |
 |---|---|
-| [BookingService](-booking-service.md) | [jvm]<br>constructor(bookingRepository: [BookingCalendarRepository](../../office.effective.features.booking.repository/-booking-calendar-repository/index.md), bookingWorkspaceRepository: [BookingWorkspaceRepository](../../office.effective.features.booking.repository/-booking-workspace-repository/index.md), userRepository: [UserRepository](../../office.effective.features.user.repository/-user-repository/index.md), workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md)) |
+| [BookingService](-booking-service.md) | [jvm]<br>constructor(bookingMeetingRepository: [BookingMeetingRepository](../../office.effective.features.booking.repository/-booking-meeting-repository/index.md), bookingRegularRepository: [BookingRegularRepository](../../office.effective.features.booking.repository/-booking-regular-repository/index.md), userRepository: [UserRepository](../../office.effective.features.user.repository/-user-repository/index.md), workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md)) |
 
 ## Functions
 
