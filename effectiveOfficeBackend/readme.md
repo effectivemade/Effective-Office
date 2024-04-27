@@ -118,8 +118,10 @@ You may use file .env.example as an example.
 **JSON_GOOGLE_CREDENTIALS** - json with Google credentials, needed to access Google calendar api<br>
 **FIREBASE_SA_JSON** - credentials json file of Firebase service account<br>
 **LOG_LEVEL** - logging level in application. Used in logback.xml. Default value: debug<br>
-**DEFAULT_CALENDAR** - default Google calendar id, used for booking meeting rooms. If not defined value from the config file will be used instead.
-**WORKSPACE_CALENDAR** - Google calendar id for booking working places (regular workspaces). If not defined value from the config file will be used instead.
+**DEFAULT_CALENDAR** - default Google calendar id, used for booking meeting rooms. 
+If not defined value from the config file will be used instead.
+Please note that meeting room bookings created via Google Calendar will not be displayed in DEFAULT_CALENDAR.<br>
+**WORKSPACE_CALENDAR** - Google calendar id for booking working places (regular workspaces). If not defined value from the config file will be used instead.<br>
 
 ### Docker-only environment variables
 
