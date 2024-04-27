@@ -1,7 +1,12 @@
 package office.effective.model
 
+import io.ktor.util.date.*
 import office.effective.common.constants.BookingConstants
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -35,14 +40,13 @@ data class RecurrenceModel (
          * Converts milliseconds date into exdate format from RFC5545
          *
          * @param millisDate - date in milliseconds ([Long])
-         * @return [String] - date in DATE-TIME (RFC5545). Example: [BookingConstants.UNTIL_FORMAT]
+         * @return [String] - date in DATE-TIME (RFC5545)
          * */
         private fun toDateRfc5545(millisDate: Long): String {
-            val time = GregorianCalendar().apply {
-                timeZone = TimeZone.getTimeZone("GMT")
-                timeInMillis = millisDate
-            }
-            return SimpleDateFormat(BookingConstants.UNTIL_FORMAT).format(time.time)
+            val oneDayInMillis = 86400000L
+            val instant = Instant.ofEpochMilli(millisDate + oneDayInMillis) //convert inclusive bound to not inclusive one
+            val dateTime = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
+            return dateTime.format(DateTimeFormatter.ofPattern(BookingConstants.UNTIL_FORMAT))
         }
     }
 }
