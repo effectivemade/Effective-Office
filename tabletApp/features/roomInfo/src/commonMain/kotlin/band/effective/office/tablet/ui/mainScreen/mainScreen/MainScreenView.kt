@@ -114,7 +114,7 @@ fun MainScreenView(
                     items(slotState.slots) {
                         Box(modifier = Modifier
                             .fillMaxSize()
-                            .padding(start = 30.dp, end = 30.dp)) {
+                            .padding(horizontal = 30.dp)) {
                             SlotView(
                                 slotUi = it,
                                 onClick = { slotComponent.sendIntent(
