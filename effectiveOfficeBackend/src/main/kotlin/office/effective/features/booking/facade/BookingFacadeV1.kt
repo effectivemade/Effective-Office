@@ -75,7 +75,7 @@ class BookingFacadeV1(
         returnInstances: Boolean
     ): List<BookingResponseDTO> {
         if (bookingRangeTo != null && bookingRangeTo <= bookingRangeFrom) {
-            throw BadRequestException("Max booking start time should be null or greater than min start time")
+            throw BadRequestException("Max booking start time must be null or greater than min start time")
         }
         val bookingList: List<Booking> = transactionManager.useTransaction({
             bookingService.findAll(

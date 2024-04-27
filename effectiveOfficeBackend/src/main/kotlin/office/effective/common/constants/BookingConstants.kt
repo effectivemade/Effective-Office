@@ -15,7 +15,6 @@ object BookingConstants {
      */
     val MIN_SEARCH_START_TIME = config.propertyOrNull("calendar.minTime")?.getString()?.toLong()
         ?: throw Exception("Config file does not contain minimum time")
-    val MAX_TIMESTAMP = 2147483647000L
     val DEFAULT_CALENDAR: String = System.getenv("DEFAULT_CALENDAR")
         ?: config.propertyOrNull("calendar.defaultCalendar")?.getString()
         ?: throw Exception("Environment and config file does not contain Google default calendar id")

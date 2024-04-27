@@ -63,13 +63,13 @@ class WorkspaceFacadeV1(
         withBookingsUntil: Long? = null
     ): List<WorkspaceDTO> {
         if (withBookingsFrom != null && withBookingsUntil != null) {
-            if (withBookingsFrom < 0L || withBookingsFrom >= BookingConstants.MAX_TIMESTAMP)
-                throw ValidationException("with_bookings_from should be non-negative and greater than timestamp max value")
-            else if (withBookingsUntil < 0L || withBookingsUntil >= BookingConstants.MAX_TIMESTAMP)
-                throw ValidationException("with_bookings_until should be non-negative and less than timestamp max value")
+            if (withBookingsFrom < 0L)
+                throw ValidationException("with_bookings_from must be non-negative")
+            else if (withBookingsUntil < 0L)
+                throw ValidationException("with_bookings_until must be non-negative")
             else if (withBookingsUntil <= withBookingsFrom)
                 throw ValidationException(
-                    "with_bookings_until (${withBookingsUntil}) should be greater than with_bookings_from (${withBookingsFrom})")
+                    "with_bookings_until (${withBookingsUntil}) must be greater than with_bookings_from (${withBookingsFrom})")
 
             return findAllByTag(tag).map { workspace ->
                 val bookings = bookingFacade.findAll(
@@ -112,13 +112,13 @@ class WorkspaceFacadeV1(
      * @author Daniil Zavyalov
      */
     fun findAllFreeByPeriod(tag: String, beginTimestamp: Long, endTimestamp: Long): List<WorkspaceDTO> {
-        if (beginTimestamp < 0L || beginTimestamp >= BookingConstants.MAX_TIMESTAMP)
-            throw ValidationException("Begin timestamp should be non-negative and less than timestamp max value")
-        else if (endTimestamp < 0L || endTimestamp >= BookingConstants.MAX_TIMESTAMP)
-            throw ValidationException("End timestamp should be non-negative and less than timestamp max value")
+        if (beginTimestamp < 0L)
+            throw ValidationException("Begin timestamp must be non-negative")
+        else if (endTimestamp < 0L)
+            throw ValidationException("End timestamp must be non-negative")
         else if (endTimestamp <= beginTimestamp)
             throw ValidationException(
-                "End timestamp (${endTimestamp}) should be greater than begin timestamp (${beginTimestamp})")
+                "End timestamp (${endTimestamp}) must be greater than begin timestamp (${beginTimestamp})")
 
         return transactionManager.useTransaction({
             val modelList = service.findAllFreeByPeriod(
