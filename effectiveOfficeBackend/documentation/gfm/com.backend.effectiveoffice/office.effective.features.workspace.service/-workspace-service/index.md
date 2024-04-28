@@ -3,7 +3,7 @@
 # WorkspaceService
 
 [jvm]\
-class [WorkspaceService](index.md)(repository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md)) : [IWorkspaceService](../../office.effective.serviceapi/-i-workspace-service/index.md)
+class [WorkspaceService](index.md)(workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md)) : [IWorkspaceService](../../office.effective.serviceapi/-i-workspace-service/index.md)
 
 Class that implements the [IWorkspaceService](../../office.effective.serviceapi/-i-workspace-service/index.md) methods
 
@@ -11,7 +11,7 @@ Class that implements the [IWorkspaceService](../../office.effective.serviceapi/
 
 | | |
 |---|---|
-| [WorkspaceService](-workspace-service.md) | [jvm]<br>constructor(repository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md)) |
+| [WorkspaceService](-workspace-service.md) | [jvm]<br>constructor(workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md)) |
 
 ## Functions
 

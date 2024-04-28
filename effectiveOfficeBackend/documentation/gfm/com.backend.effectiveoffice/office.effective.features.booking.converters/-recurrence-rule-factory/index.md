@@ -15,5 +15,5 @@ Max Mishenko
 
 | Name | Summary |
 |---|---|
-| [getRecurrence](get-recurrence.md) | [jvm]<br>fun [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html).[getRecurrence](get-recurrence.md)(): [Recurrence](../../model/-recurrence/index.md) |
-| [rule](rule.md) | [jvm]<br>fun [Recurrence](../../model/-recurrence/index.md).[rule](rule.md)(): [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [getRecurrence](get-recurrence.md) | [jvm]<br>fun [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html).[getRecurrence](get-recurrence.md)(): [Recurrence](../../office.effective.model/-recurrence/index.md) |
+| [rule](rule.md) | [jvm]<br>fun [Recurrence](../../office.effective.model/-recurrence/index.md).[rule](rule.md)(): [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |

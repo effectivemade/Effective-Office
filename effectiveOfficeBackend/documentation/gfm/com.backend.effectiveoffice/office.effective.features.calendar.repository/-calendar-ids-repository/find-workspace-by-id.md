@@ -9,10 +9,6 @@ fun [findWorkspaceById](find-workspace-by-id.md)(calendarId: [String](https://ko
 
 [Workspace](../../office.effective.model/-workspace/index.md) model by calendar id (String)
 
-#### Author
-
-Danil Kiselev
-
 #### Parameters
 
 jvm

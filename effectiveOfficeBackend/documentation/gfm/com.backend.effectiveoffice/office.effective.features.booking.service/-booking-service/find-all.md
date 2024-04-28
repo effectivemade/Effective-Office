@@ -3,7 +3,7 @@
 # findAll
 
 [jvm]\
-open override fun [findAll](find-all.md)(userId: [UUID](https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html)?, workspaceId: [UUID](https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html)?, bookingRangeTo: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)?, bookingRangeFrom: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)): [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[Booking](../../office.effective.model/-booking/index.md)&gt;
+open override fun [findAll](find-all.md)(userId: [UUID](https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html)?, workspaceId: [UUID](https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html)?, returnInstances: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html), bookingRangeTo: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)?, bookingRangeFrom: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)): [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[Booking](../../office.effective.model/-booking/index.md)&gt;
 
 Returns all bookings. Bookings can be filtered by owner and workspace id
 
@@ -19,6 +19,7 @@ jvm
 |---|---|
 | userId | use to filter by booking owner id |
 | workspaceId | use to filter by booking workspace id |
+| returnInstances | return recurring bookings as non-recurrent instances |
 | bookingRangeTo | upper bound (exclusive) for a beginBooking to filter by. Optional. |
 | bookingRangeFrom | lower bound (exclusive) for a endBooking to filter by. |
 

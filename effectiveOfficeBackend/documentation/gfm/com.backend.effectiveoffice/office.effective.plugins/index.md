@@ -7,7 +7,7 @@
 | Name | Summary |
 |---|---|
 | [applicationHttpClient](application-http-client.md) | [jvm]<br>val [applicationHttpClient](application-http-client.md): HttpClient |
-| [VerificationPlugin](-verification-plugin.md) | [jvm]<br>val [VerificationPlugin](-verification-plugin.md): ApplicationPlugin&lt;[Unit](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html)&gt;<br>Allows to check Authentication plugins automatically. Run every time when receiving input call. Checks Authentication (bearer) header containment |
+| [CustomAuthorizationPlugin](-custom-authorization-plugin.md) | [jvm]<br>val [CustomAuthorizationPlugin](-custom-authorization-plugin.md): ApplicationPlugin&lt;[Unit](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html)&gt;<br>Allows to check Authentication plugins automatically. Run every time when receiving input call. Checks Authentication (bearer) header containment |
 
 ## Functions
 

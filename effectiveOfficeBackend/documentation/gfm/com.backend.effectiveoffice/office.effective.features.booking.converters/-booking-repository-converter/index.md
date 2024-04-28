@@ -3,7 +3,18 @@
 # BookingRepositoryConverter
 
 [jvm]\
-class [BookingRepositoryConverter](index.md)(database: Database, workspaceConverter: [WorkspaceRepositoryConverter](../../office.effective.features.workspace.converters/-workspace-repository-converter/index.md), userConverter: [UserModelEntityConverter](../../office.effective.features.user.converters/-user-model-entity-converter/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md))
+class [~~BookingRepositoryConverter~~](index.md)(database: Database, workspaceConverter: [WorkspaceRepositoryConverter](../../office.effective.features.workspace.converters/-workspace-repository-converter/index.md), userConverter: [UserModelEntityConverter](../../office.effective.features.user.converters/-user-model-entity-converter/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md))---
+
+### Deprecated
+
+Used to convert into db events. We don't store events into database.
+
+#### Replace with
+
+```kotlin
+GoogleCalendarConverter
+```
+---
 
 Converts between [Booking](../../office.effective.model/-booking/index.md) and [WorkspaceBookingEntity](../../office.effective.features.booking.repository/-workspace-booking-entity/index.md) objects. Uses [UserModelEntityConverter](../../office.effective.features.user.converters/-user-model-entity-converter/index.md) and [WorkspaceRepositoryConverter](../../office.effective.features.workspace.converters/-workspace-repository-converter/index.md) to convert contained users and workspaces
 

@@ -7,3 +7,4 @@
 | Name | Summary |
 |---|---|
 | [userRouting](user-routing.md) | [jvm]<br>fun Route.[userRouting](user-routing.md)() |
+| [userRoutingV1](user-routing-v1.md) | [jvm]<br>fun Route.[userRoutingV1](user-routing-v1.md)() |

@@ -3,7 +3,7 @@
 # getRecurrence
 
 [jvm]\
-fun [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html).[getRecurrence](get-recurrence.md)(): [Recurrence](../../model/-recurrence/index.md)
+fun [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html).[getRecurrence](get-recurrence.md)(): [Recurrence](../../office.effective.model/-recurrence/index.md)
 
 #### Author
 

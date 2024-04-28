@@ -4,7 +4,7 @@
 
 # Effective-Office-EffectiveBackend
 
-[See documentation](documentation/gfm/index.md) :point_left:
+[See GFM documentation](documentation/gfm/index.md) :point_left:
 
 # Goal :dart:
 
@@ -36,7 +36,9 @@ Provides the ability to authenticate via work email, add information about emplo
 
 # Swagger :sparkles:
 
-[Link](https://d5do2upft1rficrbubot.apigw.yandexcloud.net/swagger/index.html)
+[Production server](https://d5do2upft1rficrbubot.apigw.yandexcloud.net/swagger/index.html)
+
+[Test server](https://d5dfk1qp766h8rfsjrdl.apigw.yandexcloud.net/swagger)
 
 ## Used libraries 📚
 
@@ -54,7 +56,6 @@ A list of technologies used within the project:
 * firebase
 * kotlin tests junit
 * mockito
-* h2 database drivers (for tests)
 * logback classic
 
 # How to launch backend :running:
@@ -75,10 +76,21 @@ In our project, we use monorepository, so you really don't need all the folders.
 
 ## Launch project
 
+### Intellij Idea + test server database
+
+You can run the application using test server database (see backend.local.properties in Notion). 
+This allows all backend developers to use common data for testing 
+and correctly receive data from the test Google calendars. **Don't use this configuration for testing migrations.**
+
+First of all, you should create Kotlin run/debug configuration for the project in your Intellij Idea.
+In the configuration, you should add values for project environment variables.
+List of variables you may found in the text below. **MIGRATIONS_ENABLE variable must be false**.
+Then you may run the application.
+
 ### Docker
 
 If you have **Docker** and **Docker compose**, you may use docker-compose.yml and Dockerfile files to run project.<br>
-In that case, you may need to specify some environment variables. You may use .env file in the same directory, 
+In that case, you also should specify all environment variables. You may use .env file in the same directory, 
 as docker-compose.yml located. This file must contain few variables definitions. List of variables you may found in text below. 
 
 Syntax:
@@ -89,44 +101,34 @@ As a sample, you may use **.env.example** file
 To run application you need type in terminal, being inside backend project root directory (<all-repository-directory>/effectiveOfficeBackend). 
 > docker compose up
 
-Docker will download docker images of postgreSQL and java, 
+Docker will download docker images of PostgreSQL and Java, 
 build image with application itself and run postgres container at first place and effectiveOfficeBackend
 container at the second. If build ends well, last message you will see in terminal is goind to be
 > effectiveOfficeBackend  | <current_date> <current_time> [DefaultDispatcher-worker-1] INFO  ktor.application - Responding at http://0.0.0.0:8080
 
-### Local machine
-
-It is hightly recommended not to run project locally, if you doesn't want to take part in development process.
-
-To launch locally (without docker at all), you will need postgreSQL and jre. You also need to specify 
-environment variables on running .jar file or inside your IDE.
-
-Also, it may be useful during development, to run application itsserlf on local machine, but use 
-postgres container from docker. In that case you may run named container by command:
-> docker compsoe up <container_name>
-
 ## Environment variables
+You may use file .env.example as an example.
 
-**POSTGRES_PASSWORD** - defines password for postgres db<br>
-**POSTGRES_DB** - defines name of the postgres database to connect<br>
-**POSTGRES_USER** - defines username for postgres container(postgresForKtor)<br>
-**DATABASE_PASSWORD** - specify password to send to database container to connect<br>
-**GOOGLE_CLIENT_ID** - Deprecated <br>
-**GOOGLE_CLIENT_SECRET** - Deprecated<br>
-**VERIFICATION_PLUGIN_ENABLE** - allows to turn on/off need in authetnication to access api. Any value instead of "true" will be recognised as "false"<br>
-**DATABASE_HOST** - the name of the postgres docker container in the same network<br>
 **DATABASE_PORT** - specify the port of database container where application will make a call to establish connection with postgres<br>
 **DATABASE_NAME** - specify the name of database to connect<br>
 **DATABASE_USERNAME** - specify the username of **database** user to connect<br>
+**DATABASE_PASSWORD** - specify password to send to database container to connect<br>
 **MIGRATIONS_ENABLE** - allows to turn on/off database migrations process. Any value instead of "true" will be recognised as "false"<br>
-**JSON_GOOGLE_CREDENTIALS** - json file with Google credentials, needed to access calendar api<br>
-**FIREBASE_SA_JSON** - credentials json file from Firebase service account<br>
-**APPLICATION_URL** - actual url address of application itself. Must be https url. Can't be localhost.<br>
+**VERIFICATION_PLUGIN_ENABLE** - allows to turn on/off requests authentication. Any value instead of "true" will be recognised as "false"<br>
+**JSON_GOOGLE_CREDENTIALS** - json with Google credentials, needed to access Google calendar api<br>
+**FIREBASE_SA_JSON** - credentials json file of Firebase service account<br>
 **LOG_LEVEL** - logging level in application. Used in logback.xml. Default value: debug<br>
-**DEFAULT_CALENDAR** - default Google calendar, used for booking meeting rooms. If not defined value from the config file will be used instead.
-**WORKSPACE_CALENDAR** - Google calendar for booking working places. If not defined value from the config file will be used instead.
+**DEFAULT_CALENDAR** - default Google calendar id, used for booking meeting rooms. 
+If not defined value from the config file will be used instead.
+Please note that meeting room bookings created via Google Calendar will not be displayed in DEFAULT_CALENDAR.<br>
+**WORKSPACE_CALENDAR** - Google calendar id for booking working places (regular workspaces). If not defined value from the config file will be used instead.<br>
 
-You may use file .env.example as an example.
+### Docker-only environment variables
+
+**POSTGRES_PASSWORD** - defines a password for postgres docker container<br>
+**POSTGRES_DB** - defines a database name for postgres docker container<br>
+**POSTGRES_USER** - defines an username for postgres container<br>
+
 
 ## Authors: :writing_hand:
 

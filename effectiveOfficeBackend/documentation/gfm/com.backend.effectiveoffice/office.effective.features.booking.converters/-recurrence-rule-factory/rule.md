@@ -3,7 +3,7 @@
 # rule
 
 [jvm]\
-fun [Recurrence](../../model/-recurrence/index.md).[rule](rule.md)(): [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)
+fun [Recurrence](../../office.effective.model/-recurrence/index.md).[rule](rule.md)(): [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)
 
 #### Author
 

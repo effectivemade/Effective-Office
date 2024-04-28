@@ -3,7 +3,7 @@
 # useTransaction
 
 [jvm]\
-fun &lt;[T](use-transaction.md)&gt; [useTransaction](use-transaction.md)(serviceCall: () -&gt; [T](use-transaction.md), isolation: TransactionIsolation = TransactionIsolation.READ_COMMITTED): [T](use-transaction.md)
+abstract fun &lt;[T](use-transaction.md)&gt; [useTransaction](use-transaction.md)(serviceCall: () -&gt; [T](use-transaction.md), isolation: TransactionIsolation = TransactionIsolation.READ_COMMITTED): [T](use-transaction.md)
 
 Executes code in a database transaction.
 

@@ -3,4 +3,4 @@
 # BookingFacade
 
 [jvm]\
-constructor(bookingService: [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md), bookingConverter: [BookingFacadeConverter](../../office.effective.features.booking.converters/-booking-facade-converter/index.md))
+constructor(bookingService: [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md), bookingConverter: [BookingDtoModelConverter](../../office.effective.features.booking.converters/-booking-dto-model-converter/index.md))

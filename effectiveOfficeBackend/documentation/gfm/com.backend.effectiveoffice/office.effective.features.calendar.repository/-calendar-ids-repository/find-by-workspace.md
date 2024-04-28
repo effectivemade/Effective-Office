@@ -8,7 +8,3 @@ fun [findByWorkspace](find-by-workspace.md)(workspaceId: [UUID](https://docs.ora
 #### Return
 
 String - id of calendar for specified workspace
-
-#### Author
-
-Danil Kiselev
