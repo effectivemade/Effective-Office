@@ -11,10 +11,6 @@ Updates a given booking. Use the returned model for further operations
 
 [Booking](../../office.effective.model/-booking/index.md) after change saving
 
-#### Author
-
-Daniil Zavyalov, Danil Kiselev
-
 #### Parameters
 
 jvm
@@ -27,5 +23,6 @@ jvm
 
 | | |
 |---|---|
-| [MissingIdException](../../office.effective.common.exception/-missing-id-exception/index.md) | if [Booking.id](../../office.effective.model/-booking/id.md) is null |
+| [MissingIdException](../../office.effective.common.exception/-missing-id-exception/index.md) | if [Booking.id](../../office.effective.model/-booking/id.md) or [Booking.workspace](../../office.effective.model/-booking/workspace.md).id is null |
 | [InstanceNotFoundException](../../office.effective.common.exception/-instance-not-found-exception/index.md) | if booking given id doesn't exist in the database |
+| [WorkspaceUnavailableException](../../office.effective.common.exception/-workspace-unavailable-exception/index.md) | if booking unavailable because of collision check |

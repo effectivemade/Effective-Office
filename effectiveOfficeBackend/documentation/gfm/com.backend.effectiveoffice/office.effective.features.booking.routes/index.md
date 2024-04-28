@@ -7,3 +7,4 @@
 | Name | Summary |
 |---|---|
 | [bookingRouting](booking-routing.md) | [jvm]<br>fun Route.[bookingRouting](booking-routing.md)() |
+| [bookingRoutingV1](booking-routing-v1.md) | [jvm]<br>fun Route.[bookingRoutingV1](booking-routing-v1.md)() |

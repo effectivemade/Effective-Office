@@ -3,4 +3,4 @@
 # owner
 
 [jvm]\
-var [owner](owner.md): [UserModel](../-user-model/index.md)
+var [owner](owner.md): [UserModel](../-user-model/index.md)?

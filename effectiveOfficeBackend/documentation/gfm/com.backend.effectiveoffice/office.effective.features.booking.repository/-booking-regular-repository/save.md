@@ -11,10 +11,6 @@ Saves a given booking. If given model will have an id, it will be ignored. Use t
 
 saved [Booking](../../office.effective.model/-booking/index.md)
 
-#### Author
-
-Daniil Zavyalov, Danil Kiselev
-
 #### Parameters
 
 jvm

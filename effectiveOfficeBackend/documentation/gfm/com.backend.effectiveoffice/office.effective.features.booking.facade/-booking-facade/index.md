@@ -3,7 +3,22 @@
 # BookingFacade
 
 [jvm]\
-class [BookingFacade](index.md)(bookingService: [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md), bookingConverter: [BookingFacadeConverter](../../office.effective.features.booking.converters/-booking-facade-converter/index.md))
+class [~~BookingFacade~~](index.md)(bookingService: [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md), bookingConverter: [BookingDtoModelConverter](../../office.effective.features.booking.converters/-booking-dto-model-converter/index.md))---
+
+### Deprecated
+
+Deprecated since 1.0 api version
+
+#### Replace with
+
+```kotlin
+import office.effective.features.booking.facade.BookingFacadeV1
+
+```
+```kotlin
+BookingFacadeV1
+```
+---
 
 Class used in routes to handle bookings requests. Provides business transaction, data conversion and validation.
 
@@ -13,7 +28,7 @@ In case of an error, the database transaction will be rolled back.
 
 | | |
 |---|---|
-| [BookingFacade](-booking-facade.md) | [jvm]<br>constructor(bookingService: [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md), bookingConverter: [BookingFacadeConverter](../../office.effective.features.booking.converters/-booking-facade-converter/index.md)) |
+| [BookingFacade](-booking-facade.md) | [jvm]<br>constructor(bookingService: [IBookingService](../../office.effective.serviceapi/-i-booking-service/index.md), transactionManager: [DatabaseTransactionManager](../../office.effective.common.utils/-database-transaction-manager/index.md), uuidValidator: [UuidValidator](../../office.effective.common.utils/-uuid-validator/index.md), bookingConverter: [BookingDtoModelConverter](../../office.effective.features.booking.converters/-booking-dto-model-converter/index.md)) |
 
 ## Functions
 

@@ -22,9 +22,3 @@ jvm
 | | |
 |---|---|
 | booking | changed booking |
-
-#### Throws
-
-| | |
-|---|---|
-| [InstanceNotFoundException](../../office.effective.common.exception/-instance-not-found-exception/index.md) | if workspace with the given id not found |

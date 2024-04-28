@@ -3,4 +3,4 @@
 # WorkspaceService
 
 [jvm]\
-constructor(repository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md))
+constructor(workspaceRepository: [WorkspaceRepository](../../office.effective.features.workspace.repository/-workspace-repository/index.md))

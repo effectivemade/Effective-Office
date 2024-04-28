@@ -5,7 +5,22 @@
 [jvm]\
 @Serializable
 
-data class [BookingDTO](index.md)(val owner: [UserDTO](../-user-d-t-o/index.md), val participants: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[UserDTO](../-user-d-t-o/index.md)&gt;, val workspace: [WorkspaceDTO](../-workspace-d-t-o/index.md), val id: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?, val beginBooking: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html), val endBooking: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html), val recurrence: [RecurrenceDTO](../../model/-recurrence-d-t-o/index.md)? = null)
+data class [~~BookingDTO~~](index.md)(val owner: [UserDTO](../-user-d-t-o/index.md), val participants: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[UserDTO](../-user-d-t-o/index.md)&gt;, val workspace: [WorkspaceDTO](../-workspace-d-t-o/index.md), val id: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?, val beginBooking: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html), val endBooking: [Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html), val recurrence: [RecurrenceDTO](../../model/-recurrence-d-t-o/index.md)? = null)---
+
+### Deprecated
+
+Deprecated since 1.0 api version
+
+#### Replace with
+
+```kotlin
+import office.effective.dto.BookingRequestDTO
+
+```
+```kotlin
+BookingRequestDTO or BookingResponseDTO
+```
+---
 
 ## Constructors
 

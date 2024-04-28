@@ -21,4 +21,4 @@ jvm
 
 | | |
 |---|---|
-| model | [BookingDTO](../../office.effective.dto/-booking-d-t-o/index.md) to be converted |
+| model | [Booking](../../office.effective.model/-booking/index.md) to be converted |
