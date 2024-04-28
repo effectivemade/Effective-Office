@@ -4,6 +4,13 @@ import kotlinx.serialization.Serializable
 import model.RecurrenceDTO
 
 @Serializable
+@Deprecated(
+    message = "Deprecated since 1.0 api version",
+    replaceWith = ReplaceWith(
+        expression = "BookingRequestDTO or BookingResponseDTO",
+        imports = ["office.effective.dto.BookingRequestDTO"]
+    )
+)
 data class BookingDTO (
     val owner: UserDTO,
     val participants: List<UserDTO>,

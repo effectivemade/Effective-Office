@@ -1,20 +1,15 @@
 package office.effective.features.booking.converters
 
-import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.model.Event
 import com.google.api.services.calendar.model.Event.Organizer
 import com.google.api.services.calendar.model.EventAttendee
 import com.google.api.services.calendar.model.EventDateTime
-import office.effective.model.Recurrence.Companion.toRecurrence
 import office.effective.common.constants.BookingConstants
 import office.effective.common.utils.UuidValidator
 import office.effective.dto.BookingDTO
-import office.effective.dto.UserDTO
 import office.effective.dto.WorkspaceDTO
 import office.effective.features.calendar.repository.CalendarIdsRepository
-import office.effective.features.user.converters.UserDTOModelConverter
 import office.effective.features.user.repository.UserRepository
-import office.effective.features.workspace.converters.WorkspaceFacadeConverter
 import office.effective.model.Booking
 import office.effective.model.UserModel
 import office.effective.model.Workspace
@@ -33,14 +28,177 @@ import kotlin.collections.List as List
 class GoogleCalendarConverter(
     private val calendarIdsRepository: CalendarIdsRepository,
     private val userRepository: UserRepository,
-    private val workspaceConverter: WorkspaceFacadeConverter,
-    private val userConverter: UserDTOModelConverter,
-    private val bookingConverter: BookingFacadeConverter,
     private val verifier: UuidValidator,
     private val workspaceRepository: WorkspaceRepository
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val defaultAccount: String = BookingConstants.DEFAULT_CALENDAR
+
+    /**
+     * Converts regular [Event] to [Booking]
+     *
+     * Creates placeholders if workspace or owner doesn't exist in database
+     *
+     * @param event [Event] to be converted
+     * @param owner specify this parameter to reduce the number
+     * of database queries if the owner has already been retrieved
+     * @param participants specify this parameter to reduce the number
+     * of database queries if participants have already been retrieved
+     * @param workspace specify this parameter to reduce the number
+     * of database queries if workspace have already been retrieved
+     * @return The resulting [Booking] object
+     */
+    fun toRegularWorkspaceBooking(
+        event: Event,
+        owner: UserModel? = null,
+        workspace: Workspace? = null,
+        participants: List<UserModel>? = null,
+    ): Booking {
+        logger.debug("[toRegularWorkspaceBooking] converting an event to workspace booking dto")
+        val recurrence = event.recurrence?.toString()?.getRecurrence()
+
+        val model = Booking(
+            owner = owner ?: getUserModel(event),
+            participants = participants ?: emptyList(),
+            workspace = workspace ?: getWorkspaceModel(event),
+            id = event.id ?: null,
+            beginBooking = toLocalInstant(event.start),
+            endBooking = toLocalInstant(event.end),
+            recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) },
+            recurringBookingId = event.recurringEventId
+        )
+        logger.trace("[toRegularWorkspaceBooking] {}", model.toString())
+        return model
+    }
+
+    /**
+     * Find [UserModel]. May return placeholder if user with the given email doesn't exist in database
+     *
+     * @param event
+     * @return [UserModel] with data from database or [UserModel] placeholder
+     * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
+     */
+    private fun getUserModel(event: Event): UserModel {
+        val userId: UUID = try {
+            UUID.fromString(event.description.substringBefore(" "))
+        } catch (e: Exception) {
+            logger.error("[getUserModel] Can't get user UUID from Google Calendar event description. " +
+                    "Creating placeholder", e)
+            return UserModel(
+                id = null,
+                fullName = "Unregistered user",
+                tag = null,
+                active = false,
+                role = null,
+                avatarURL = null,
+                integrations = emptySet(),
+                email = "placeholder@gmail.com"
+            )
+        }
+        val userModel: UserModel = userRepository.findById(userId)
+            ?: run {
+                logger.warn("[getUserModel] can't find a user with id ${userId}. Creating placeholder.")
+                UserModel(
+                    id = null,
+                    fullName = "Unregistered user",
+                    tag = null,
+                    active = false,
+                    role = null,
+                    avatarURL = null,
+                    integrations = emptySet(),
+                    email = "placeholder@gmail.com"
+                )
+            }
+        return userModel
+    }
+
+    /**
+     * Find [Workspace] for regular workspace booking. May return placeholder
+     *
+     * @param event
+     * @return [Workspace]
+     */
+    private fun getWorkspaceModel(event: Event): Workspace {
+        val workspaceId: UUID = try {
+            UUID.fromString(event.summary.substringBefore(" "))
+        } catch (e: Exception) {
+            logger.error("[getWorkspaceModel] Can't get workspace UUID from Google Calendar event description. " +
+                    "Creating placeholder", e)
+            return Workspace(null, "Nonexistent workspace", "regular", listOf(), null)
+        }
+        return workspaceRepository.findById(workspaceId) ?: run {
+            logger.warn("[getWorkspaceModel] can't find a workspace with id ${workspaceId}. Creating placeholder.")
+            Workspace(null, "Nonexistent workspace", "regular", listOf(), null)
+        }
+    }
+
+    /**
+     * Converts meeting [Event] to [Booking]
+     *
+     * @param event [Event] to be converted
+     * @param owner specify this parameter to reduce the number
+     * of database queries if the owner has already been retrieved
+     * @param participants specify this parameter to reduce the number
+     * of database queries if participants have already been retrieved
+     * @param workspace specify this parameter to reduce the number
+     * of database queries if workspace have already been retrieved
+     * @return The resulting [BookingDTO] object
+     * @author Danil Kiselev, Max Mishenko
+     */
+    fun toMeetingWorkspaceBooking(
+        event: Event,
+        owner: UserModel? = null,
+        workspace: Workspace? = null,
+        participants: List<UserModel>? = null,
+    ): Booking {
+        logger.debug("[toMeetingWorkspaceBooking] converting calendar event to meeting room booking model")
+        val organizer: String = event.organizer?.email ?: ""
+        val email = if (organizer != defaultAccount) {
+            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event.organizer field")
+            organizer
+        } else {
+            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event description")
+            event.description?.substringBefore(" ") ?: ""
+        }
+        val recurrence = event.recurrence?.toString()?.getRecurrence()
+
+        val booking = Booking(
+            owner = owner ?: getUserModel(email),
+            participants = participants ?: getParticipantsModels(event),
+            workspace = workspace ?: getWorkspaceModel(getCalendarId(event)),
+            id = event.id ?: null,
+            beginBooking = toLocalInstant(event.start),
+            endBooking = toLocalInstant(event.end),
+            recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) }
+        )
+        logger.trace("[toMeetingWorkspaceBooking] {}", booking.toString())
+        return booking
+    }
+
+    /**
+     * Find [UserModel] by email. May return placeholder if user with the given email doesn't exist in database
+     *
+     * @param email
+     * @return [UserModel] with data from database or [UserModel] placeholder with the given [email]
+     * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
+     */
+    private fun getUserModel(email: String): UserModel {
+        val userModel: UserModel = userRepository.findByEmail(email)
+            ?: run {
+                logger.warn("[getUserModel] can't find a user with email ${email}. Creating placeholder.")
+                UserModel(
+                    id = null,
+                    fullName = "Unregistered user",
+                    tag = null,
+                    active = false,
+                    role = null,
+                    avatarURL = null,
+                    integrations = emptySet(),
+                    email = email
+                )
+            }
+        return userModel
+    }
 
     /**
      * Gets the list of event participants, excluding resources, and returns a list of user Models.
@@ -52,17 +210,7 @@ class GoogleCalendarConverter(
         val attendees = event.attendees
             .filter { attendee -> !attendee.isResource }
             .map { attendee -> attendee.email }
-        return getAllUserModels(attendees)
-    }
-
-    /**
-     * Retrieves a list of users by email addresses and converts them to a list of user Models.
-     *
-     * @param emails List of user email addresses.
-     * @return List of user Models.
-     */
-    private fun getAllUserModels(emails: List<String>): List<UserModel> {
-        return userRepository.findAllByEmail(emails)
+        return userRepository.findAllByEmails(attendees)
     }
 
     /**
@@ -75,80 +223,6 @@ class GoogleCalendarConverter(
     private fun getCalendarId(event: Event): String? {
         return event.attendees?.firstOrNull { it?.resource ?: false }
             ?.email
-    }
-
-    /**
-     * Converts regular [Event] to [Booking]
-     *
-     * Creates placeholders if workspace or owner doesn't exist in database
-     *
-     * @param event [Event] to be converted
-     * @return The resulting [Booking] object
-     * @throws Exception if it fails to get user id from description or workspace id from summary of Google Calendar event
-     * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
-     */
-    fun toWorkspaceBooking(event: Event): Booking {
-        logger.debug("[toWorkspaceBooking] converting an event to workspace booking dto")
-        val userId: UUID = try {
-            UUID.fromString(event.description.substringBefore(" "))
-        } catch (e: Exception) {
-            throw Exception("Can't get user UUID from Google Calendar event description. Reason: ${e.printStackTrace()}")
-        }
-        val workspaceID: UUID = try {
-            UUID.fromString(event.summary.substringBefore(" "))
-        } catch (e: Exception) {
-            throw Exception("Can't get user UUID from Google Calendar event summary. Reason: ${e.printStackTrace()}")
-        }
-        val recurrence = event.recurrence?.toString()?.getRecurrence()
-
-        val model = Booking(
-            owner = userRepository.findById(userId)
-                ?: run {
-                    logger.warn("[toWorkspaceBooking] can't find user with id ${userId}. Creating placeholder.")
-                    UserModel(
-                        id = null,
-                        fullName = "Nonexistent user",
-                        tag = null,
-                        active = false,
-                        role = null,
-                        avatarURL = null,
-                        integrations = emptySet(),
-                        email = ""
-                    )
-                },
-            participants = emptyList(),
-            workspace = workspaceRepository.findById(workspaceID)
-                ?:  run {
-                    logger.warn("[toWorkspaceBooking] can't find a user with id ${userId}. Creating placeholder.")
-                    Workspace(null, "Nonexistent workspace", "placeholder", listOf(), null)
-                },
-            id = event.id ?: null,
-            beginBooking = Instant.ofEpochMilli(event.start?.dateTime?.value ?: 0),
-            endBooking = Instant.ofEpochMilli(
-                event.end?.dateTime?.value ?: ((event.start?.dateTime?.value ?: 0) + 86400000)
-            ),
-            recurrence = recurrence?.toDto()?.let {
-                RecurrenceConverter.recurrenceToModel(recurrence)
-            }
-        )
-        logger.trace("[toBookingDTO] {}", model.toString())
-        return model
-    }
-
-    /**
-     * Find [WorkspaceDTO] by workspace calendar id
-     *
-     * @param calendarId Google id of calendar of workspace
-     * @return [WorkspaceDTO]
-     * @author Danil Kiselev, Max Mishenko
-     */
-    private fun getWorkspaceDto(calendarId: String?): WorkspaceDTO {
-        if (calendarId == null) {
-            logger.warn("[toBookingDTO] can't get workspace calendar from event.attendees")
-            return workspaceConverter.modelToDto(Workspace(null, "placeholder", "placeholder", listOf(), null))
-        }
-        val workspaceModel: Workspace = calendarIdsRepository.findWorkspaceById(calendarId) //may return placeholder
-        return workspaceConverter.modelToDto(workspaceModel)
     }
 
     /**
@@ -167,57 +241,6 @@ class GoogleCalendarConverter(
     }
 
     /**
-     * Find [UserDTO] by email. May return placeholder if user with the given email doesn't exist in database
-     *
-     * @param email
-     * @return [UserDTO] with data from database or [UserDTO] placeholder with the given [email]
-     * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
-     */
-    private fun getUserDto(email: String): UserDTO {
-        val userModel: UserModel = userRepository.findByEmail(email)
-            ?: run {
-                logger.warn("[getUser] can't find a user with email ${email}. Creating placeholder.")
-                UserModel(
-                    id = null,
-                    fullName = "Unregistered user",
-                    tag = null,
-                    active = false,
-                    role = null,
-                    avatarURL = null,
-                    integrations = emptySet(),
-                    email = email
-                )
-            }
-        return userConverter.modelToDTO(userModel)
-    }
-
-    /**
-     * Find [UserModel] by email. May return placeholder if user with the given email doesn't exist in database
-     *
-     * @param email
-     * @return [UserDTO] with data from database or [UserDTO] placeholder with the given [email]
-     * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
-     */
-    private fun getUserModel(email: String): UserModel {
-        val userModel: UserModel = userRepository.findByEmail(email)
-            ?: run {
-                logger.warn("[getUser] can't find a user with email ${email}. Creating placeholder.")
-                UserModel(
-                    id = null,
-                    fullName = "Unregistered user",
-                    tag = null,
-                    active = false,
-                    role = null,
-                    avatarURL = null,
-                    integrations = emptySet(),
-                    email = email
-                )
-            }
-        return userModel
-    }
-
-
-    /**
      * Converts regular workspace [Booking] to [Event]. [Event.description] is used to indicate the booking author,
      * because [Event.organizer] is [defaultAccount] of application.
      * [Event.summary] is used to indicate the booking workspace.
@@ -227,16 +250,27 @@ class GoogleCalendarConverter(
      * @author Daniil Zavyalov
      */
     fun toGoogleWorkspaceRegularEvent(model: Booking): Event {
-        logger.debug("[toGoogleWorkspaceEvent] converting workspace booking dto to calendar event")
+        logger.debug("[toGoogleWorkspaceRegularEvent] converting regular workspace booking to calendar event")
         val event = Event().apply {
-            summary = "${model.workspace.id} - workspace id (${model.workspace.zone} - ${model.workspace.name})"
-            description = "${model.owner.id} - organizer id [ ${model.owner.email} ]"
-            getRecurrenceFromRecurrenceModel(model)?.let{ recurrence = it }
-            start = model.beginBooking.toGoogleDateTime()
-            end = model.endBooking.toGoogleDateTime()
+            id = model.id
+            summary = eventSummaryForRegularBooking(model)
+            description = eventDescriptionRegularBooking(model)
+            attendees = listOf()
+            recurrence = getRecurrenceFromRecurrenceModel(model)
+            start = model.beginBooking.toGoogleEventDateTime()
+            end = model.endBooking.toGoogleEventDateTime()
         }
-        logger.trace("[toGoogleWorkspaceEvent] {}", event.toString())
+        logger.trace("[toGoogleWorkspaceEvent] {}", event)
         return event
+    }
+
+    private fun eventSummaryForRegularBooking(model: Booking): String {
+        return "${model.workspace.id} - workspace id (${model.workspace.zone} - ${model.workspace.name})"
+    }
+
+    private fun eventDescriptionRegularBooking(model: Booking): String {
+        val owner = model.owner ?: return ""
+        return "${owner.id} - organizer id [ ${owner.email} ]"
     }
 
     /**
@@ -244,24 +278,35 @@ class GoogleCalendarConverter(
      * because [Event.organizer] is [defaultAccount] of application.
      * [Event.summary] is used to indicate the booking workspace.
      *
-     * @param model [BookingDTO] to be converted
+     * @param model [Booking] to be converted
      * @return The resulting [Event] object
      * @author Daniil Zavyalov
      */
     fun toGoogleWorkspaceMeetingEvent(model: Booking): Event {
+        logger.debug("[toGoogleWorkspaceMeetingEvent] converting meeting room booking to calendar event")
+        val attendeeList: MutableList<EventAttendee> = participantsAndOwnerToAttendees(model)
+
         val event = Event().apply {
-            summary = createDetailedEventSummary(model)
-            description = "${model.owner.email} - почта организатора"
+            id = model.id
+            summary = eventSummaryForMeetingBooking(model)
+            description = eventDescriptionMeetingBooking(model)
             organizer =  userModelToGoogleOrganizer(model.owner)
-            attendees = model.participants
-                .map { userModelToAttendee(it) } + userModelToAttendee(model.owner)
-                .apply { organizer = true } + workspaceModelToAttendee(model.workspace)
-            getRecurrenceFromRecurrenceModel(model)?.let{ recurrence = it }
-            start = model.beginBooking.toGoogleDateTime()
-            end = model.endBooking.toGoogleDateTime()
+            attendees = attendeeList
+            recurrence = getRecurrenceFromRecurrenceModel(model)
+            start = model.beginBooking.toGoogleEventDateTime()
+            end = model.endBooking.toGoogleEventDateTime()
         }
         logger.debug("[toGoogleWorkspaceEvent] converting workspace booking model to calendar event")
-        return event;
+        return event
+    }
+
+    private fun eventSummaryForMeetingBooking(model: Booking): String {
+        return "Meet ${ model.owner?.fullName ?: "" }"
+    }
+
+    private fun eventDescriptionMeetingBooking(model: Booking): String {
+        val ownerEmail = model.owner?.email ?: return ""
+        return "$ownerEmail - почта организатора"
     }
 
     private fun getRecurrenceFromRecurrenceModel(model: Booking): List<String>? {
@@ -274,88 +319,41 @@ class GoogleCalendarConverter(
         return res
     }
 
+    private fun participantsAndOwnerToAttendees(model: Booking): MutableList<EventAttendee> {
+        val attendees: MutableList<EventAttendee> = model.participants
+            .map { userModelToAttendee(it) }
+            .toMutableList()
 
-
-    /**
-     * Converts meeting [Event] to [Booking]
-     *
-     *
-     * @param event [Event] to be converted
-     * @return The resulting [BookingDTO] object
-     * @author Danil Kiselev, Max Mishenko
-     */
-    fun toBookingModelForMeetingWorkspace(event: Event): Booking {
-        logger.debug("[toGoogleEvent] converting calendar event to meeting room booking model")
-        val organizer: String = event.organizer?.email ?: ""
-        val email = if (organizer != defaultAccount) {
-            logger.trace("[toBookingModel] organizer email derived from event.organizer field")
-            organizer
-        } else {
-            logger.trace("[toBookingModel] organizer email derived from event description")
-            event.description?.substringBefore(" ") ?: ""
+        model.owner?.let { owner ->
+            val ownerAsAttendee = userModelToAttendee(owner)
+            ownerAsAttendee.organizer = true
+            attendees.add(ownerAsAttendee)
         }
-        val recurrence = event.recurrence?.toString()?.getRecurrence()
-
-        val booking = Booking(
-            owner = getUserModel(email),
-            participants = getParticipantsModels(event),
-            workspace = getWorkspaceModel(getCalendarId(event)),
-            id = event.id ?: null,
-            beginBooking = Instant.ofEpochMilli(event.start?.dateTime?.value ?: 0),
-            endBooking = Instant.ofEpochMilli(event.end?.dateTime?.value ?: 1),
-            recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) }
-        )
-        logger.trace("[toBookingModel] {}", booking.toString())
-        return booking
-
-    }
-
-    private fun createDetailedEventSummary(dto: BookingDTO): String {
-        return "Meet ${dto.owner.fullName}"
-    }
-    private fun createDetailedEventSummary(model: Booking): String {
-        return "Meet ${model.owner.fullName}"
+        attendees.add(workspaceModelToAttendee(model.workspace))
+        return attendees
     }
 
     /**
-     * Converts milliseconds to [EventDateTime]
+     * Converts [EventDateTime] to [Instant]. Returns placeholder if [googleDateTime] is null
+     *
+     * @return [Instant]
+     */
+    private fun toLocalInstant(googleDateTime: EventDateTime?) : Instant {
+        val gmtEpoch: Long? = googleDateTime?.dateTime?.value
+        val localEpoch = gmtEpoch?.let { it + BookingConstants.DEFAULT_TIMEZONE_OFFSET_MILLIS } ?: 0
+        return Instant.ofEpochMilli(localEpoch)
+    }
+
+    /**
+     * Converts [Instant] to [EventDateTime]
      *
      * @return [EventDateTime]
-     * @author Danil Kiselev, Max Mishenko
      */
-    private fun Long.toGoogleDateTime(): EventDateTime {
-        return EventDateTime().also {
-            it.dateTime = DateTime(this)
-            it.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID
-        }
-    }
-
-    private fun Instant.toGoogleDateTime():EventDateTime {
-        return EventDateTime().also {
-            it.dateTime = DateTime(this.toEpochMilli())
-            it.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID
-        }
-    }
-
-
-    /**
-     * Converts [UserDTO] of participant to [EventAttendee]
-     *
-     * @return [EventAttendee]
-     * @author Danil Kiselev, Max Mishenko
-     */
-    private fun UserDTO.toAttendee(): EventAttendee {
-        return EventAttendee().also {
-            it.email =
-                this.email
-        }
-    }
-
-    private fun userDtoToAttendee(dto: UserDTO): EventAttendee {
-        return EventAttendee().also {
-            it.email = dto.email
-            it.resource = false
-        }
+    private fun Instant.toGoogleEventDateTime() : EventDateTime {
+        val googleEventDateTime = EventDateTime()
+        googleEventDateTime.dateTime = this.toEpochMilli().toGoogleDateTime()
+        googleEventDateTime.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID
+        return googleEventDateTime
     }
 
     private fun userModelToAttendee(model: UserModel): EventAttendee {
@@ -373,52 +371,17 @@ class GoogleCalendarConverter(
     }
 
     /**
-     * Converts [UserDTO] of owner to [Organizer]
-     *
-     * @return [Organizer]
-     * @author Danil Kiselev, Max Mishenko
-     */
-    private fun UserDTO.toGoogleOrganizer(): Organizer? {
-        return Organizer().also {
-            it.email =
-                this.email
-        }
-    }
-
-    /**
-     * Converts [UserDTO] of owner to [Organizer]
-     *
-     * @return [Organizer]
-     * @author Danil Kiselev
-     */
-    private fun userDTOtoGoogleOrganizer(dto: UserDTO): Organizer {
-        return Organizer().also {
-            it.email = dto.email
-        }
-    }
-
-    /**
      * Converts [UserModel] of owner to [Organizer]
      *
      * @return [Organizer]
      * @author Danil Kiselev
      */
-    private fun userModelToGoogleOrganizer(model: UserModel): Organizer {
+    private fun userModelToGoogleOrganizer(model: UserModel?): Organizer {
+        if (model == null) {
+            return Organizer()
+        }
         return Organizer().also {
             it.email = model.email
-        }
-    }
-
-    /**
-     * Converts [WorkspaceDTO]to [EventAttendee] (Rooms are also considered participants)
-     *
-     * @return [EventAttendee]
-     * @author Danil Kiselev, Max Mishenko
-     */
-    private fun WorkspaceDTO.toAttendee(): EventAttendee {
-        return EventAttendee().also {
-            it.email = getCalendarIdByWorkspaceId(id)
-            it.resource = true
         }
     }
 

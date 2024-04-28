@@ -3,6 +3,7 @@ package office.effective.features.workspace.DI
 import office.effective.features.workspace.converters.WorkspaceFacadeConverter
 import office.effective.features.workspace.converters.WorkspaceRepositoryConverter
 import office.effective.features.workspace.facade.WorkspaceFacade
+import office.effective.features.workspace.facade.WorkspaceFacadeV1
 import office.effective.features.workspace.repository.WorkspaceRepository
 import office.effective.features.workspace.service.WorkspaceService
 import office.effective.serviceapi.IWorkspaceService
@@ -15,4 +16,5 @@ val workspaceDiModule = module(createdAtStart = true) {
     single<IWorkspaceService> { get<WorkspaceService>() }
     single { WorkspaceFacadeConverter(get()) }
     single { WorkspaceFacade(get(), get(), get(), get()) }
+    single { WorkspaceFacadeV1(get(), get(), get(), get(), get()) }
 }

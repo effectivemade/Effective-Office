@@ -6,7 +6,8 @@ import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.utils.DatabaseTransactionManager
 import office.effective.common.utils.UuidValidator
 import office.effective.features.booking.converters.BookingDtoModelConverter
-import office.effective.dto.BookingDTO
+import office.effective.dto.BookingRequestDTO
+import office.effective.dto.BookingResponseDTO
 import office.effective.model.Booking
 import office.effective.model.Workspace
 import office.effective.serviceapi.IBookingService
@@ -17,14 +18,7 @@ import office.effective.serviceapi.IBookingService
  *
  * In case of an error, the database transaction will be rolled back.
  */
-@Deprecated(
-    message = "Deprecated since 1.0 api version",
-    replaceWith = ReplaceWith(
-        expression = "BookingFacadeV1",
-        imports = ["office.effective.features.booking.facade.BookingFacadeV1"]
-    )
-)
-class BookingFacade(
+class BookingFacadeV1(
     private val bookingService: IBookingService,
     private val transactionManager: DatabaseTransactionManager,
     private val uuidValidator: UuidValidator,
@@ -47,15 +41,15 @@ class BookingFacade(
      * Retrieves a booking model by its id
      *
      * @param id id of requested booking
-     * @return [BookingDTO] with the given id
+     * @return [BookingResponseDTO] with the given id
      * @throws InstanceNotFoundException if booking with the given id doesn't exist in database
      * @author Daniil Zavyalov
      */
-    fun findById(id: String): BookingDTO {
-        val dto: BookingDTO = transactionManager.useTransaction({
+    fun findById(id: String): BookingResponseDTO {
+        val dto: BookingResponseDTO = transactionManager.useTransaction({
             val model = bookingService.findById(id)
                 ?: throw InstanceNotFoundException(Workspace::class, "Booking with id $id not found")
-            bookingConverter.modelToDto(model)
+            bookingConverter.modelToResponseDto(model)
         })
         return dto
     }
@@ -69,44 +63,46 @@ class BookingFacade(
      * Should be greater than range_from.
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * Should be lover than [bookingRangeFrom]. Default value: [BookingConstants.MIN_SEARCH_START_TIME]
-     * @return [BookingDTO] list
+     * @param returnInstances return recurring bookings as non-recurrent instances
+     * @return [BookingResponseDTO] list
      * @author Daniil Zavyalov
      */
     fun findAll(
         userId: String?,
         workspaceId: String?,
         bookingRangeTo: Long?,
-        bookingRangeFrom: Long = BookingConstants.MIN_SEARCH_START_TIME
-    ): List<BookingDTO> {
+        bookingRangeFrom: Long = BookingConstants.MIN_SEARCH_START_TIME,
+        returnInstances: Boolean
+    ): List<BookingResponseDTO> {
         if (bookingRangeTo != null && bookingRangeTo <= bookingRangeFrom) {
-            throw BadRequestException("Max booking start time should be null or greater than min start time")
+            throw BadRequestException("Max booking start time must be null or greater than min start time")
         }
         val bookingList: List<Booking> = transactionManager.useTransaction({
             bookingService.findAll(
                 userId?.let { uuidValidator.uuidFromString(it) },
                 workspaceId?.let { uuidValidator.uuidFromString(it) },
-                true,
+                returnInstances,
                 bookingRangeTo,
                 bookingRangeFrom
             )
         })
-        return bookingList.map {
-            bookingConverter.modelToDto(it)
+        return bookingList.map { booking ->
+            bookingConverter.modelToResponseDto(booking)
         }
     }
 
     /**
      * Saves a given booking. Use the returned model for further operations
      *
-     * @param bookingDTO [BookingDTO] to be saved
-     * @return saved [BookingDTO]
+     * @param bookingDTO [BookingRequestDTO] to be saved
+     * @return saved [BookingResponseDTO]
      * @author Daniil Zavyalov
      */
-    fun post(bookingDTO: BookingDTO): BookingDTO {
-        val model = bookingConverter.dtoToModel(bookingDTO)
-        val dto: BookingDTO = transactionManager.useTransaction({
+    fun post(bookingDTO: BookingRequestDTO): BookingResponseDTO {
+        val model = bookingConverter.requestDtoToModel(bookingDTO)
+        val dto: BookingResponseDTO = transactionManager.useTransaction({
             val savedModel = bookingService.save(model)
-            bookingConverter.modelToDto(savedModel)
+            bookingConverter.modelToResponseDto(savedModel)
         })
         return dto
     }
@@ -115,16 +111,15 @@ class BookingFacade(
      * Updates a given booking. Use the returned model for further operations
      *
      * @param bookingDTO changed booking
-     * @return [BookingDTO] after change saving
-     * @throws BadRequestException if booking id is null
+     * @param bookingId booking id
+     * @return updated booking
      * @author Daniil Zavyalov
      */
-    fun put(bookingDTO: BookingDTO): BookingDTO {
-        if (bookingDTO.id == null) throw BadRequestException("Missing booking id")
-        val model = bookingConverter.dtoToModel(bookingDTO)
-        val dto: BookingDTO = transactionManager.useTransaction({
+    fun put(bookingDTO: BookingRequestDTO, bookingId: String): BookingResponseDTO {
+        val model = bookingConverter.requestDtoToModel(bookingDTO, bookingId)
+        val dto: BookingResponseDTO = transactionManager.useTransaction({
             val savedModel = bookingService.update(model)
-            bookingConverter.modelToDto(savedModel)
+            bookingConverter.modelToResponseDto(savedModel)
         })
         return dto
     }

@@ -13,9 +13,9 @@ import office.effective.dto.WorkspaceZoneDTO
 /**
  * @suppress
  */
-fun SwaggerDocument.returnWorkspaceById(): OpenApiRoute.() -> Unit = {
+fun SwaggerDocument.returnWorkspaceByIdV1(): OpenApiRoute.() -> Unit = {
     description = "Return workspace by id"
-    tags = listOf("workspaces")
+    tags = listOf("Workspaces V1")
     request {
         pathParameter<String>("id") {
             description = "Workspace id"
@@ -34,12 +34,12 @@ fun SwaggerDocument.returnWorkspaceById(): OpenApiRoute.() -> Unit = {
                         utilities = listOf(
                             UtilityDTO(
                                 id = "50d89406-2bc6-11ee-be56-0242ac120002",
-                                name = "Sockets",
+                                name = "Place",
                                 iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
                                 count = 8
                             ), UtilityDTO(
                                 id = "a62a86c6-2bc6-11ee-be56-0242ac120002",
-                                name = "Projectors",
+                                name = "Sockets",
                                 iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
                                 count = 1
                             )
@@ -60,9 +60,11 @@ fun SwaggerDocument.returnWorkspaceById(): OpenApiRoute.() -> Unit = {
 /**
  * @suppress
  */
-fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
-    description = "Return all workspaces by tag"
-    tags = listOf("workspaces")
+fun SwaggerDocument.returnWorkspaceByTagV1(): OpenApiRoute.() -> Unit = {
+    description = "Return all workspaces by tag. Can return workspaces with their bookings " +
+            "or workspaces that are free during a certain period of time. " +
+            "Note that requesting workspaces with their bookings significantly increases the response time."
+    tags = listOf("Workspaces V1")
     request {
         queryParameter<WorkspaceTag>("workspace_tag") {
             description = "Workspace tag"
@@ -71,13 +73,36 @@ fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
             allowEmptyValue = false
         }
         queryParameter<Long>("free_from") {
-            description = "Timestamp from which the workspace should be free"
+            description = "Timestamp from which the workspace should be free."
             example = 1691591501000L
             required = false
             allowEmptyValue = false
         }
         queryParameter<Long>("free_until") {
-            description = "Timestamp before which the workspace should be free."
+            description = "Timestamp before which the workspace should be free. Should be greater than free_from."
+            example = 1691591578000L
+            required = false
+            allowEmptyValue = false
+        }
+        queryParameter<Long>("with_bookings") {
+            description = "Specify this parameter to get workspaces with their bookings for today. Optional. " +
+                    "Can't be specified together with free_from and free_until."
+            example = true
+            required = false
+            allowEmptyValue = false
+        }
+        queryParameter<Long>("with_bookings_from") {
+            description = "Specify this parameter to get workspaces with their bookings for a certain period of time. " +
+                    "The default value is the beginning of today. " +
+                    "Should be greater than with_bookings_from. Can't be specified together with free_from and free_until."
+            example = 1691591501000L
+            required = false
+            allowEmptyValue = false
+        }
+        queryParameter<Long>("with_bookings_until") {
+            description = "Specify this parameter to get workspaces with their bookings for a certain period of time. " +
+                    "The default value is the end of today. " +
+                    "Should be greater than with_bookings_from. Can't be specified together with free_from and free_until."
             example = 1691591578000L
             required = false
             allowEmptyValue = false
@@ -94,12 +119,12 @@ fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
                             utilities = listOf(
                                 UtilityDTO(
                                     id = "50d89406-2bc6-11ee-be56-0242ac120002",
-                                    name = "Sockets",
+                                    name = "Place",
                                     iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
                                     count = 8
                                 ), UtilityDTO(
                                     id = "a62a86c6-2bc6-11ee-be56-0242ac120002",
-                                    name = "Projectors",
+                                    name = "Sockets",
                                     iconUrl = "https://img.freepik.com/free-photo/beautiful-shot-of-a-white-british-shorthair-kitten_181624-57681.jpg",
                                     count = 1
                                 )
@@ -120,8 +145,7 @@ fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
             }
         }
         HttpStatusCode.BadRequest to {
-            description = "Tag shouldn't be null, free_from " +
-                    "and free_until should be numbers from 0 to 2147483647000 (max timestamp)"
+            description = "Invalid request parameter"
         }
         HttpStatusCode.NotFound to {
             description = "Provided tag doesn't exist"
@@ -132,9 +156,9 @@ fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
 /**
  * @suppress
  */
-fun SwaggerDocument.returnAllZones(): OpenApiRoute.() -> Unit = {
+fun SwaggerDocument.returnAllZonesV1(): OpenApiRoute.() -> Unit = {
     description = "Returns all workspace zones"
-    tags = listOf("workspaces")
+    tags = listOf("Workspaces V1")
     response {
         HttpStatusCode.OK to {
             description = "Returns all workspaces found by tag"
@@ -157,3 +181,10 @@ private val zoneExample1 = WorkspaceZoneDTO("3ca26fe0-f837-4939-b586-dd4195d2a50
  * @suppress
  */
 private val zoneExample2 = WorkspaceZoneDTO("6cb3c60d-3c29-4a45-80e6-fac14fb0569b","Sirius")
+
+/**
+ * @suppress
+ */
+enum class WorkspaceTag(val tagName: String) {
+    meeting("meeting"), regular("regular")
+}

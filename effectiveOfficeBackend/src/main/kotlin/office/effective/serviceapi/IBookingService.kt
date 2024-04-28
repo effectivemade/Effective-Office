@@ -40,6 +40,7 @@ interface IBookingService {
      *
      * @param userId use to filter by booking owner id
      * @param workspaceId use to filter by booking workspace id
+     * @param returnInstances return recurring bookings as non-recurrent instances
      * @param bookingRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * @throws InstanceNotFoundException if [UserModel] or [Workspace] with the given id doesn't exist in database
@@ -48,6 +49,7 @@ interface IBookingService {
     fun findAll(
         userId: UUID? = null,
         workspaceId: UUID? = null,
+        returnInstances: Boolean = true,
         bookingRangeTo: Long? = null,
         bookingRangeFrom: Long
     ): List<Booking>

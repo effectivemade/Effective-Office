@@ -4,7 +4,7 @@ import office.effective.features.user.converters.IntegrationDTOModelConverter
 import office.effective.features.user.converters.IntegrationModelEntityConverter
 import office.effective.features.user.converters.UserDTOModelConverter
 import office.effective.features.user.converters.UserModelEntityConverter
-import office.effective.features.user.facade.UserFacade
+import office.effective.features.user.facade.UserFacadeV1
 import office.effective.features.user.repository.UserRepository
 import office.effective.serviceapi.IUserService
 import office.effective.features.user.service.UserService
@@ -16,6 +16,6 @@ val userDIModule = module(createdAtStart = true) {
     single<UserModelEntityConverter> { UserModelEntityConverter() }
     single<UserDTOModelConverter> { UserDTOModelConverter(get(), get(), get()) }
     single<UserRepository> { UserRepository(get(), get(), get()) }
-    single<UserFacade> { UserFacade(get(), get(), get()) }
+    single<UserFacadeV1> { UserFacadeV1(get(), get(), get()) }
     single<IntegrationDTOModelConverter> { IntegrationDTOModelConverter(get()) }
 }
