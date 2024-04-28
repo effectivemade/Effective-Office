@@ -16,10 +16,10 @@ import office.effective.features.user.routes.swagger.returnUserByIdV1
 import office.effective.features.user.routes.swagger.returnUsersV1
 import org.koin.core.context.GlobalContext
 
-fun Route.userRouting() {
+fun Route.userRoutingV1() {
     val facade: UserFacadeV1 = GlobalContext.get().get()
 
-    route("users", {}) {
+    route("/api/v1/users", {}) {
         get(SwaggerDocument.returnUsersV1()) {
             val tag: String? = call.request.queryParameters["user_tag"]
             val email: String? = call.request.queryParameters["email"]

@@ -11,6 +11,7 @@ import org.ktorm.dsl.*
 import org.ktorm.entity.*
 import org.slf4j.LoggerFactory
 import java.util.*
+import kotlin.collections.List
 
 /**
  * Perform database queries with users
@@ -114,31 +115,26 @@ class UserRepository(
     }
 
     /**
-     * Retrieves a user models by email list
+     * Retrieves users models with integrations by emails.
+     * If a user with one of the specified emails does not exist, that email will be ignored.
      *
-     * @return [UserModel]
-     * @throws InstanceNotFoundException if user with the given email doesn't exist in database
+     * @return users with integrations
      * @author Daniil Zavyalov
      */
-    fun findAllByEmail(email: List<String>): List<UserModel> {
-        logger.debug("[findAllByEmail] retrieving a users with specified emails {}", email)
-        val userEntities: MutableList<UserEntity> = mutableListOf()
-        val usersIds: MutableList<UUID> = mutableListOf()
-        val result: MutableList<UserModel> = mutableListOf()
-        db.from(Users)
-            .innerJoin(right = UsersTags, on = UsersTags.id eq Users.tagId)
-            .select()
-            .where { Users.email inList email }
-            .forEach { raw ->
-                val user: UserEntity = Users.createEntity(raw)
-                usersIds.add(user.id)
-                userEntities.add(user)
-            }
-        val integrations = findAllIntegrationsByUserIds(usersIds)
-        userEntities.forEach { userEntity ->
-            result.add(converter.entityToModel(userEntity, integrations[userEntity.id]))
+    fun findAllByEmails(emails: Collection<String>): List<UserModel> {
+        logger.debug("[findAllByEmails] retrieving users with emails {}", emails.joinToString())
+        if (emails.isEmpty()) return listOf()
+        val entities: List<UserEntity> = db.users.filter { it.email inList emails }.toList()
+
+        val ids : MutableList<UUID> = mutableListOf()
+        for (entity in entities) {
+            ids.add(entity.id)
         }
-        return result
+        val integrations = findAllIntegrationsByUserIds(ids)
+
+        return entities.map { entity ->
+            converter.entityToModel(entity, integrations[entity.id])
+        }
     }
 
     /**

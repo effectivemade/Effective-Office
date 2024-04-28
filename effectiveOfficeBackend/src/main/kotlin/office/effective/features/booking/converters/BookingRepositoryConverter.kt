@@ -6,6 +6,7 @@ import office.effective.common.utils.UuidValidator
 import office.effective.features.booking.repository.WorkspaceBookingEntity
 import office.effective.features.user.converters.UserModelEntityConverter
 import office.effective.features.user.repository.UserEntity
+import office.effective.features.user.repository.UsersTagEntity
 import office.effective.features.user.repository.users
 import office.effective.features.workspace.converters.WorkspaceRepositoryConverter
 import office.effective.features.workspace.repository.WorkspaceEntity
@@ -75,7 +76,16 @@ class BookingRepositoryConverter(private val database: Database,
     fun modelToEntity(bookingModel: Booking): WorkspaceBookingEntity {
         logger.trace("Converting booking model to entity")
         return WorkspaceBookingEntity {
-            owner = findOwnerEntity(bookingModel.owner)
+            owner = bookingModel.owner?.let { findOwnerEntity(it) }
+                ?: UserEntity {
+                    id = UUID.randomUUID()
+                    fullName = ""
+                    tag = UsersTagEntity {}
+                    active = false
+                    role = ""
+                    avatarURL = ""
+                    email = ""
+                }
             workspace = findWorkspaceEntity(bookingModel.workspace)
             id = bookingModel.id?.let { uuidValidator.uuidFromString(it) }
                 ?: throw MissingIdException("Booking model doesn't have an id")

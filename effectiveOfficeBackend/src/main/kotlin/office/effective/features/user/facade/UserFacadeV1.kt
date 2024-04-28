@@ -11,7 +11,7 @@ import office.effective.model.UserModel
  * Class used in routes to handle user-related requests.
  * Provides business transaction, data conversion and validation.
  * */
-class UserFacade(
+class UserFacadeV1(
     private val service: IUserService,
     private val converterDTO: UserDTOModelConverter,
     private val transactionManager: DatabaseTransactionManager
