@@ -2,6 +2,7 @@ package band.effective.office.tablet.ui.mainScreen.roomInfoComponents
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,37 +17,17 @@ import band.effective.office.tablet.ui.mainScreen.roomInfoComponents.uiComponent
 import java.util.Calendar
 import java.util.GregorianCalendar
 
-
 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 @Composable
 fun RoomInfoComponent(
     modifier: Modifier = Modifier,
     room: RoomInfo,
     onOpenFreeRoomModalRequest: () -> Unit,
-    onOpenDateTimePickerModalRequest: () -> Unit,
-    onIncrementDate: () -> Unit,
-    onDecrementDate: () -> Unit,
-    selectDate: Calendar,
     timeToNextEvent: Int,
     isError: Boolean,
-    onResetDate: () -> Unit
 ) {
     val paddings = 30.dp
     Column(modifier = modifier) {
-        DateTimeView(
-            modifier = Modifier.padding(
-                start = paddings,
-                top = 50.dp,
-                end = 20.dp,
-                bottom = 0.dp
-            ).height(70.dp),
-            selectDate = selectDate,
-            increment = onIncrementDate,
-            decrement = onDecrementDate,
-            onOpenDateTimePickerModal = onOpenDateTimePickerModalRequest,
-            currentDate = GregorianCalendar(),
-            back = onResetDate,
-        )
         when {
             room.isFree() -> {
                 FreeRoomInfoComponent(

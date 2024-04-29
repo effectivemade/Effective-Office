@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,6 +47,7 @@ import band.effective.office.tablet.ui.mainScreen.slotComponent.store.SlotStore
 import band.effective.office.tablet.ui.theme.LocalCustomColorsPalette
 import band.effective.office.tablet.ui.theme.h7
 import band.effective.office.tablet.ui.theme.subslotColor
+import org.koin.core.component.getScopeId
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -55,7 +58,7 @@ fun SlotList(component: SlotComponent) {
     SlotList(
         slots = state.slots,
         onClick = { component.sendIntent(SlotStore.Intent.ClickOnSlot(this)) },
-        onCancel = { component.sendIntent(SlotStore.Intent.OnCancelDelete(it)) }
+        onCancel = { component.sendIntent(SlotStore.Intent.OnCancelDelete(it)) },
     )
 }
 
@@ -63,20 +66,20 @@ fun SlotList(component: SlotComponent) {
 private fun SlotList(
     slots: List<SlotUi>,
     onClick: SlotUi.() -> Unit,
-    onCancel: (SlotUi.DeleteSlot) -> Unit
+    onCancel: (SlotUi.DeleteSlot) -> Unit,
 ) {
     LazyColumn(
-        Modifier.padding(start = 30.dp, top = 0.dp, end = 30.dp, bottom = 30.dp)
+        Modifier.padding(start = 30.dp, top = 0.dp, end = 30.dp, bottom = 30.dp),
     ) {
-        items(items = slots) {
-            SlotView(slotUi = it, onClick = onClick, onCancel = onCancel)
+        itemsIndexed(items = slots) { id, slot ->
+            SlotView(slotUi = slot, onClick = onClick, onCancel = onCancel)
             Spacer(Modifier.height(20.dp))
         }
     }
 }
 
 @Composable
-private fun SlotView(
+fun SlotView(
     slotUi: SlotUi,
     onClick: SlotUi.() -> Unit,
     onCancel: (SlotUi.DeleteSlot) -> Unit
