@@ -82,7 +82,7 @@ fun StoryContent(
                     .fillMaxSize()
             ) {
                 Text(
-                    text = employeeInfo.name + ",",
+                    text = employeeInfo.name,
                     fontSize = 64.sp,
                     fontFamily = museoCyrl,
                     color = Color.Black,
