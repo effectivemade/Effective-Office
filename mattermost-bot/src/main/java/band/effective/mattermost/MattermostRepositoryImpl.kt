@@ -158,8 +158,6 @@ class MattermostRepositoryImpl(private val token: String, private val coroutineS
                 val outputStream = ByteArrayOutputStream()
                 val result: Boolean = ImageIO.write(inputImage, fileExtension, outputStream)
 
-                //close all streams
-                stream.close()
                 inputImage.flush()
 
                 return if (result) outputStream.toByteArray() else imageData
