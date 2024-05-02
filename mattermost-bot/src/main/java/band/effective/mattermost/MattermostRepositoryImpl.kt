@@ -150,7 +150,7 @@ class MattermostRepositoryImpl(private val token: String, private val coroutineS
         if (imageData == null) {
             return imageData
         }
-        if (type?.startsWith("image/") == true) {
+        if (type?.startsWith("image/heic") == true) {
             val fileExtension = "png" //Transcode to this photo extension
             try {
                 val stream: ImageInputStream = ImageIO.createImageInputStream(imageData.toInputStream())
