@@ -1,15 +1,13 @@
 package office.effective.features.workspace.facade
 
-import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.ValidationException
 import office.effective.common.utils.DatabaseTransactionManager
 import office.effective.common.utils.UuidValidator
-import office.effective.features.workspace.converters.WorkspaceFacadeConverter
+import office.effective.features.workspace.converters.WorkspaceDtoModelConverter
 import office.effective.dto.WorkspaceDTO
 import office.effective.dto.WorkspaceZoneDTO
 import office.effective.features.booking.facade.BookingFacadeV1
-import office.effective.features.booking.service.BookingService
 import office.effective.model.Workspace
 import office.effective.serviceapi.IWorkspaceService
 import java.time.Instant
@@ -22,7 +20,7 @@ import java.time.Instant
  */
 class WorkspaceFacadeV1(
     private val service: IWorkspaceService,
-    private val converter: WorkspaceFacadeConverter,
+    private val converter: WorkspaceDtoModelConverter,
     private val transactionManager: DatabaseTransactionManager,
     private val uuidValidator: UuidValidator,
     private val bookingFacade: BookingFacadeV1

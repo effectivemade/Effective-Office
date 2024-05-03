@@ -7,7 +7,7 @@ import io.github.smiley4.ktorswaggerui.dsl.OpenApiRoute
 import io.ktor.http.*
 import office.effective.common.swagger.SwaggerDocument
 import office.effective.dto.UtilityDTO
-import office.effective.dto.WorkspaceDTO
+import office.effective.dto.WorkspaceResponseDTO
 import office.effective.dto.WorkspaceZoneDTO
 
 /**
@@ -27,9 +27,9 @@ fun SwaggerDocument.returnWorkspaceById(): OpenApiRoute.() -> Unit = {
     response {
         HttpStatusCode.OK to {
             description = "Returns workspace found by id"
-            body<WorkspaceDTO> {
+            body<WorkspaceResponseDTO> {
                 example(
-                    "Workspaces", WorkspaceDTO(
+                    "Workspaces", WorkspaceResponseDTO(
                         id = "2561471e-2bc6-11ee-be56-0242ac120002", name = "Sun", tag = "meeting",
                         utilities = listOf(
                             UtilityDTO(
@@ -86,10 +86,10 @@ fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
     response {
         HttpStatusCode.OK to {
             description = "Returns all workspaces found by tag"
-            body<List<WorkspaceDTO>> {
+            body<List<WorkspaceResponseDTO>> {
                 example(
                     "Workspace", listOf(
-                        WorkspaceDTO(
+                        WorkspaceResponseDTO(
                             id = "2561471e-2bc6-11ee-be56-0242ac120002", name = "Sun", tag = "meeting",
                             utilities = listOf(
                                 UtilityDTO(
@@ -104,7 +104,7 @@ fun SwaggerDocument.returnWorkspaceByTag(): OpenApiRoute.() -> Unit = {
                                     count = 1
                                 )
                             )
-                        ), WorkspaceDTO(
+                        ), WorkspaceResponseDTO(
                             id = "2561471e-2bc6-11ee-be56-0242ac120002", name = "Moon", tag = "meeting",
                             utilities = listOf(
                                 UtilityDTO(

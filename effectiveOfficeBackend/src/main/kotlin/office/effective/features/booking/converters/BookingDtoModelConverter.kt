@@ -10,7 +10,7 @@ import office.effective.dto.BookingResponseDTO
 import office.effective.dto.UserDTO
 import office.effective.features.user.converters.UserDTOModelConverter
 import office.effective.features.user.repository.UserRepository
-import office.effective.features.workspace.converters.WorkspaceFacadeConverter
+import office.effective.features.workspace.converters.WorkspaceDtoModelConverter
 import office.effective.features.workspace.repository.WorkspaceRepository
 import office.effective.model.*
 import org.slf4j.LoggerFactory
@@ -19,11 +19,11 @@ import java.time.Instant
 /**
  * Converts between [BookingDTO] and [Booking]
  *
- * Uses [UserDTOModelConverter] and [WorkspaceFacadeConverter] to convert contained users and workspaces
+ * Uses [UserDTOModelConverter] and [WorkspaceDtoModelConverter] to convert contained users and workspaces
  */
 class BookingDtoModelConverter(
     private val userConverter: UserDTOModelConverter,
-    private val workspaceConverter: WorkspaceFacadeConverter,
+    private val workspaceConverter: WorkspaceDtoModelConverter,
     private val userRepository: UserRepository,
     private val workspaceRepository: WorkspaceRepository,
     private val uuidValidator: UuidValidator
@@ -51,7 +51,7 @@ class BookingDtoModelConverter(
             owner = booking.owner?.let { userConverter.modelToDTO(it) }
                 ?: UserDTO("", "", true, "", "", listOf(), "", ""),
             participants = booking.participants.map { userConverter.modelToDTO(it) },
-            workspace = workspaceConverter.modelToDto(booking.workspace),
+            workspace = workspaceConverter.modelToResponseDto(booking.workspace),
             id = booking.id.toString(),
             beginBooking = booking.beginBooking.toEpochMilli(),
             endBooking = booking.endBooking.toEpochMilli(),
@@ -111,7 +111,7 @@ class BookingDtoModelConverter(
         return Booking(
             owner = userConverter.dTOToModel(bookingDTO.owner),
             participants = bookingDTO.participants.map { userConverter.dTOToModel(it) },
-            workspace = workspaceConverter.dtoToModel(bookingDTO.workspace),
+            workspace = workspaceConverter.responseDtoToModel(bookingDTO.workspace),
             id = bookingDTO.id,
             beginBooking = Instant.ofEpochMilli(bookingDTO.beginBooking),
             endBooking = Instant.ofEpochMilli(bookingDTO.endBooking),
