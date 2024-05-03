@@ -24,6 +24,7 @@ val moshi: Moshi = Moshi.Builder()
 val moshiConverterFactory = MoshiConverterFactory.create(moshi).asLenient()
 
 val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(HEICToPNGInterceptor())
         .addInterceptor(HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }).build()

@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
 import okhttp3.ResponseBody
 import retrofit2.Response
 import java.awt.image.BufferedImage
@@ -53,17 +52,11 @@ class MattermostRepositoryImpl(private val token: String, private val coroutineS
     override suspend fun downloadFile(fileId: String): ByteArray? {
         val response: Response<ResponseBody> = mattermostApi.downloadFile(token = token, fileId = fileId)
 
-        val mediaType: MediaType? = response.body()?.contentType()
-        val type: String? = mediaType?.type()
-
         val buffer: ByteArray? = response.body()?.byteStream()?.readBytes()
         println("read byte from mattermost ${buffer?.size}")
 
-        val transcodeToPNG: ByteArray? = transcodeToPNG(imageData = buffer, type = type)
-        println("transcoded image bytes ${transcodeToPNG?.size}")
-
         response.body()?.byteStream()?.close()
-        return transcodeToPNG
+        return buffer
     }
 
     private suspend fun getAllPostsFromChannels(): Either<ErrorReason, List<Post>> {

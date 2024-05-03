@@ -83,6 +83,12 @@
       <artifactId>logging-interceptor</artifactId>
       <version>3.14.9</version>
     </dependency>
+    <!-- Android -->
+    <dependency>
+      <groupId>com.google.android</groupId>
+      <artifactId>android</artifactId>
+      <version>4.1.1.4</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
