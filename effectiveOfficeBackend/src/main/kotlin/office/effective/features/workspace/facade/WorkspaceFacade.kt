@@ -4,8 +4,9 @@ import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.ValidationException
 import office.effective.common.utils.DatabaseTransactionManager
 import office.effective.common.utils.UuidValidator
-import office.effective.features.workspace.converters.WorkspaceFacadeConverter
+import office.effective.features.workspace.converters.WorkspaceDtoModelConverter
 import office.effective.dto.WorkspaceDTO
+import office.effective.dto.WorkspaceResponseDTO
 import office.effective.dto.WorkspaceZoneDTO
 import office.effective.model.Workspace
 import office.effective.serviceapi.IWorkspaceService
@@ -17,42 +18,49 @@ import java.time.Instant
  *
  * In case of an error, the database transaction will be rolled back.
  */
+@Deprecated(
+    message = "Deprecated since 1.0 api version",
+    replaceWith = ReplaceWith(
+        expression = "WorkspaceFacadeV1",
+        imports = ["office.effective.features.workspace.facade.WorkspaceFacadeV1"]
+    )
+)
 class WorkspaceFacade(private val service: IWorkspaceService,
-                      private val converter: WorkspaceFacadeConverter,
+                      private val converter: WorkspaceDtoModelConverter,
                       private val transactionManager: DatabaseTransactionManager,
                       private val uuidValidator: UuidValidator) {
 
     /**
-     * Retrieves a [WorkspaceDTO] by its id
+     * Retrieves a [WorkspaceResponseDTO] by its id
      *
      * @param id id of requested workspace. Should be valid UUID
-     * @return [WorkspaceDTO] with the given [id]
+     * @return [WorkspaceResponseDTO] with the given [id]
      * @throws InstanceNotFoundException if workspace with the given id doesn't exist in database
      * @author Daniil Zavyalov
      */
-    fun findById(id: String): WorkspaceDTO {
+    fun findById(id: String): WorkspaceResponseDTO {
         val uuid = uuidValidator.uuidFromString(id)
 
-        val workspaceDTO: WorkspaceDTO = transactionManager.useTransaction({
+        val workspaceDTO: WorkspaceResponseDTO = transactionManager.useTransaction({
             val workspace = service.findById(uuid)
                 ?: throw InstanceNotFoundException(Workspace::class, "Workspace with id $id not found", uuid)
-            workspace.let { converter.modelToDto(it) }
+            workspace.let { converter.modelToResponseDto(it) }
         })
 
         return workspaceDTO
     }
 
     /**
-     * Returns all [WorkspaceDTO] with the given tag
+     * Returns all [WorkspaceResponseDTO] with the given tag
      *
      * @param tag tag name of requested workspaces
-     * @return List of [WorkspaceDTO] with the given [tag]
+     * @return List of [WorkspaceResponseDTO] with the given [tag]
      * @author Daniil Zavyalov
      */
-    fun findAllByTag(tag: String): List<WorkspaceDTO> {
+    fun findAllByTag(tag: String): List<WorkspaceResponseDTO> {
         val result = transactionManager.useTransaction({
             val workspaceList: List<Workspace> = service.findAllByTag(tag)
-            workspaceList.map { converter.modelToDto(it) }
+            workspaceList.map { converter.modelToResponseDto(it) }
         })
         return result
     }
@@ -63,12 +71,12 @@ class WorkspaceFacade(private val service: IWorkspaceService,
      * @param tag tag name of requested workspaces
      * @param beginTimestamp period start time
      * @param endTimestamp period end time
-     * @return List of [WorkspaceDTO] with the given [tag]
+     * @return List of [WorkspaceResponseDTO] with the given [tag]
      * @throws ValidationException if begin or end timestamp less than 0, greater than max timestamp
      * or if end timestamp less than or equal to begin timestamp
      * @author Daniil Zavyalov
      */
-    fun findAllFreeByPeriod(tag: String, beginTimestamp: Long, endTimestamp: Long): List<WorkspaceDTO> {
+    fun findAllFreeByPeriod(tag: String, beginTimestamp: Long, endTimestamp: Long): List<WorkspaceResponseDTO> {
         if (beginTimestamp < 0L || beginTimestamp >= 2147483647000L)
             throw ValidationException("Begin timestamp should be non-negative and less than timestamp max value")
         else if (endTimestamp < 0L || endTimestamp >= 2147483647000L)
@@ -83,7 +91,7 @@ class WorkspaceFacade(private val service: IWorkspaceService,
                 Instant.ofEpochMilli(beginTimestamp),
                 Instant.ofEpochMilli(endTimestamp)
             )
-            modelList.map { converter.modelToDto(it) }
+            modelList.map { converter.modelToResponseDto(it) }
         })
     }
 

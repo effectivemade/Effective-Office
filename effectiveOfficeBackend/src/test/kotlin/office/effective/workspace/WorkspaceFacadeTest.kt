@@ -4,7 +4,7 @@ import junit.framework.TestCase.assertEquals
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.utils.impl.DatabaseTransactionManagerImpl
 import office.effective.common.utils.UuidValidator
-import office.effective.features.workspace.converters.WorkspaceFacadeConverter
+import office.effective.features.workspace.converters.WorkspaceDtoModelConverter
 import office.effective.dto.WorkspaceDTO
 import office.effective.features.workspace.facade.WorkspaceFacade
 import office.effective.features.workspace.service.WorkspaceService
@@ -26,7 +26,7 @@ class WorkspaceFacadeTest {
     @Mock
     private lateinit var mockService: WorkspaceService
     @Mock
-    private lateinit var mockConverter: WorkspaceFacadeConverter
+    private lateinit var mockConverter: WorkspaceDtoModelConverter
     @Mock
     private lateinit var mockTransactionManager: DatabaseTransactionManagerImpl
     @Mock

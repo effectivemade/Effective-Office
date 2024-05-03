@@ -7,11 +7,7 @@ import io.github.smiley4.ktorswaggerui.dsl.OpenApiRoute
 import io.ktor.http.*
 import office.effective.common.constants.BookingConstants
 import office.effective.common.swagger.SwaggerDocument
-import office.effective.dto.BookingDTO
-import office.effective.dto.IntegrationDTO
-import office.effective.dto.UserDTO
-import office.effective.dto.UtilityDTO
-import office.effective.dto.WorkspaceDTO
+import office.effective.dto.*
 import java.time.Instant
 
 /**
@@ -149,7 +145,7 @@ fun SwaggerDocument.postBooking(): OpenApiRoute.() -> Unit = {
                             tag = "employee"
                         )
                     ),
-                    workspace = WorkspaceDTO(
+                    workspace = WorkspaceResponseDTO(
                         id = "2561471e-2bc6-11ee-be56-0242ac120002", name = "Sun", tag = "meeting",
                         utilities = listOf(
                             UtilityDTO(
@@ -301,7 +297,7 @@ private val bookingExample1 = BookingDTO(
             tag = "employee"
         )
     ),
-    workspace = WorkspaceDTO(
+    workspace = WorkspaceResponseDTO(
         id = "2561471e-2bc6-11ee-be56-0242ac120002", name = "Sun", tag = "meeting",
         utilities = listOf(
             UtilityDTO(
@@ -361,7 +357,7 @@ private val bookingExample2 = BookingDTO(
             tag = "employee"
         )
     ),
-    workspace = WorkspaceDTO(
+    workspace = WorkspaceResponseDTO(
         id = "2561471e-2bc6-11ee-be56-0242ac120002", name = "Sun", tag = "meeting",
         utilities = listOf(
             UtilityDTO(
