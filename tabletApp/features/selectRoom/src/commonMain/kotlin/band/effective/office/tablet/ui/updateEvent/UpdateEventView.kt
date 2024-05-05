@@ -106,6 +106,7 @@ fun UpdateEventView(
                         onDeleteEvent = { component.sendIntent(UpdateEventStore.Intent.OnDeleteEvent) },
                         inputText = state.inputText,
                         onInput = { component.sendIntent(UpdateEventStore.Intent.OnInput(it)) },
+                        isInputError = state.isInputError,
                         onDoneInput = { component.sendIntent(UpdateEventStore.Intent.OnDoneInput) },
                         isUpdateError = state.isErrorUpdate,
                         isUpdateLoad = state.isLoadUpdate,
@@ -149,6 +150,7 @@ fun UpdateEventView(
     onDeleteEvent: () -> Unit,
     inputText: String,
     onInput: (String) -> Unit,
+    isInputError: Boolean,
     onDoneInput: (String) -> Unit,
     isUpdateError: Boolean,
     isUpdateLoad: Boolean,
@@ -198,6 +200,7 @@ fun UpdateEventView(
                 onExpandedChange = onExpandedChange,
                 onSelectItem = onSelectOrganizer,
                 onInput = onInput,
+                isInputError = isInputError,
                 onDoneInput = onDoneInput,
                 inputText = inputText
             )

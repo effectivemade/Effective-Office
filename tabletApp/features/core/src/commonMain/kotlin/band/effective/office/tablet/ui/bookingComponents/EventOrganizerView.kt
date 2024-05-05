@@ -44,6 +44,7 @@ fun EventOrganizerView(
     onExpandedChange: () -> Unit,
     onSelectItem: (Organizer) -> Unit,
     onInput: (String) -> Unit,
+    isInputError: Boolean,
     onDoneInput: (String) -> Unit,
     inputText: String
 ) {
@@ -74,7 +75,12 @@ fun EventOrganizerView(
                     onValueChange = { onInput(it) },
                     placeholder = {
                         Text(
-                            text = MainRes.string.selectbox_organizer_title,
+                            text = if (isInputError) {
+                                MainRes.string.selectbox_organizer_error
+                            }
+                            else {
+                                MainRes.string.selectbox_organizer_title
+                            },
                             color = LocalCustomColorsPalette.current.tertiaryTextAndIcon
                         )
                     },

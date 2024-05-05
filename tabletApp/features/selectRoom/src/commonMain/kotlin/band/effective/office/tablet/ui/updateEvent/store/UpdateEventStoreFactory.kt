@@ -66,6 +66,7 @@ class UpdateEventStoreFactory(
         ) : Message
         object LoadUpdate : Message
         object FailUpdate : Message
+        data class InputError(val isError: Boolean) : Message
         data class Input(val newInput: String, val newList: List<Organizer>) : Message
         data class UpdateOrganizer(val newValue: Organizer) : Message
         data class ChangeShowSelectDateModal(val newValue: Boolean) : Message
@@ -85,11 +86,14 @@ class UpdateEventStoreFactory(
             when (intent) {
                 is UpdateEventStore.Intent.OnDeleteEvent -> cancel(state)
                 is UpdateEventStore.Intent.OnExpandedChange -> dispatch(Message.ExpandedChange(!state.expanded))
-                is UpdateEventStore.Intent.OnSelectOrganizer -> dispatch(
-                    Message.UpdateOrganizer(
-                        intent.newOrganizer
+                is UpdateEventStore.Intent.OnSelectOrganizer -> {
+                    dispatch(
+                        Message.UpdateOrganizer(
+                            intent.newOrganizer
+                        ),
                     )
-                )
+                    dispatch(Message.InputError(isError = false))
+                }
 
                 is UpdateEventStore.Intent.OnUpdateDate -> updateInfo(
                     state = state,
@@ -193,10 +197,13 @@ class UpdateEventStoreFactory(
 
         fun onDone(state: UpdateEventStore.State) {
             val input = state.inputText.lowercase()
+            val defaultOrganizerId = ""
             val organizer =
                 state.selectOrganizers.firstOrNull { it.fullName.lowercase().contains(input) }
                     ?: state.event.organizer
             dispatch(Message.UpdateOrganizer(organizer))
+            dispatch(Message.InputError(organizer.id==defaultOrganizerId))
+
         }
 
         fun onInput(input: String, state: UpdateEventStore.State) {
@@ -286,6 +293,7 @@ class UpdateEventStoreFactory(
                 )
                 is Message.FailUpdate -> copy(isErrorUpdate = true, isLoadUpdate = false)
                 is Message.LoadUpdate -> copy(isErrorUpdate = false, isLoadUpdate = true)
+                is Message.InputError -> copy(isInputError = msg.isError)
                 is Message.Input -> copy(inputText = msg.newInput, selectOrganizers = msg.newList)
                 is Message.UpdateOrganizer -> copy(
                     selectOrganizer = msg.newValue,
