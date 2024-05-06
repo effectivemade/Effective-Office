@@ -1,4 +1,5 @@
 [versions]
+avifCoderCoil = "1.7.5"
 retrofit-ver = "2.9.0"
 tv-ver="1.0.0-alpha04"
 moshi-ver="1.14.0"
@@ -41,6 +42,8 @@ shadow = "7.1.2"
 gms = "20.4.0"
 
 [libraries]
+avif-coder = { module = "com.github.awxkee:avif-coder", version.ref = "avifCoderCoil" }
+avif-coder-coil = { module = "com.github.awxkee:avif-coder-coil", version.ref = "avifCoderCoil" }
 retrofit = {module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit-ver"}
 moshi = {module = "com.squareup.moshi:moshi", version.ref = "moshi-ver"}
 moshi-adapter = {module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi-ver"}

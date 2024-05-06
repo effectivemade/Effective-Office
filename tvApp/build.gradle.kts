@@ -105,6 +105,10 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.svg)
 
+    //Avif decoder coil plugin
+    implementation(libs.avif.coder)
+    implementation(libs.avif.coder.coil)
+
     //notion
     implementation(libs.notion)
 
