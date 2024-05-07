@@ -43,7 +43,6 @@ class MainComponent(
     val cancelUseCase by inject<CancelUseCase>()
     val deleteCachedEventUseCase: DeleteCachedEventUseCase by inject()
 
-
     val slotComponent = SlotComponent(
         componentContext = componentContext,
         storeFactory = storeFactory,
@@ -108,7 +107,11 @@ class MainComponent(
                     }))
 
                 },
-                onCloseRequest = { closeModalWindow() }
+                onCloseRequest = { closeModalWindow() },
+                onTempLoading = {
+                    //Here is loading event
+                    slotComponent.sendIntent(SlotStore.Intent.Loading(Slot.LoadingEventSlot(start = it.startTime, finish = it.finishTime, it)))
+                }
             )
         }
     }

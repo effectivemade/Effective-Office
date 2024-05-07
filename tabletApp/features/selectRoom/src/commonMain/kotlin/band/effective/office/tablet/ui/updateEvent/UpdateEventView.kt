@@ -1,6 +1,7 @@
 package band.effective.office.tablet.ui.updateEvent
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -113,7 +114,9 @@ fun UpdateEventView(
                         isDeleteLoad = state.isLoadDelete,
                         enableUpdateButton = state.enableUpdateButton,
                         isNewEvent = !state.isCreatedEvent(),
-                        onCreateEvent = { component.sendIntent(UpdateEventStore.Intent.OnBooking) },
+                        onCreateEvent = {
+                            component.sendIntent(UpdateEventStore.Intent.OnBooking)
+                        },
                         start = state.event.startTime.format("HH:mm"),
                         finish = state.event.finishTime.format("HH:mm"),
                         room = component.room
@@ -209,7 +212,7 @@ fun UpdateEventView(
                     enable = enableUpdateButton
                 ) {
                     when {
-                        isUpdateLoad -> Loader()
+//                        isUpdateLoad -> Loader()
                         isUpdateError -> Text(
                             text = MainRes.string.try_again,
                             style = MaterialTheme.typography.h6
@@ -233,7 +236,7 @@ fun UpdateEventView(
                     enable = enableUpdateButton
                 ) {
                     when {
-                        isUpdateLoad -> Loader()
+//                        isUpdateLoad -> Loader()
                         isUpdateError -> Text(
                             text = MainRes.string.try_again,
                             style = MaterialTheme.typography.h6

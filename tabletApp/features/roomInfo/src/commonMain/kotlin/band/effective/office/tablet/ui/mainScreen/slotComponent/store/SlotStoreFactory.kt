@@ -1,6 +1,7 @@
 package band.effective.office.tablet.ui.mainScreen.slotComponent.store
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.OfficeTime
@@ -34,8 +35,8 @@ import kotlin.time.Duration.Companion.minutes
 class SlotStoreFactory(
     private val storeFactory: StoreFactory,
     private val roomName: () -> String,
-    private val openBookingDialog: (event: EventInfo, room: String) -> Unit
-) :
+    private val openBookingDialog: (event: EventInfo, room: String) -> Unit,
+    ) :
     KoinComponent {
     private val slotUseCase: SlotUseCase by inject()
     private val roomInfoUseCase: RoomInfoUseCase by inject()
@@ -97,6 +98,8 @@ class SlotStoreFactory(
                 subSlots = it.events.map { slot -> SlotUi.NestedSlot(slot) },
                 isOpen = false
             )
+
+            is Slot.LoadingEventSlot -> SlotUi.LoadingSlot(it)
         }
     }
 
@@ -240,6 +243,8 @@ class SlotStoreFactory(
                     }
                     dispatch(Message.UpdateSlots(newSlots))
                 }
+
+                is SlotStore.Intent.Loading -> intent.slot.execute(getState())
             }
         }
 
@@ -266,6 +271,10 @@ class SlotStoreFactory(
             is SlotUi.MultiSlot -> openMultislot(this, state)
             is SlotUi.SimpleSlot -> slot.execute(state)
             is SlotUi.NestedSlot -> slot.execute(state)
+            is SlotUi.LoadingSlot -> {
+//                Log.i("TAG", state.slots.toString())
+                slot.execute(state)
+            }
         }
 
         private fun openMultislot(multislot: SlotUi.MultiSlot, state: SlotStore.State) {
@@ -279,6 +288,9 @@ class SlotStoreFactory(
             is Slot.EmptySlot -> executeFreeSlot(this)
             is Slot.EventSlot -> executeEventSlot(this)
             is Slot.MultiEventSlot -> {}
+            is Slot.LoadingEventSlot -> {
+//                Log.i("TAG", state.slots.toString())
+            }
         }
 
         private fun executeFreeSlot(slot: Slot.EmptySlot) {

@@ -122,6 +122,11 @@ fun SlotView(
             modifier = itemModifier,
             slotUi = slotUi
         )
+
+        is SlotUi.LoadingSlot -> LoadingSlotView(
+            modifier = itemModifier,
+            slotUi = slotUi
+        )
     }
 }
 
@@ -209,6 +214,34 @@ private fun CommonSlotView(
 }
 
 @Composable
+private fun LoadingSlotView(
+    modifier: Modifier = Modifier,
+    slotUi: SlotUi,
+    content: @Composable () -> Unit = {}
+) {
+    val slot = slotUi.slot
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text(
+                text = "Загрузка слота на время: ${slot.start.toFormattedString("HH:mm")} - ${slot.finish.toFormattedString("HH:mm")}", //TODO() replace this hard str
+                style = MaterialTheme.typography.h5,
+                color = MaterialTheme.colors.onPrimary
+            )
+            Text(
+                text = slot.subtitle(),
+                style = MaterialTheme.typography.h7,
+                color = Color.White
+            )
+        }
+        content()
+    }
+}
+
+@Composable
 private fun SlotUi.borderColor() = when (this) {
     is SlotUi.DeleteSlot -> Color.Gray
     is SlotUi.MultiSlot -> LocalCustomColorsPalette.current.busyStatus
@@ -217,13 +250,17 @@ private fun SlotUi.borderColor() = when (this) {
         is Slot.EmptySlot -> LocalCustomColorsPalette.current.freeStatus
         is Slot.EventSlot -> LocalCustomColorsPalette.current.busyStatus
         is Slot.MultiEventSlot -> LocalCustomColorsPalette.current.busyStatus
+        is Slot.LoadingEventSlot -> LocalCustomColorsPalette.current.loadingColor
     }
+
+    is SlotUi.LoadingSlot -> LocalCustomColorsPalette.current.loadingColor
 }
 
 private fun Slot.subtitle() = when (this) {
     is Slot.EmptySlot -> MainRes.string.empty_slot.format(freeTime(this).toString())
     is Slot.EventSlot -> MainRes.string.event_slot.format(eventInfo.organizer.fullName)
     is Slot.MultiEventSlot -> MainRes.string.multislot.format(events.size.toString())
+    is Slot.LoadingEventSlot -> TODO()
 }
 
 fun freeTime(slot: Slot): Int {

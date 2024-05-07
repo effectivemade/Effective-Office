@@ -1,5 +1,6 @@
 package band.effective.office.tablet.ui.updateEvent.store
 
+import androidx.compose.ui.graphics.Color
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
@@ -24,6 +25,7 @@ import java.util.GregorianCalendar
 class UpdateEventStoreFactory(
     private val storeFactory: StoreFactory,
     private val onCloseRequest: () -> Unit,
+    private val onTempLoading: (EventInfo) -> Unit,
     private val navigate: (UpdateEventComponent.ModalConfig) -> Unit,
     private val room: String,
     private val onDelete: (Slot) -> Unit,
@@ -125,28 +127,36 @@ class UpdateEventStoreFactory(
         }
 
         fun createEvent(state: UpdateEventStore.State) {
+
+            val event = EventInfo(
+                startTime = state.date,
+                organizer = state.selectOrganizer,
+                finishTime = (state.date.clone() as Calendar).apply {
+                    add(
+                        Calendar.MINUTE,
+                        state.duration
+                    )
+                },
+                id = ""
+            )
+
+            onCloseRequest()
+            onTempLoading(event)
+
             scope.launch {
-                val event = EventInfo(
-                    startTime = state.date,
-                    organizer = state.selectOrganizer,
-                    finishTime = (state.date.clone() as Calendar).apply {
-                        add(
-                            Calendar.MINUTE,
-                            state.duration
-                        )
-                    },
-                    id = ""
-                )
+
                 if ((checkBookingUseCase.busyEvents(
                         event = event,
                         room = room
                     ) as? Either.Success)?.data?.isEmpty() == true
                 ) {
-                    dispatch(Message.LoadUpdate)
-                    when (bookingUseCase.invoke(
+//                    Temp comments
+//                    dispatch(Message.LoadUpdate)
+                    val result = bookingUseCase.invoke(
                         eventInfo = event,
                         room = room
-                    )) {
+                    )
+                    when (result) {
                         is Either.Error -> {
                             dispatch(Message.FailUpdate)
                             navigate(UpdateEventComponent.ModalConfig.FailureModal)
