@@ -75,13 +75,14 @@ fun EventOrganizerView(
                     onValueChange = { onInput(it) },
                     placeholder = {
                         Text(
-                            text = if (isInputError) {
-                                MainRes.string.selectbox_organizer_error
-                            }
-                            else {
-                                MainRes.string.selectbox_organizer_title
+                            text = when (isInputError) {
+                                true -> MainRes.string.selectbox_organizer_error
+                                false -> MainRes.string.selectbox_organizer_title
                             },
-                            color = LocalCustomColorsPalette.current.tertiaryTextAndIcon
+                            color = when (isInputError) {
+                                true -> LocalCustomColorsPalette.current.busyStatus
+                                false -> LocalCustomColorsPalette.current.tertiaryTextAndIcon
+                            }
                         )
                     },
                     colors = TextFieldDefaults.textFieldColors(
