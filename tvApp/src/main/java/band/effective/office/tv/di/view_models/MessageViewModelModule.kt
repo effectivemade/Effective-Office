@@ -7,6 +7,7 @@ import band.effective.office.tv.network.MattermostClient
 import band.effective.office.tv.repository.uselessFactRepository.UselessFactRepository
 import band.effective.office.tv.repository.uselessFactRepository.impl.UselessFactRepositoryImpl
 import coil.ImageLoader
+import com.github.awxkee.avifcoil.decoder.HeifDecoder
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -38,5 +39,11 @@ class MessageViewModelModule {
         @ApplicationContext context: Context,
         @MattermostClient okHttpClient: OkHttpClient
     ): ImageLoader =
-        ImageLoader.Builder(context).okHttpClient(okHttpClient).build()
+        ImageLoader
+            .Builder(context)
+            .components {
+                add(HeifDecoder.Factory(context))
+            }
+            .okHttpClient(okHttpClient)
+            .build()
 }
