@@ -26,7 +26,7 @@ import band.effective.office.tablet.features.selectRoom.MainRes
 import band.effective.office.tablet.ui.bookingComponents.DateTimeView
 import band.effective.office.tablet.ui.bookingComponents.EventDurationView
 import band.effective.office.tablet.ui.bookingComponents.EventOrganizerView
-import band.effective.office.tablet.ui.bookingComponents.pickerDateTime.DateTimePickerModalView
+import band.effective.office.tablet.ui.pickerDateTime.DateTimePickerModalView
 import band.effective.office.tablet.ui.buttons.alert.AlertButton
 import band.effective.office.tablet.ui.buttons.success.SuccessButton
 import band.effective.office.tablet.ui.common.CrossButtonView

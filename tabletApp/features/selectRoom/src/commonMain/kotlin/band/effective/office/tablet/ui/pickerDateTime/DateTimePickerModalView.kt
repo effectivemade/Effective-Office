@@ -1,4 +1,4 @@
-package band.effective.office.tablet.ui.bookingComponents.pickerDateTime
+package band.effective.office.tablet.ui.pickerDateTime
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -28,6 +28,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import band.effective.office.tablet.features.selectRoom.MainRes
+import band.effective.office.tablet.ui.bookingComponents.pickerDateTime.DatePickerView
+import band.effective.office.tablet.ui.bookingComponents.pickerDateTime.TimePickerView
+import band.effective.office.tablet.ui.pickerDateTime.store.DateTimePickerStore
 import band.effective.office.tablet.ui.common.CrossButtonView
 import band.effective.office.tablet.ui.theme.LocalCustomColorsPalette
 import band.effective.office.tablet.ui.theme.header8
@@ -86,7 +90,8 @@ fun DateTimePickerModalView(
         },
         onChangeTime = {
             dateTimePickerComponent.sendIntent(DateTimePickerStore.Intent.OnChangeTime(it))
-        }
+        },
+        enableDateButton = stateDateTime.isEnabledButton
     )
 }
 
@@ -98,7 +103,8 @@ fun DateTimePickerModalView(
     selectedDateTime: Calendar,
     onCloseRequest: () -> Unit,
     onChangeDate: (LocalDate) -> Unit,
-    onChangeTime: (LocalTime) -> Unit
+    onChangeTime: (LocalTime) -> Unit,
+    enableDateButton: Boolean
 ) {
     Dialog(
         onDismissRequest = onCloseRequest,
@@ -143,12 +149,16 @@ fun DateTimePickerModalView(
                         onClick = {
                             onCloseRequest()
                         },
+                        enabled = enableDateButton,
                         colors = buttonColors(
                             containerColor = LocalCustomColorsPalette.current.pressedPrimaryButton
                         )
                     ) {
                         Text(
-                            text = SimpleDateFormat("dd MMMM HH:mm").format(currentDate.time), /*MainRes.string.apply_date_time_for_booking*/
+                            text = when (enableDateButton) {
+                                true -> SimpleDateFormat("dd MMMM HH:mm").format(currentDate.time) /*MainRes.string.apply_date_time_for_booking*/
+                                false -> MainRes.string.time_booked
+                            },
                             style = header8,
                             color = LocalCustomColorsPalette.current.primaryTextAndIcon,
                         )
