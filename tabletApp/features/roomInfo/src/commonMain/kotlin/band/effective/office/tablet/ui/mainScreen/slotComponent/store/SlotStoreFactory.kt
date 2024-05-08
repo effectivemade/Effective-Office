@@ -244,7 +244,31 @@ class SlotStoreFactory(
                     dispatch(Message.UpdateSlots(newSlots))
                 }
 
-                is SlotStore.Intent.Loading -> intent.slot.execute(getState())
+                is SlotStore.Intent.Loading -> {
+                    val allSlots = getState().slots
+                    var mainSlot: SlotUi.MultiSlot? = null
+                    val uiSlot = allSlots.firstOrNull { it.slot == intent.slot }
+                        ?: allSlots.mapNotNull { (it as? SlotUi.MultiSlot)?.subSlots }.flatten()
+                            .firstOrNull { it.slot == intent.slot }
+                            ?.apply {
+                                mainSlot = allSlots.mapNotNull { it as? SlotUi.MultiSlot }
+                                    .first { it.subSlots.contains(this) }
+                            }
+
+                    val indexInMultiSlot = mainSlot!!.subSlots.indexOf(uiSlot)
+                    val indexMultiSlot = allSlots.indexOf(mainSlot!!)
+                    val newMainSlot = mainSlot!!.copy(
+                        subSlots = mainSlot!!.subSlots.toMutableList().apply {
+                            this[indexInMultiSlot] =
+                                SlotUi.LoadingSlot(intent.slot)
+                        })
+
+                    dispatch(
+                        Message.UpdateSlots(
+                            allSlots.toMutableList()
+                                .apply { this[indexMultiSlot] = newMainSlot })
+                    )
+                }
             }
         }
 
@@ -289,7 +313,7 @@ class SlotStoreFactory(
             is Slot.EventSlot -> executeEventSlot(this)
             is Slot.MultiEventSlot -> {}
             is Slot.LoadingEventSlot -> {
-//                Log.i("TAG", state.slots.toString())
+
             }
         }
 
