@@ -156,7 +156,7 @@ fun DateTimePickerModalView(
                     ) {
                         Text(
                             text = when (enableDateButton) {
-                                true -> SimpleDateFormat("dd MMMM HH:mm").format(currentDate.time) /*MainRes.string.apply_date_time_for_booking*/
+                                true -> SimpleDateFormat("dd MMMM HH:mm").format(currentDate.time)
                                 false -> MainRes.string.time_booked
                             },
                             style = header8,
