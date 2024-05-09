@@ -61,7 +61,7 @@ interface UpdateEventStore :
                 isLoadDelete = false,
                 isErrorDelete = false,
                 showSelectDate = false,
-                enableUpdateButton = true,
+                enableUpdateButton = false,
                 isBusyEvent = false
             )
         }

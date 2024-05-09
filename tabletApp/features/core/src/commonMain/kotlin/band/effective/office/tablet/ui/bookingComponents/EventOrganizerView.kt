@@ -79,10 +79,7 @@ fun EventOrganizerView(
                                 true -> MainRes.string.selectbox_organizer_error
                                 false -> MainRes.string.selectbox_organizer_title
                             },
-                            color = when (isInputError) {
-                                true -> LocalCustomColorsPalette.current.busyStatus
-                                false -> LocalCustomColorsPalette.current.tertiaryTextAndIcon
-                            }
+                            color = LocalCustomColorsPalette.current.busyStatus
                         )
                     },
                     colors = TextFieldDefaults.textFieldColors(
