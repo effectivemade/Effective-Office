@@ -46,6 +46,10 @@ kotlin {
                 api(Dependencies.MviKotlin.mviKotlin)
                 api(Dependencies.MviKotlin.mviKotlinMain)
                 api(Dependencies.MviKotlin.mviKotlinExtensionsCoroutines)
+                
+                //EpicDatePicker
+                implementation(Dependencies.Calendar.composeDatePicker)
+                implementation(Dependencies.KotlinxDatetime.kotlinxDatetime)
 
                 implementation(project(":tabletApp:features:core"))
                 implementation(project(":tabletApp:features:domain"))

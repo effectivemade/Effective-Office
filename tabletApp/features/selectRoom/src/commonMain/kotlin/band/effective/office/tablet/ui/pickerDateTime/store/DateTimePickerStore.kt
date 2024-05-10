@@ -1,4 +1,4 @@
-package band.effective.office.tablet.ui.bookingComponents.pickerDateTime
+package band.effective.office.tablet.ui.pickerDateTime.store
 
 import com.arkivanov.mvikotlin.core.store.Store
 import kotlinx.datetime.LocalDate
@@ -15,11 +15,13 @@ interface DateTimePickerStore :
     }
 
     data class State(
-        val currentDate: Calendar
+        val currentDate: Calendar,
+        val isEnabledButton: Boolean
     ) {
         companion object {
             val default = State(
                 currentDate = Calendar.getInstance(),
+                isEnabledButton = true
             )
         }
     }
