@@ -66,8 +66,11 @@ ktor-client-commonLogging = {module = "io.ktor:ktor-client-logging", version.ref
 ktor-client-cio = {module = "io.ktor:ktor-client-cio", version.ref = "ktor"}
 ktor-client-android = {module = "io.ktor:ktor-client-android", version.ref="ktor"}
 ktor-client-drawin = {module = "io.ktor:ktor-client-darwin", version.ref="ktor"}
+ktor-client-contentNegotiation = {module = "io.ktor:ktor-client-content-negotiation", version.ref="ktor"}
+ktor-client-serialization-json = {module = "io.ktor:ktor-serialization-kotlinx-json", version.ref="ktor"}
 ktor-server-netty = {module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor"}
 ktor-server-logback = {module = "ch.qos.logback:logback-classic", version = "1.2.11"}
+ktor-client-auth = {module = "io.ktor:ktor-client-auth", version.ref = "ktor"}
 androdx-activityKtx = {module = "androidx.activity:activity-ktx", version.ref = "activity-ktx"}
 androdx-appCompat = {module = "androidx.appcompat:appcompat", version.ref = "androidx-appCompat"}
 androidx-activityCompose = {module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose"}
