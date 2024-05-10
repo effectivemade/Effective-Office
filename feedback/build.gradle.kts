@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     implementation(libs.notion)
+
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.commonLogging)
@@ -19,6 +20,14 @@ dependencies {
     implementation(libs.ktor.client.contentNegotiation)
     implementation(libs.ktor.client.serialization.json)
     implementation(libs.ktor.client.auth)
+
+    implementation(libs.ydb.sdk.bom)
+    implementation(libs.ydb.sdk.coordination)
+    implementation(libs.ydb.sdk.scheme)
+    implementation(libs.ydb.sdk.topic)
+    implementation(libs.ydb.sdk.table)
+    implementation(libs.yc.auth.provider)
+
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
