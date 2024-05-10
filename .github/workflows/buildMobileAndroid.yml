@@ -1,0 +1,33 @@
+name: Mobile android app CI
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - 'develop'
+    paths:
+      - 'composeApp/**'
+    
+  workflow_dispatch:
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: adopt
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Add params to local.properties
+        run: echo '${{ secrets.localProperties }}' > local.properties
+
+      - name: Build and run tests
+        run: ./gradlew :composeApp:assembleDebug :composeApp:testDebugUnitTest --no-daemon
