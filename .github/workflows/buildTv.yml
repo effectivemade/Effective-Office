@@ -27,7 +27,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Add params to local.properties
-        run: echo '${{ secrets.localProperties }}' > local.properties
+        run: echo '${{ secrets.local_properties }}' > local.properties
 
       - name: Build and run tests
         run: ./gradlew :tvApp:assembleDebug :tvApp:testDebugUnitTest --no-daemon
