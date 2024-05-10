@@ -15,7 +15,7 @@ localProperties.load(FileInputStream(rootProject.file("local.properties")))
 
 android {
     namespace  = "band.effective.office.tv"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId  = "band.effective.office.tv"
@@ -106,7 +106,6 @@ dependencies {
     implementation(libs.coil.svg)
 
     //Avif decoder coil plugin
-    implementation(libs.avif.coder)
     implementation(libs.avif.coder.coil)
 
     //notion
