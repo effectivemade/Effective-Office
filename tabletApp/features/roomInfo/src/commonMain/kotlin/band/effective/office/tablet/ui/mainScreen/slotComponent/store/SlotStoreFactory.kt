@@ -36,7 +36,7 @@ class SlotStoreFactory(
     private val storeFactory: StoreFactory,
     private val roomName: () -> String,
     private val openBookingDialog: (event: EventInfo, room: String) -> Unit,
-    ) :
+) :
     KoinComponent {
     private val slotUseCase: SlotUseCase by inject()
     private val roomInfoUseCase: RoomInfoUseCase by inject()
@@ -155,7 +155,7 @@ class SlotStoreFactory(
             when (intent) {
                 is SlotStore.Intent.ClickOnSlot -> intent.slot.execute(getState())
                 is SlotStore.Intent.UpdateRequest -> {
-                    if (!getState().slots.any { it is SlotUi.DeleteSlot } || intent.refresh){
+                    if (!getState().slots.any { it is SlotUi.DeleteSlot } || intent.refresh) {
                         updateSlot(intent.room, intent.refresh)
                     }
                 }
@@ -246,28 +246,11 @@ class SlotStoreFactory(
 
                 is SlotStore.Intent.Loading -> {
                     val allSlots = getState().slots
-                    var mainSlot: SlotUi.MultiSlot? = null
-                    val uiSlot = allSlots.firstOrNull { it.slot == intent.slot }
-                        ?: allSlots.mapNotNull { (it as? SlotUi.MultiSlot)?.subSlots }.flatten()
-                            .firstOrNull { it.slot == intent.slot }
-                            ?.apply {
-                                mainSlot = allSlots.mapNotNull { it as? SlotUi.MultiSlot }
-                                    .first { it.subSlots.contains(this) }
-                            }
-
-                    val indexInMultiSlot = mainSlot!!.subSlots.indexOf(uiSlot)
-                    val indexMultiSlot = allSlots.indexOf(mainSlot!!)
-                    val newMainSlot = mainSlot!!.copy(
-                        subSlots = mainSlot!!.subSlots.toMutableList().apply {
-                            this[indexInMultiSlot] =
-                                SlotUi.LoadingSlot(intent.slot)
-                        })
-
-                    dispatch(
-                        Message.UpdateSlots(
-                            allSlots.toMutableList()
-                                .apply { this[indexMultiSlot] = newMainSlot })
-                    )
+                    val slot = intent.slot
+                    val newSlot = SlotUi.LoadingSlot(slot)
+                    val list = allSlots.toMutableList()
+                    list.add(newSlot)
+                    dispatch(Message.UpdateSlots(list))
                 }
             }
         }
