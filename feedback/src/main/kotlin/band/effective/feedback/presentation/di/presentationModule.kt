@@ -3,6 +3,7 @@ package band.effective.feedback.presentation.di
 import band.effective.feedback.data.mattermost.MattermostFeedbackRepository
 import band.effective.feedback.domain.useCase.SaveFeedbackUseCase
 import band.effective.feedback.domain.useCase.StartFeedbackLoopUseCase
+import band.effective.feedback.presentation.Reactor
 import org.koin.dsl.module
 
 fun presentationModule() = module {
@@ -18,5 +19,8 @@ fun presentationModule() = module {
             feedbackRequestRepository = get(),
             requester = get()
         )
+    }
+    factory<Reactor> {
+        Reactor(mattermostApi = get())
     }
 }

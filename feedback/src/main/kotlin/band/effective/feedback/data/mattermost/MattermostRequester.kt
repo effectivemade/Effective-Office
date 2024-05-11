@@ -10,7 +10,9 @@ class MattermostRequester(private val mattermostApi: MattermostApi) : Requester 
         val direct = mattermostApi.getDirect(id1 = bot.id, id2 = userRequested.id)
         mattermostApi.writeMessage(
             channelId = direct.id,
-            message = "Привет! @${requester} запросил у тебя обратную связь. Напиши её пожалуйста и пометь хештегом. Спасибо."
+            message = "Привет! @$requester запросил у тебя обратную связь. Ты можешь использовать команду sendFeedback, чтобы отправить обратную связь, или если ты пишешь отзыв в открытом чате, то можешь использовать хештег #обратная_связь. Не забудь упомянуть @$requester в сообщение. \n" +
+                    "\n" +
+                    "Пример: /sendfeedback @name хорошо показал себя в этом квартале. Так держать."
         )
     }
 }
