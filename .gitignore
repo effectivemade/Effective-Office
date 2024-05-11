@@ -20,3 +20,4 @@ build-cache/
 *.podspec
 /tvApp/google-services.json
 /contract/contract.podspec
+/feedback/gradle.properties

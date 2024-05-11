@@ -11,14 +11,17 @@ class SaveFeedbackUseCase(
     private val defaultFeedbackRepository: FeedbackRepository
 ) {
     suspend fun save(feedback: Feedback, requester: String) = runCatching {
-        val request = feedbackRequestRepository.getRequest(requester, feedback.name).getOrThrow()
-        val storage = request.storage
-        val feedbackRepository = feedbackRepositoryMap.getOrDefault(storage.type, defaultFeedbackRepository)
-        try {
-            feedbackRepository.addFeedback(feedback, requester)
-        } catch (e: Throwable) {
-            defaultFeedbackRepository.addFeedback(feedback, requester)
-        }
-        feedbackRequestRepository.removeRequest(request).getOrThrow()
+        feedbackRequestRepository.getRequest(requester, feedback.name).fold(
+            onSuccess = { request ->
+                val storage = request.storage
+                val feedbackRepository = feedbackRepositoryMap.getOrDefault(storage.type, defaultFeedbackRepository)
+                feedbackRepository.addFeedback(feedback, requester).getOrElse {
+                    defaultFeedbackRepository.addFeedback(feedback, requester).getOrThrow()
+                }
+                feedbackRequestRepository.removeRequest(request).getOrThrow()
+            },
+            onFailure = {
+                defaultFeedbackRepository.addFeedback(feedback, requester).getOrThrow()
+            })
     }
 }

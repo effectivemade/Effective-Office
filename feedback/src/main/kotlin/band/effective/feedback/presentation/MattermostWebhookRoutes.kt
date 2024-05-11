@@ -20,10 +20,11 @@ fun Route.mattermostWebhookRoutes() {
         post("/start") {
             val webHookDto = call.receive<WebHookDto>()
             val requester = webHookDto.user_name
-            val requested = webHookDto.text.split(" ").filter { it.first() == '@' }.map { it.drop(1) }
+            val requested = webHookDto.text.split(" ").filter { it.firstOrNull() == '@' }.map { it.drop(1) }
             startFeedbackLoopUseCase.start(requester, requested, FeedbackStorage.Ydb).fold(
                 onSuccess = { call.respond(HttpStatusCode.Created) },
                 onFailure = {
+                    println(it.stackTraceToString())
                     call.respond(
                         status = HttpStatusCode.InternalServerError,
                         message = it.stackTraceToString()
@@ -33,7 +34,7 @@ fun Route.mattermostWebhookRoutes() {
         }
         post("send") {
             val webHookDto = call.receive<WebHookDto>()
-            val requester = webHookDto.text.split(" ").firstOrNull { it.first() == '@' }?.drop(1)
+            val requester = webHookDto.text.split(" ").firstOrNull { it.firstOrNull() == '@' }?.drop(1)
             if (requester == null) {
                 call.respond(
                     status = HttpStatusCode.BadRequest,
@@ -44,6 +45,7 @@ fun Route.mattermostWebhookRoutes() {
             saveFeedbackUseCase.save(webHookDto.getFeedback(), requester).fold(
                 onSuccess = { call.respond(HttpStatusCode.Created) },
                 onFailure = {
+                    println(it.stackTraceToString())
                     call.respond(
                         status = HttpStatusCode.InternalServerError,
                         message = it.stackTraceToString()

@@ -1,6 +1,9 @@
+import dev.icerock.gradle.utils.propertyString
+
 plugins {
     kotlin("jvm")
     id(Plugins.Serialization.plugin)
+    id("io.ktor.plugin")
 }
 
 group = "ru.omgtu.ivt213.mishenko.maksim"
@@ -42,4 +45,24 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+ktor {
+    docker {
+        jib {
+            from {
+                image = "openjdk:21-jdk"
+            }
+            to {
+                //NOTE(Maksim Mishenko): put this properties in /feedback/gradle.properties
+                val dockerHub = project.propertyString("registryUrl")
+                val yandexPassword = project.propertyString("yandexPassword")
+                image = "$dockerHub/feedback-image"
+                auth {
+                    username = "oauth"
+                    password = yandexPassword
+                }
+            }
+        }
+    }
 }
