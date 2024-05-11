@@ -36,3 +36,6 @@ fun <T> DataQueryResult.getAll(builder: ResultSetReader.() -> T): List<T> {
 
 fun <T> SessionRetryContext.getResultQuery(query: String, builder: ResultSetReader.() -> T) =
     executeQuery(query).getAll(builder)
+
+fun SessionRetryContext.newId(tableName: String) =
+    (getResultQuery("select * from $tableName") { getColumn("id").uint64 }.maxOrNull() ?: -1) + 1

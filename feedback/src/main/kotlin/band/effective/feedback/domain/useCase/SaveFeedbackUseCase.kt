@@ -10,14 +10,14 @@ class SaveFeedbackUseCase(
     private val feedbackRepositoryMap: Map<FeedbackStorageType, FeedbackRepository>,
     private val defaultFeedbackRepository: FeedbackRepository
 ) {
-    fun save(feedback: Feedback, requester: String) = runCatching {
+    suspend fun save(feedback: Feedback, requester: String) = runCatching {
         val request = feedbackRequestRepository.getRequest(requester, feedback.name).getOrThrow()
         val storage = request.storage
         val feedbackRepository = feedbackRepositoryMap.getOrDefault(storage.type, defaultFeedbackRepository)
         try {
-            feedbackRepository.addFeedback(feedback)
+            feedbackRepository.addFeedback(feedback, requester)
         } catch (e: Throwable) {
-            defaultFeedbackRepository.addFeedback(feedback)
+            defaultFeedbackRepository.addFeedback(feedback, requester)
         }
         feedbackRequestRepository.removeRequest(request).getOrThrow()
     }
