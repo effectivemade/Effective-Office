@@ -28,6 +28,14 @@ dependencies {
     implementation(libs.ydb.sdk.table)
     implementation(libs.yc.auth.provider)
 
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.logback)
+    implementation(libs.ktor.server.contentNegotiation)
+
+    implementation(libs.koin.core)
+    implementation(libs.koin.ktor)
+
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
