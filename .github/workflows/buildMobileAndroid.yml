@@ -7,7 +7,17 @@ on:
       - 'develop'
     paths:
       - 'composeApp/**'
-    
+      - 'modal_custom_dialog/**'
+      - 'wheel-picker-compose/**'
+
+  push:
+    branches:
+      - 'develop'
+    paths:
+      - 'composeApp/**'
+      - 'modal_custom_dialog/**'
+      - 'wheel-picker-compose/**'
+
   workflow_dispatch:
 
 jobs:

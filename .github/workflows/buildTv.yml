@@ -8,6 +8,12 @@ on:
     paths:
       - 'tvApp/**'
 
+  push:
+    branches:
+      - 'develop'
+    paths:
+      - 'tvApp/**'
+
   workflow_dispatch:
 
 jobs:

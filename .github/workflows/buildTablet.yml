@@ -8,6 +8,12 @@ on:
     paths:
       - 'tabletApp/**'
 
+  push:
+    branches:
+      - 'develop'
+    paths:
+      - 'tabletApp/**'
+        
   workflow_dispatch:
 
 jobs:
