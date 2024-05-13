@@ -7,6 +7,7 @@ on:
       - 'develop'
     paths:
       - 'composeApp/**'
+      - 'contract/**'
       - 'modal_custom_dialog/**'
       - 'wheel-picker-compose/**'
 
@@ -15,6 +16,7 @@ on:
       - 'develop'
     paths:
       - 'composeApp/**'
+      - 'contract/**'
       - 'modal_custom_dialog/**'
       - 'wheel-picker-compose/**'
 

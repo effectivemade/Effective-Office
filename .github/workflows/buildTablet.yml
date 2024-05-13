@@ -7,12 +7,14 @@ on:
       - 'develop'
     paths:
       - 'tabletApp/**'
+      - 'contract/**'
 
   push:
     branches:
       - 'develop'
     paths:
       - 'tabletApp/**'
+      - 'contract/**'
         
   workflow_dispatch:
 
