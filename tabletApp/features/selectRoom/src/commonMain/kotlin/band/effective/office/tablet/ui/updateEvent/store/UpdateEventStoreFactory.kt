@@ -139,10 +139,6 @@ class UpdateEventStoreFactory(
                 },
                 id = ""
             )
-
-            onCloseRequest()
-            onTempLoading(event)
-
             scope.launch {
 
                 if ((checkBookingUseCase.busyEvents(
@@ -164,12 +160,16 @@ class UpdateEventStoreFactory(
 
                         is Either.Success -> {
                             dispatch(Message.FailUpdate)
-                            navigate(UpdateEventComponent.ModalConfig.SuccessModal)
+//                            navigate(UpdateEventComponent.ModalConfig.SuccessModal)
                         }
                     }
                 }
 
             }
+
+//            onCloseRequest()
+            onTempLoading(event)
+            navigate(UpdateEventComponent.ModalConfig.SuccessModal)
         }
 
         fun setDay(

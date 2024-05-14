@@ -260,7 +260,7 @@ private fun Slot.subtitle() = when (this) {
     is Slot.EmptySlot -> MainRes.string.empty_slot.format(freeTime(this).toString())
     is Slot.EventSlot -> MainRes.string.event_slot.format(eventInfo.organizer.fullName)
     is Slot.MultiEventSlot -> MainRes.string.multislot.format(events.size.toString())
-    is Slot.LoadingEventSlot -> TODO()
+    is Slot.LoadingEventSlot -> MainRes.string.loading_slot.format(eventInfo.organizer.fullName)
 }
 
 fun freeTime(slot: Slot): Int {
