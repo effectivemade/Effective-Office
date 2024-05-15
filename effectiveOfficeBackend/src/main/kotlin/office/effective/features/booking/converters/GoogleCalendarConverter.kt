@@ -133,7 +133,8 @@ class GoogleCalendarConverter(
     }
 
     /**
-     * Converts meeting [Event] to [Booking]
+     * Converts meeting [Event] to [Booking].
+     * If participant responseStatus is declined that participant will be filtered out.
      *
      * @param event [Event] to be converted
      * @param owner specify this parameter to reduce the number
@@ -171,7 +172,7 @@ class GoogleCalendarConverter(
             beginBooking = toLocalInstant(event.start),
             endBooking = toLocalInstant(event.end),
             recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) },
-            isDeclinedByOwner = participantModels.any { model -> model.email == organizerEmail }
+            isDeclinedByOwner = participantModels.none { model -> model.email == organizerEmail }
         )
         logger.trace("[toMeetingWorkspaceBooking] {}", booking.toString())
         return booking
