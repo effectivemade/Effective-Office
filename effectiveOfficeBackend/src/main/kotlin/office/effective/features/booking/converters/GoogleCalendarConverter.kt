@@ -5,6 +5,7 @@ import com.google.api.services.calendar.model.Event.Organizer
 import com.google.api.services.calendar.model.EventAttendee
 import com.google.api.services.calendar.model.EventDateTime
 import office.effective.common.constants.BookingConstants
+import office.effective.common.exception.InvalidParameterException
 import office.effective.common.utils.UuidValidator
 import office.effective.dto.BookingDTO
 import office.effective.dto.WorkspaceDTO
@@ -152,14 +153,7 @@ class GoogleCalendarConverter(
         participants: List<UserModel>? = null,
     ): Booking {
         logger.debug("[toMeetingWorkspaceBooking] converting calendar event to meeting room booking model")
-        val organizer: String = event.organizer?.email ?: ""
-        val email = if (organizer != defaultAccount) {
-            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event.organizer field")
-            organizer
-        } else {
-            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event description")
-            event.description?.substringBefore(" ") ?: ""
-        }
+        val email: String? = extractOrganizerEmailFromMeetingEvent(event);
         val recurrence = event.recurrence?.toString()?.getRecurrence()
 
         val booking = Booking(
@@ -175,6 +169,30 @@ class GoogleCalendarConverter(
         return booking
     }
 
+    private fun extractOrganizerEmailFromMeetingEvent(event: Event): String? {
+        val organizerFromEvent: String? = event.organizer?.email
+        val organizerFromDescription : String? = event.description?.substringBefore(" ")
+        if(organizerFromEvent == defaultAccount || organizerFromEvent == null) {
+            if(organizerFromDescription == null) {
+                return null
+            }
+            else return organizerFromDescription
+        }
+        else return organizerFromEvent
+
+
+//        val organizer: String? = event.organizer?.email ?: "";
+//        val email = if (organizer != defaultAccount) {
+//            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event.organizer field")
+//            organizer
+//        } else {
+//            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event description")
+//            event.description?.substringBefore(" ") ?: ""
+//        }
+//
+//        return email;
+    }
+
     /**
      * Find [UserModel] by email. May return placeholder if user with the given email doesn't exist in database
      *
@@ -182,7 +200,8 @@ class GoogleCalendarConverter(
      * @return [UserModel] with data from database or [UserModel] placeholder with the given [email]
      * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
      */
-    private fun getUserModel(email: String): UserModel {
+    private fun getUserModel(email: String?): UserModel? {
+        if(email == null) {return null}
         val userModel: UserModel = userRepository.findByEmail(email)
             ?: run {
                 logger.warn("[getUserModel] can't find a user with email ${email}. Creating placeholder.")
@@ -251,6 +270,9 @@ class GoogleCalendarConverter(
      */
     fun toGoogleWorkspaceRegularEvent(model: Booking): Event {
         logger.debug("[toGoogleWorkspaceRegularEvent] converting regular workspace booking to calendar event")
+        if(model.owner == null) {
+            throw InvalidParameterException("[toGoogleWorkspaceRegularEvent] Cannot create regular event without organizer.")
+        }
         val event = Event().apply {
             id = model.id
             summary = eventSummaryForRegularBooking(model)

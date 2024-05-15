@@ -96,6 +96,7 @@ class BookingService(
         bookingRangeTo: Long?,
         bookingRangeFrom: Long
     ): List<Booking> {
+        //TODO move switch-case construction to facade
         val bookingList = when {
             userId != null && workspaceId != null -> {
                 val workspace = workspaceRepository.findById(workspaceId)
@@ -285,12 +286,16 @@ class BookingService(
         val workspace = workspaceRepository.findById(workspaceId)
             ?: throw InstanceNotFoundException(WorkspaceBookingEntity::class, "Workspace with id $workspaceId not wound")
         return if (workspace.tag == "meeting") {
-            logger.error("Saving meeting room booking")
+            logger.debug("Saving meeting room booking")
             bookingMeetingRepository.save(booking)
-        } else {
-            logger.error("Saving workspace booking")
-            bookingRegularRepository.save(booking)
-        }
+        } else
+            if (workspace.tag == "regular") {
+                logger.debug("Saving workspace booking")
+                bookingRegularRepository.save(booking)
+            } else {
+                logger.error("[save] Unknown workspace.tag value. Expected: \"meeting\" or \"regular\". Received: {}", workspace.tag)
+                throw RuntimeException("Unknown workspace.tag value. Expected: \"meeting\" or \"regular\". Received: " + workspace.tag)
+            }
     }
 
     /**
@@ -301,12 +306,19 @@ class BookingService(
      * @author Daniil Zavyalov
      */
     override fun update(booking: Booking): Booking {
-        return if (booking.workspace.tag == "meeting") {
-            logger.error("Updating meeting room booking")
-            bookingMeetingRepository.update(booking)
-        } else {
-            logger.error("Updating workspace booking")
-            bookingRegularRepository.update(booking)
+        return when (booking.workspace.tag) {
+            "meeting" -> {
+                logger.debug("Updating meeting room booking")
+                bookingMeetingRepository.update(booking)
+            }
+            "regular" -> {
+                logger.debug("Updating workspace booking")
+                bookingRegularRepository.update(booking)
+            }
+            else -> {
+                logger.error("[update] Unknown workspace.tag value. Expected: \"meeting\" or \"regular\". Received: {}", booking.workspace.tag)
+                throw RuntimeException("Unknown workspace.tag value. Expected: \"meeting\" or \"regular\". Received: " + booking.workspace.tag)
+            }
         }
     }
 }
