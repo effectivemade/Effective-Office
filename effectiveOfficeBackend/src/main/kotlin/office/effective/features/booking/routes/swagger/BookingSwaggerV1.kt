@@ -111,7 +111,7 @@ fun SwaggerDocument.returnBookingsV1(): OpenApiRoute.() -> Unit = {
  * @suppress
  */
 fun SwaggerDocument.postBookingV1(): OpenApiRoute.() -> Unit = {
-    description = "Saves a given booking. Participants of regular workspace booking will be ignored."
+    description = "Saves a given booking. Participants of regular workspace booking will be ignored. You cannot create regular workspace booking without owner."
     tags = listOf("Bookings V1")
     request {
         body<BookingRequestDTO> {

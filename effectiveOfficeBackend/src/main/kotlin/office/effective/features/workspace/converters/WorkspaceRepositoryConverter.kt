@@ -75,7 +75,7 @@ class WorkspaceRepositoryConverter(private val database: Database) {
         val tagEntity: WorkspaceTagEntity = database.workspaceTags.find { it.name eq model.tag }
             ?: throw InstanceNotFoundException(WorkspaceTagEntity::class, "Workspace tag ${model.tag} not found")
 
-        if(tagEntity.name != model.tag) {
+        if (tagEntity.name != model.tag) {
             throw IllegalArgumentException("model.tag=${model.tag} is not equal to tagEntity.name=${tagEntity.name}")
         }
         return WorkspaceEntity {
