@@ -5,7 +5,7 @@ import com.google.api.services.calendar.model.Event.Organizer
 import com.google.api.services.calendar.model.EventAttendee
 import com.google.api.services.calendar.model.EventDateTime
 import office.effective.common.constants.BookingConstants
-import office.effective.common.exception.InvalidParameterException
+import office.effective.common.exception.UnavailableOperationException
 import office.effective.common.utils.UuidValidator
 import office.effective.dto.BookingDTO
 import office.effective.dto.WorkspaceDTO
@@ -177,18 +177,6 @@ class GoogleCalendarConverter(
                 return null
             } else return organizerFromDescription
         } else return organizerFromEvent
-
-
-//        val organizer: String? = event.organizer?.email ?: "";
-//        val email = if (organizer != defaultAccount) {
-//            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event.organizer field")
-//            organizer
-//        } else {
-//            logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event description")
-//            event.description?.substringBefore(" ") ?: ""
-//        }
-//
-//        return email;
     }
 
     /**
@@ -271,7 +259,7 @@ class GoogleCalendarConverter(
     fun toGoogleWorkspaceRegularEvent(model: Booking): Event {
         logger.debug("[toGoogleWorkspaceRegularEvent] converting regular workspace booking to calendar event")
         if (model.owner == null) {
-            throw InvalidParameterException("[toGoogleWorkspaceRegularEvent] Cannot create regular event without organizer.")
+            throw UnavailableOperationException("[toGoogleWorkspaceRegularEvent] Cannot create regular event without organizer.")
         }
         val event = Event().apply {
             id = model.id

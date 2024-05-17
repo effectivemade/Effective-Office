@@ -1,4 +1,7 @@
 package office.effective.common.exception
 
-class InvalidParameterException (message: String): RuntimeException(message){
+/**
+ * Represents the exception that occurs if current operation is not allowed for some reason.
+ * */
+class UnavailableOperationException (message: String): RuntimeException(message){
 }
