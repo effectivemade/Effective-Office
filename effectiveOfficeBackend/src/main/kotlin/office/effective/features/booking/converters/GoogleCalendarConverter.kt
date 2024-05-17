@@ -133,7 +133,8 @@ class GoogleCalendarConverter(
     }
 
     /**
-     * Converts meeting [Event] to [Booking]
+     * Converts meeting [Event] to [Booking].
+     * If participant responseStatus is declined that participant will be filtered out.
      *
      * @param event [Event] to be converted
      * @param owner specify this parameter to reduce the number
@@ -153,7 +154,7 @@ class GoogleCalendarConverter(
     ): Booking {
         logger.debug("[toMeetingWorkspaceBooking] converting calendar event to meeting room booking model")
         val organizer: String = event.organizer?.email ?: ""
-        val email = if (organizer != defaultAccount) {
+        val organizerEmail = if (organizer != defaultAccount) {
             logger.trace("[toMeetingWorkspaceBooking] organizer email derived from event.organizer field")
             organizer
         } else {
@@ -161,15 +162,17 @@ class GoogleCalendarConverter(
             event.description?.substringBefore(" ") ?: ""
         }
         val recurrence = event.recurrence?.toString()?.getRecurrence()
+        val participantModels = participants ?: getParticipantsModels(event)
 
         val booking = Booking(
-            owner = owner ?: getUserModel(email),
-            participants = participants ?: getParticipantsModels(event),
+            owner = owner ?: getUserModel(organizerEmail),
+            participants = participantModels,
             workspace = workspace ?: getWorkspaceModel(getCalendarId(event)),
             id = event.id ?: null,
             beginBooking = toLocalInstant(event.start),
             endBooking = toLocalInstant(event.end),
-            recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) }
+            recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) },
+            isDeclinedByOwner = participantModels.none { model -> model.email == organizerEmail }
         )
         logger.trace("[toMeetingWorkspaceBooking] {}", booking.toString())
         return booking
@@ -208,7 +211,7 @@ class GoogleCalendarConverter(
      */
     private fun getParticipantsModels(event: Event): List<UserModel> {
         val attendees = event.attendees
-            .filter { attendee -> !attendee.isResource }
+            .filter { attendee -> !attendee.isResource && attendee.responseStatus != "declined" }
             .map { attendee -> attendee.email }
         return userRepository.findAllByEmails(attendees)
     }
@@ -221,7 +224,8 @@ class GoogleCalendarConverter(
      * @return Calendar ID of the workspace or default value.
      */
     private fun getCalendarId(event: Event): String? {
-        return event.attendees?.firstOrNull { it?.resource ?: false }
+        return event.attendees
+            ?.firstOrNull { it?.resource == true }
             ?.email
     }
 

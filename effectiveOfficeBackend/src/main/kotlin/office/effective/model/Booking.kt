@@ -10,5 +10,6 @@ data class Booking (
     var beginBooking: Instant,
     var endBooking: Instant,
     var recurrence: RecurrenceModel?,
-    val recurringBookingId: String? = null
+    val recurringBookingId: String? = null,
+    val isDeclinedByOwner: Boolean = false
 )

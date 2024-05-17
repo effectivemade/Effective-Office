@@ -1,19 +1,19 @@
 package office.effective.features.booking.repository
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
-import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.Event
+import kotlinx.coroutines.delay
 import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
 import office.effective.common.exception.WorkspaceUnavailableException
-import office.effective.features.calendar.repository.CalendarIdsRepository
 import office.effective.features.booking.converters.GoogleCalendarConverter
 import office.effective.features.booking.converters.toGoogleDateTime
+import office.effective.features.calendar.repository.CalendarIdsRepository
+import office.effective.features.user.repository.UserEntity
 import office.effective.features.user.repository.UserRepository
 import office.effective.model.Booking
-import office.effective.features.user.repository.UserEntity
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
@@ -85,8 +85,32 @@ class BookingMeetingRepository(
      */
     override fun findById(bookingId: String): Booking? {
         logger.debug("[findById] retrieving a booking with id={}", bookingId)
-        val event: Event? = findByCalendarIdAndBookingId(bookingId)
-        return event?.let { googleCalendarConverter.toMeetingWorkspaceBooking(it) }
+        val calendars: List<String> = calendarIdsRepository.findAllCalendarsId()
+
+        val futures = calendars.map { calendarId ->
+            findEventAsync(bookingId, calendarId)
+        }
+
+        val event: Event?  = CompletableFuture.allOf(*futures.toTypedArray())
+            .thenApply {
+                futures.map { it.get() }
+            }
+            .join()
+            .find { it != null }
+
+        if (event != null) {
+            val booking = googleCalendarConverter.toMeetingWorkspaceBooking(event)
+            if (!booking.isDeclinedByOwner) {
+                return booking
+            }
+        }
+        return null
+    }
+
+    private fun findEventAsync(eventId: String, calendarId: String): CompletableFuture<Event> {
+        return CompletableFuture.supplyAsync {
+            findByCalendarIdAndBookingId(eventId, calendarId)
+        }
     }
 
     /**
@@ -161,7 +185,7 @@ class BookingMeetingRepository(
         val eventsWithWorkspace = basicQuery(eventRangeFrom, eventRangeTo, returnInstances, workspaceCalendarId)
             .execute().items
 
-        return eventsWithWorkspace.toList().map { googleCalendarConverter.toMeetingWorkspaceBooking(it) }
+        return filterAndConvertToBookings(eventsWithWorkspace)
     }
 
     /**
@@ -280,15 +304,8 @@ class BookingMeetingRepository(
 
         val eventsWithUser = getEventsWithQParam(calendars, userEmail, returnInstances, eventRangeFrom, eventRangeTo)
 
-        val result = mutableListOf<Booking>()
-        for (event in eventsWithUser) {
-            if (checkEventOrganizer(event, userEmail)) {
-                result.add(googleCalendarConverter.toMeetingWorkspaceBooking(event))
-            } else {
-                logger.trace("[findAllByOwnerId] filtered out event: {}", event)
-            }
-        }
-        return result
+        val additionalFilter: (Event) -> Boolean = { event -> checkEventOrganizer(event, userEmail) }
+        return filterAndConvertToBookings(eventsWithUser, additionalFilter)
     }
 
     /**
@@ -323,16 +340,8 @@ class BookingMeetingRepository(
             .setQ(userEmail)
             .execute().items
 
-        val result = mutableListOf<Booking>()
-        for (event in eventsWithUserAndWorkspace) {
-            if (checkEventOrganizer(event, userEmail)) {
-                result.add(googleCalendarConverter.toMeetingWorkspaceBooking(event))
-            }  else {
-                logger.trace("[findAllByOwnerAndWorkspaceId] filtered out event: {}", event)
-            }
-        }
-
-        return result
+        val additionalFilter: (Event) -> Boolean = { event -> checkEventOrganizer(event, userEmail) }
+        return filterAndConvertToBookings(eventsWithUserAndWorkspace, additionalFilter)
     }
 
     /**
@@ -352,7 +361,35 @@ class BookingMeetingRepository(
         )
         val calendars: List<String> = calendarIdsRepository.findAllCalendarsId()
         val events: List<Event> = getAllEvents(calendars, returnInstances, eventRangeFrom, eventRangeTo)
-        return events.map { googleCalendarConverter.toMeetingWorkspaceBooking(it) }
+
+        val result: MutableList<Booking> = mutableListOf()
+        for (event in events) {
+            val booking = googleCalendarConverter.toMeetingWorkspaceBooking(event)
+            if (!booking.isDeclinedByOwner) {
+                result.add(booking)
+            }
+        }
+        return filterAndConvertToBookings(events)
+    }
+
+    private fun filterAndConvertToBookings(
+        events: List<Event>,
+        additionalFilter: (Event) -> Boolean = { true }
+    ): List<Booking> {
+        val result = mutableListOf<Booking>()
+        for (event in events) {
+            if (additionalFilter(event)) {
+                val booking = googleCalendarConverter.toMeetingWorkspaceBooking(event)
+                if (!booking.isDeclinedByOwner) {
+                    result.add(googleCalendarConverter.toMeetingWorkspaceBooking(event))
+                } else {
+                    logger.trace("[filterAndConvertToBookings] filtered out event deleted by owner: {}", event)
+                }
+            }  else {
+                logger.trace("[filterAndConvertToBookings] filtered out event with wrong organizer: {}", event)
+            }
+        }
+        return result
     }
 
     /**
@@ -502,7 +539,9 @@ class BookingMeetingRepository(
             .execute().items
 
         for (event in sameTimeEvents) {
-            if (areEventsOverlap(eventToVerify, event) && eventsIsNotSame(eventToVerify, event)) {
+            if (areEventsOverlap(eventToVerify, event) &&
+                eventsIsNotSame(eventToVerify, event) &&
+                eventIsNotDeletedByOwner(event)) {
                 return true
             }
         }
@@ -556,5 +595,24 @@ class BookingMeetingRepository(
                     firstEvent.recurringEventId != secondEvent.recurringEventId
         }
         return firstEvent.id != secondEvent.id && eventsDoNotBelongToSameRecurringEvent
+    }
+
+    private fun eventIsNotDeletedByOwner(event: Event): Boolean {
+        val organiserEmail = findOrganiser(event)
+        for (attendee in event.attendees) {
+            if (attendee.email == organiserEmail && attendee.responseStatus == "declined") {
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun findOrganiser(event: Event): String {
+        val organizer: String = event.organizer?.email ?: ""
+        return if (organizer != BookingConstants.DEFAULT_CALENDAR) {
+            organizer
+        } else {
+            event.description?.substringBefore(" ") ?: ""
+        }
     }
 }
