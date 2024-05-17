@@ -214,7 +214,7 @@ class BookingRepository(private val database: Database,
      */
     fun update(booking: Booking): Booking {
         booking.id?.let {
-            if(!existsById(it))
+            if (!existsById(it))
                 throw InstanceNotFoundException(WorkspaceBookingEntity::class, "Booking with id $it not wound")
         }
 

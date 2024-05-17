@@ -28,7 +28,7 @@ fun Route.workspaceRouting() {
             val freeFrom: String? = call.request.queryParameters["free_from"]
             val freeUntil: String? = call.request.queryParameters["free_until"]
 
-            if(freeFrom == null && freeUntil == null) {
+            if (freeFrom == null && freeUntil == null) {
                 call.respond(facade.findAllByTag(tag))
             } else {
                 val fromLong: Long = if (freeFrom==null) 0

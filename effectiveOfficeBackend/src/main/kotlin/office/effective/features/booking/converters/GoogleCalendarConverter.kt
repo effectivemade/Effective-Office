@@ -171,14 +171,12 @@ class GoogleCalendarConverter(
 
     private fun extractOrganizerEmailFromMeetingEvent(event: Event): String? {
         val organizerFromEvent: String? = event.organizer?.email
-        val organizerFromDescription : String? = event.description?.substringBefore(" ")
-        if(organizerFromEvent == defaultAccount || organizerFromEvent == null) {
-            if(organizerFromDescription == null) {
+        val organizerFromDescription: String? = event.description?.substringBefore(" ")
+        if (organizerFromEvent == defaultAccount || organizerFromEvent == null) {
+            if (organizerFromDescription == null) {
                 return null
-            }
-            else return organizerFromDescription
-        }
-        else return organizerFromEvent
+            } else return organizerFromDescription
+        } else return organizerFromEvent
 
 
 //        val organizer: String? = event.organizer?.email ?: "";
@@ -201,7 +199,9 @@ class GoogleCalendarConverter(
      * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
      */
     private fun getUserModel(email: String?): UserModel? {
-        if(email == null) {return null}
+        if (email == null) {
+            return null
+        }
         val userModel: UserModel = userRepository.findByEmail(email)
             ?: run {
                 logger.warn("[getUserModel] can't find a user with email ${email}. Creating placeholder.")
@@ -270,7 +270,7 @@ class GoogleCalendarConverter(
      */
     fun toGoogleWorkspaceRegularEvent(model: Booking): Event {
         logger.debug("[toGoogleWorkspaceRegularEvent] converting regular workspace booking to calendar event")
-        if(model.owner == null) {
+        if (model.owner == null) {
             throw InvalidParameterException("[toGoogleWorkspaceRegularEvent] Cannot create regular event without organizer.")
         }
         val event = Event().apply {

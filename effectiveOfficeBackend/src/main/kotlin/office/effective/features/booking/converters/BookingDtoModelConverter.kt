@@ -44,7 +44,7 @@ class BookingDtoModelConverter(
     fun modelToDto(booking: Booking): BookingDTO {
         logger.trace("Converting booking model to dto")
         var recurrenceDTO : RecurrenceDTO? = null
-        if(booking.recurrence != null) {
+        if (booking.recurrence != null) {
             recurrenceDTO = RecurrenceConverter.modelToDto(booking.recurrence!!)
         }
         return BookingDTO(
@@ -105,7 +105,7 @@ class BookingDtoModelConverter(
     fun dtoToModel(bookingDTO: BookingDTO): Booking {
         logger.trace("Converting booking dto to model")
         var recurrenceModel : RecurrenceModel? = null
-        if(bookingDTO.recurrence != null) {
+        if (bookingDTO.recurrence != null) {
             recurrenceModel = RecurrenceConverter.dtoToModel(bookingDTO.recurrence)
         }
         return Booking(
