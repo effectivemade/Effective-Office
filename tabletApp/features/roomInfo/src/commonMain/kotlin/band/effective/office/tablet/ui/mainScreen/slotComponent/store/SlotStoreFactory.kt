@@ -57,7 +57,7 @@ class SlotStoreFactory(
     @RequiresApi(Build.VERSION_CODES.N)
     @OptIn(ExperimentalMviKotlinApi::class)
     private fun bootstrapper() = coroutineBootstrapper<Action> {
-        updateTimer.init(this, 15.minutes) {
+        updateTimer.init(this, 5.minutes) {
             withContext(Dispatchers.Main) {
                 dispatch(Action.UpdateSlots(getUiSlots(roomInfoUseCase.getRoom(roomName()))))
             }
