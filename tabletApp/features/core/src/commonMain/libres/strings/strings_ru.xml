@@ -14,5 +14,4 @@
     <string name="selectbox_organizer_title">Выберите организатора</string>
     <string name="timepicker_view_title"> Занять с </string>
     <string name="apply_date_time_for_booking"> Подтвердить </string>
-    <string name="loading_slot">Слот загружается</string>
 </resources>
