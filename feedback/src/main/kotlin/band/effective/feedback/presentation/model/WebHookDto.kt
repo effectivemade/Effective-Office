@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class WebHookDto(
     val text: String,
     val user_name: String,
-    val post_id: String,
+    val post_id: String = "",
 )

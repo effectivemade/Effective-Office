@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.ktor.server.logback)
     implementation(libs.ktor.server.contentNegotiation)
 
+
     implementation(libs.koin.core)
     implementation(libs.koin.ktor)
 
