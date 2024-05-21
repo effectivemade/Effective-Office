@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Slot
-import band.effective.office.tablet.ui.bookingComponents.pickerDateTime.DateTimePickerComponent
+import band.effective.office.tablet.ui.pickerDateTime.DateTimePickerComponent
 import band.effective.office.tablet.ui.modal.ModalWindow
 import band.effective.office.tablet.ui.updateEvent.store.UpdateEventStore
 import band.effective.office.tablet.ui.updateEvent.store.UpdateEventStoreFactory
@@ -55,7 +55,10 @@ class UpdateEventComponent(
             storeFactory = storeFactory,
             onSelectDate = { store.accept(UpdateEventStore.Intent.OnSetDate(it)) },
             onCloseRequest = { store.accept(UpdateEventStore.Intent.OnCloseSelectDateDialog) },
-            initDate = { state.value.date }
+            initDate = { state.value.date },
+            event = state.value.event,
+            room = room,
+            duration = state.value.duration
         )
     }
 

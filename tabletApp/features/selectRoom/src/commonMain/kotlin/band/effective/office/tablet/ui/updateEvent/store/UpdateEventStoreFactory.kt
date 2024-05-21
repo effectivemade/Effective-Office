@@ -64,10 +64,13 @@ class UpdateEventStoreFactory(
             val newDate: Calendar,
             val newDuration: Int,
             val newOrganizer: Organizer,
-            val enableButton: Boolean
         ) : Message
+
+        data class EnableButton(val isEnable: Boolean) : Message
+        data class BusyEvent(val isBusy: Boolean) : Message
         object LoadUpdate : Message
         object FailUpdate : Message
+        data class InputError(val isError: Boolean) : Message
         data class Input(val newInput: String, val newList: List<Organizer>) : Message
         data class UpdateOrganizer(val newValue: Organizer) : Message
         data class ChangeShowSelectDateModal(val newValue: Boolean) : Message
@@ -87,11 +90,15 @@ class UpdateEventStoreFactory(
             when (intent) {
                 is UpdateEventStore.Intent.OnDeleteEvent -> cancel(state)
                 is UpdateEventStore.Intent.OnExpandedChange -> dispatch(Message.ExpandedChange(!state.expanded))
-                is UpdateEventStore.Intent.OnSelectOrganizer -> dispatch(
-                    Message.UpdateOrganizer(
-                        intent.newOrganizer
+                is UpdateEventStore.Intent.OnSelectOrganizer -> {
+                    dispatch(
+                        Message.UpdateOrganizer(
+                            intent.newOrganizer
+                        ),
                     )
-                )
+                    dispatch(Message.InputError(isError = false))
+                    checkEnableButton(inputError = false, state.isBusyEvent)
+                }
 
                 is UpdateEventStore.Intent.OnUpdateDate -> updateInfo(
                     state = state,
@@ -187,9 +194,9 @@ class UpdateEventStoreFactory(
                     newDate = newDate,
                     newDuration = state.duration,
                     newOrganizer = state.selectOrganizer,
-                    enableButton = busyEvent.isEmpty()
                 )
             )
+            dispatch(Message.BusyEvent(isBusy = busyEvent.isNotEmpty()))
         }
 
         fun cancel(state: UpdateEventStore.State) {
@@ -203,10 +210,16 @@ class UpdateEventStoreFactory(
 
         fun onDone(state: UpdateEventStore.State) {
             val input = state.inputText.lowercase()
+            val defaultOrganizerId = ""
             val organizer =
                 state.selectOrganizers.firstOrNull { it.fullName.lowercase().contains(input) }
                     ?: state.event.organizer
             dispatch(Message.UpdateOrganizer(organizer))
+            dispatch(Message.InputError(organizer.id == defaultOrganizerId))
+            checkEnableButton(
+                inputError = organizer.id == defaultOrganizerId,
+                busyEvent = state.isBusyEvent
+            )
         }
 
         fun onInput(input: String, state: UpdateEventStore.State) {
@@ -250,10 +263,24 @@ class UpdateEventStoreFactory(
                         newDate = newDate,
                         newDuration = newDuration,
                         newOrganizer = newOrganizer,
-                        enableButton = busyEvent.isEmpty()
                     )
                 )
+                dispatch(Message.BusyEvent(busyEvent.isNotEmpty()))
+                checkEnableButton(state.isInputError, busyEvent.isNotEmpty() )
             }
+        }
+
+        private fun checkEnableButton(
+            inputError: Boolean,
+            busyEvent: Boolean
+        ){
+            if(!inputError && !busyEvent) {
+                dispatch(Message.EnableButton(isEnable = true))
+            }
+            else {
+                dispatch(Message.EnableButton(isEnable = false))
+            }
+
         }
 
         private fun today() = GregorianCalendar().apply {
@@ -291,17 +318,19 @@ class UpdateEventStoreFactory(
                     date = msg.newDate,
                     duration = msg.newDuration,
                     selectOrganizer = msg.newOrganizer,
-                    enableUpdateButton = msg.enableButton,
                     event = msg.event(event.id)
                 )
                 is Message.FailUpdate -> copy(isErrorUpdate = true, isLoadUpdate = false)
                 is Message.LoadUpdate -> copy(isErrorUpdate = false, isLoadUpdate = true)
+                is Message.InputError -> copy(isInputError = msg.isError)
                 is Message.Input -> copy(inputText = msg.newInput, selectOrganizers = msg.newList)
                 is Message.UpdateOrganizer -> copy(
                     selectOrganizer = msg.newValue,
                     inputText = msg.newValue.fullName,
                 )
                 is Message.ChangeShowSelectDateModal -> copy(showSelectDate = msg.newValue)
+                is Message.EnableButton -> copy(enableUpdateButton = msg.isEnable)
+                is Message.BusyEvent -> copy(isBusyEvent = msg.isBusy)
             }
 
         private fun Message.UpdateInformation.event(id: String): EventInfo {

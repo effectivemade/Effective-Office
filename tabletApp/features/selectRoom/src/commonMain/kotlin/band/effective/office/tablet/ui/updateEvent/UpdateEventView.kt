@@ -27,7 +27,7 @@ import band.effective.office.tablet.features.selectRoom.MainRes
 import band.effective.office.tablet.ui.bookingComponents.DateTimeView
 import band.effective.office.tablet.ui.bookingComponents.EventDurationView
 import band.effective.office.tablet.ui.bookingComponents.EventOrganizerView
-import band.effective.office.tablet.ui.bookingComponents.pickerDateTime.DateTimePickerModalView
+import band.effective.office.tablet.ui.pickerDateTime.DateTimePickerModalView
 import band.effective.office.tablet.ui.buttons.alert.AlertButton
 import band.effective.office.tablet.ui.buttons.success.SuccessButton
 import band.effective.office.tablet.ui.common.CrossButtonView
@@ -107,6 +107,7 @@ fun UpdateEventView(
                         onDeleteEvent = { component.sendIntent(UpdateEventStore.Intent.OnDeleteEvent) },
                         inputText = state.inputText,
                         onInput = { component.sendIntent(UpdateEventStore.Intent.OnInput(it)) },
+                        isInputError = state.isInputError,
                         onDoneInput = { component.sendIntent(UpdateEventStore.Intent.OnDoneInput) },
                         isUpdateError = state.isErrorUpdate,
                         isUpdateLoad = state.isLoadUpdate,
@@ -152,6 +153,7 @@ fun UpdateEventView(
     onDeleteEvent: () -> Unit,
     inputText: String,
     onInput: (String) -> Unit,
+    isInputError: Boolean,
     onDoneInput: (String) -> Unit,
     isUpdateError: Boolean,
     isUpdateLoad: Boolean,
@@ -201,6 +203,7 @@ fun UpdateEventView(
                 onExpandedChange = onExpandedChange,
                 onSelectItem = onSelectOrganizer,
                 onInput = onInput,
+                isInputError = isInputError,
                 onDoneInput = onDoneInput,
                 inputText = inputText
             )

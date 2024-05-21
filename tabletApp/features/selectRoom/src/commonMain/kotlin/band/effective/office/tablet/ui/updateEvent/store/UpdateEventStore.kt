@@ -38,10 +38,12 @@ interface UpdateEventStore :
         val isLoadUpdate: Boolean,
         val isErrorUpdate: Boolean,
         val inputText: String,
+        val isInputError: Boolean,
         val isLoadDelete: Boolean,
         val isErrorDelete: Boolean,
         val showSelectDate: Boolean,
-        val enableUpdateButton: Boolean
+        val enableUpdateButton: Boolean,
+        val isBusyEvent: Boolean
     ) {
         companion object {
             val defaultValue = State(
@@ -55,10 +57,12 @@ interface UpdateEventStore :
                 isLoadUpdate = false,
                 isErrorUpdate = false,
                 inputText = "",
+                isInputError = false,
                 isLoadDelete = false,
                 isErrorDelete = false,
                 showSelectDate = false,
-                enableUpdateButton = true
+                enableUpdateButton = false,
+                isBusyEvent = false
             )
         }
 
