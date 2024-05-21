@@ -24,7 +24,13 @@ fun Route.calendarNotificationsRouting() {
         post(SwaggerDocument.receiveNotification()) {
             val logger = LoggerFactory.getLogger(FcmNotificationSender::class.java)
             logger.info("[calendarNotificationsRouting] received push notification: {}", call.receive<String>())
-            messageSender.sendEmptyMessage("booking")
+            // Calendar's resource id, https://developers.google.com/calendar/api/guides/push#headers
+            val resourceId = call.request.header("X-Goog-Resource-ID")
+            if (resourceId == null) {
+                logger.warn("[calendarNotificationsRouting] resource id header was null")
+                return@post call.respond(HttpStatusCode.OK)
+            }
+            messageSender.sendUpdateContentMessages("booking", resourceId)
             call.respond(HttpStatusCode.OK)
         }
     }

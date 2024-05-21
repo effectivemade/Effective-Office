@@ -1,21 +1,37 @@
 package office.effective.common.notifications
 
+import com.google.firebase.messaging.BatchResponse
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import office.effective.dto.BookingDTO
-import office.effective.dto.UserDTO
-import office.effective.dto.WorkspaceDTO
+import office.effective.common.constants.BookingConstants
+import office.effective.dto.*
+import office.effective.features.calendar.repository.CalendarIdsRepository
+import office.effective.serviceapi.IBookingService
 import org.slf4j.LoggerFactory
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.UUID
 
 /**
  * Class for sending Firebase cloud messages
  */
-class FcmNotificationSender(private val fcm: FirebaseMessaging): INotificationSender {
+class FcmNotificationSender(
+    private val fcm: FirebaseMessaging,
+    private val calendarIdsRepository: CalendarIdsRepository,
+    private val bookingService: IBookingService
+): INotificationSender {
     private val logger = LoggerFactory.getLogger(FcmNotificationSender::class.java)
 
+    companion object {
+        private const val AVG_BOOKING_EVENT_SIZE = 260
+        // 196 bytes for default structure (token, message) and message id
+        private const val MAX_MESSAGE_SIZE = 3900
+        const val MAX_BOOKING_EVENTS_IN_MESSAGE = MAX_MESSAGE_SIZE / AVG_BOOKING_EVENT_SIZE
+        private const val ONE_WEEK_IN_MILLISECONDS = 7L * 24 * 60 * 60 * 1000
+    }
     /**
      * Sends empty FCM message on topic
      *
@@ -28,6 +44,58 @@ class FcmNotificationSender(private val fcm: FirebaseMessaging): INotificationSe
             .putData("message", "$topic was changed")
             .build()
         fcm.send(msg)
+    }
+    
+    override fun sendUpdateContentMessages(topic: String, resourceId: String) {
+        logger.info("[fcmNotificationSender] Received update on {} calendar id", resourceId)
+        val workspace = calendarIdsRepository.findWorkspaceById(resourceId)
+        if (workspace.tag != "meeting") return
+        
+        val startTime = ZonedDateTime
+            .now(ZoneId.of(BookingConstants.DEFAULT_TIMEZONE_ID))
+            .toEpochSecond() * 1000
+        val endTime = startTime + ONE_WEEK_IN_MILLISECONDS
+        
+        val bookings = bookingService.findAll(
+            workspaceId = workspace.id,
+            bookingRangeFrom = startTime,
+            bookingRangeTo = endTime
+        )
+        
+        if (bookings.isEmpty()) {
+            logger.info("[fcmNotificationSender] Bookings on 1 week from now for {} workspace were empty", workspace.name)
+            return
+        }
+        
+        val messageId = UUID.randomUUID().toString()
+        val messageBatches = bookings.chunked(MAX_BOOKING_EVENTS_IN_MESSAGE) { bookingList ->
+            val fcmWorkspace = FcmWorkspaceWithBookingsDTOModelConverter
+                .fromModelsToDTO(workspace, bookingList)
+            
+            val json = Json.encodeToString(fcmWorkspace)
+
+            Message.builder()
+                .setTopic(topic)
+                .putData("id", messageId)
+                .putData("object", json)
+                .build()
+        }
+        
+        val batchResponse = fcm.sendAll(messageBatches)
+        handleFcmResponses(batchResponse)
+    }
+    
+    private fun handleFcmResponses(batchResponse: BatchResponse) {
+        for (response in batchResponse.responses) {
+            if (!response.isSuccessful) {
+                logger.error("[fcmNotificationSender] Message was not successfully delivered, exception: {}, error code: {}",
+                    response.exception.message, response.exception.errorCode
+                )
+            }
+        }
+        logger.info("[fcmNotificationSender] {} messages have been sent, {} of them successful, {} - failures",
+            batchResponse.responses.size, batchResponse.successCount, batchResponse.failureCount
+        )
     }
 
     /**

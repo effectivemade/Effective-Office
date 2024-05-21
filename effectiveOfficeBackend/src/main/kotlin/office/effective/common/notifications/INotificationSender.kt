@@ -16,6 +16,8 @@ interface INotificationSender {
      * @author Daniil Zavyalov
      */
     fun sendEmptyMessage(topic: String)
+    
+    fun sendUpdateContentMessages(topic: String, resourceId: String)
 
     /**
      * Sends message about workspace modification
