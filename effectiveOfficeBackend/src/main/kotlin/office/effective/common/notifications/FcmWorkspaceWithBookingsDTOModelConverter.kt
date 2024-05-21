@@ -7,7 +7,18 @@ import office.effective.model.Booking
 import office.effective.model.UserModel
 import office.effective.model.Workspace
 
+/**
+ * Converts the [Workspace] and list of its [Booking]
+ * to [FcmWorkspaceWithBookingsDTO]
+ */
 object FcmWorkspaceWithBookingsDTOModelConverter {
+    /**
+     * Converts the [Workspace] and list of its [Booking]
+     * to [FcmWorkspaceWithBookingsDTO]
+     * @param workspace [Workspace] changed workspace
+     * @param bookings booking of workspace
+     * @return @return resulting [FcmWorkspaceWithBookingsDTO] object
+     */
     fun fromModelsToDTO(workspace: Workspace, bookings: List<Booking>): FcmWorkspaceWithBookingsDTO {
         return FcmWorkspaceWithBookingsDTO(
             id = workspace.id.toString(),

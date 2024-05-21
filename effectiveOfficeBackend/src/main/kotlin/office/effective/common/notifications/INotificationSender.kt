@@ -16,7 +16,13 @@ interface INotificationSender {
      * @author Daniil Zavyalov
      */
     fun sendEmptyMessage(topic: String)
-    
+
+    /**
+     * Sends messages with workspace and bookings in it
+     * for the modified workspace to specified topic
+     * @param topic topic to which the messages will be sent
+     * @param resourceId google calendar's id of workspace
+     */
     fun sendUpdateContentMessages(topic: String, resourceId: String)
 
     /**
