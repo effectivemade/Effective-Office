@@ -250,6 +250,7 @@ class SlotStoreFactory(
                     val newSlot = SlotUi.LoadingSlot(slot)
                     val list = allSlots.toMutableList()
                     list.add(newSlot)
+                    list.sortBy { it.slot.start }
                     dispatch(Message.UpdateSlots(list))
                 }
             }
