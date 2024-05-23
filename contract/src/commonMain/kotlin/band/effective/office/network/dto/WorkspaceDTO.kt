@@ -8,5 +8,6 @@ data class WorkspaceDTO(
     val name: String,
     val utilities: List<UtilityDTO>,
     val zone: WorkspaceZoneDTO? = null,
-    val tag: String
+    val tag: String,
+    val bookings: List<BookingResponseDTO>? = null
 )
