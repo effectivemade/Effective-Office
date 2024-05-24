@@ -18,6 +18,7 @@ sealed interface SlotUi {
     ) : SlotUi
 
     data class NestedSlot(override val slot: Slot) : SlotUi
+    data class LoadingSlot(override val slot: Slot) : SlotUi
 }
 
 

@@ -15,7 +15,7 @@ class SlotComponent(
     private val componentContext: ComponentContext,
     storeFactory: StoreFactory,
     val roomName: () -> String,
-    openBookingDialog: (event: EventInfo, room: String) -> Unit
+    openBookingDialog: (event: EventInfo, room: String) -> Unit,
 ) : ComponentContext by componentContext, KoinComponent {
     @RequiresApi(Build.VERSION_CODES.N)
     private val store = SlotStoreFactory(storeFactory, roomName, openBookingDialog).create()

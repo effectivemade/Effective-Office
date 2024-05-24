@@ -1,6 +1,7 @@
 package band.effective.office.tablet.ui.mainScreen.mainScreen.store
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.ErrorWithData

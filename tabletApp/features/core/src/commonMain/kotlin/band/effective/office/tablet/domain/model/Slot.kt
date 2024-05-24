@@ -23,4 +23,10 @@ sealed class Slot {
         override val finish: Calendar,
         val events: List<EventSlot>
     ) : Slot()
+
+    data class LoadingEventSlot(
+        override val start: Calendar,
+        override val finish: Calendar,
+        val eventInfo: EventInfo
+    ) : Slot()
 }
