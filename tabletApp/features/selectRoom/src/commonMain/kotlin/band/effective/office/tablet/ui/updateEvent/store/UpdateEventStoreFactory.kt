@@ -249,6 +249,7 @@ class UpdateEventStoreFactory(
             val newDuration = state.duration + changeDuration
             val newOrganizer = state.organizers.firstOrNull { it.fullName == newOrg.fullName }
                 ?: state.event.organizer
+            val defaultOrganizerId = ""
             val busyEvent: List<EventInfo> = checkBookingUseCase.busyEvents(
                 event = state.copy(
                     date = newDate,
@@ -266,7 +267,10 @@ class UpdateEventStoreFactory(
                     )
                 )
                 dispatch(Message.BusyEvent(busyEvent.isNotEmpty()))
-                checkEnableButton(state.isInputError, busyEvent.isNotEmpty() )
+                checkEnableButton(
+                    inputError = newOrganizer.id == defaultOrganizerId,
+                    busyEvent = busyEvent.isNotEmpty()
+                )
             }
         }
 
