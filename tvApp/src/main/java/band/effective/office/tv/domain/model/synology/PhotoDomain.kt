@@ -7,13 +7,15 @@ import band.effective.office.tv.network.synology.models.response.SynologyPhotoSA
 import java.net.URLEncoder
 
 data class PhotoDomain(
-    val photoThumb: String
+    val photoThumb: String,
+    val filename: String,
 )
 
 fun SynologyListResponse.toDomain(sid: String) =
     data.files.map {
         PhotoDomain(
-            photoThumb = formThumbPhoto(it.path, sid)
+            photoThumb = formThumbPhoto(it.path, sid),
+            filename = it.name
         )
     }
 
@@ -31,7 +33,8 @@ fun SynologyPhotoSAlbumsResponse.toDomain(sid: String) =
                 cacheKey = photoInfo.additional.thumbnail.cacheKey,
                 sid = sid,
                 size = size
-            )
+            ),
+            filename = photoInfo.filename
         )
     }
 
@@ -49,7 +52,8 @@ fun List<PhotoInfo>.toDomain(sid: String) =
                 cacheKey = photoInfo.additional.thumbnail.cacheKey,
                 sid = sid,
                 size = size
-            )
+            ),
+            filename = photoInfo.filename
         )
     }
 fun formThumbPhoto(photoPath: String, sid: String): String {

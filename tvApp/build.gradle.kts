@@ -8,6 +8,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.devtools.ksp").version("1.9.20-1.0.14")
     alias(libs.plugins.hilt)
+    id(libs.plugins.google.services.gms.get().pluginId)
 }
 
 val localProperties = Properties()
@@ -110,6 +111,9 @@ dependencies {
 
     //notion
     implementation(libs.notion)
+
+    //analytics
+    implementation(libs.firebase.analytics)
 
     //test
     testImplementation (libs.junit)

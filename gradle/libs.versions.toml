@@ -40,6 +40,7 @@ essenty = "1.1.0"
 logback = "1.2.11"
 shadow = "7.1.2"
 gms = "20.4.0"
+analytics-gms = "4.4.1"
 
 [libraries]
 avif-coder-coil = { module = "com.github.awxkee:avif-coder-coil", version.ref = "avifCoderCoil" }
@@ -103,6 +104,7 @@ plugin-kotlin = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.r
 junit = {module = "junit:junit", version.ref = "junit-ver"}
 androidJunit = {module = "androidx.test.ext:junit", version.ref = "androidJunit-ver"}
 espresso = {module = "androidx.test.espresso:espresso-core", version.ref = "espresso-ver"}
+firebase-analytics = {module = "com.google.firebase:firebase-analytics", version = "22.0.0"}
 
 [plugins]
 kapt = {id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin"}
@@ -117,6 +119,7 @@ parcelize = {id = "org.jetbrains.kotlin.plugin.parcelize"}
 android = {id = "com.android.application"}
 shadow = {id = "com.github.johnrengelman.shadow"}
 kotlin = {id = "org.jetbrains.kotlin.multiplatform"}
+google-services-gms = {id = "com.google.gms.google-services", version.ref = "analytics-gms"}
 
 [bundles]
 android-core = ["androdx-appCompat", "androidx-activityCompose", "compose-uiTooling", "androdx-activityKtx", "compose-material", "kotlinx-coroutines-android"]
