@@ -6,10 +6,10 @@ import dev.icerock.moko.resources.compose.fontFamilyResource
 
 @Composable
 internal fun getDefaultFont(): FontFamily {
-    return fontFamilyResource(MainRes.fonts.Roboto.regular)
+    return fontFamilyResource(MainRes.fonts.roboto_regular)
 }
 
 @Composable
 internal fun getPromoFont(): FontFamily {
-    return fontFamilyResource(MainRes.fonts.Museocyrl.bold)
+    return fontFamilyResource(MainRes.fonts.museocyrl_bold)
 }

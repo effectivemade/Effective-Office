@@ -62,7 +62,7 @@ object Plugins {
     }
 
     object Moko {
-        const val implementation = "dev.icerock.moko:resources-generator:0.23.0"
+        const val implementation = "dev.icerock.moko:resources-generator:0.24.0-beta-5"
         const val plugin = "dev.icerock.mobile.multiplatform-resources"
     }
 
