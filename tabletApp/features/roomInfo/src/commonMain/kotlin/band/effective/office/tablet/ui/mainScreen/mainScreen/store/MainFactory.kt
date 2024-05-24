@@ -1,7 +1,6 @@
 package band.effective.office.tablet.ui.mainScreen.mainScreen.store
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.ErrorWithData
@@ -138,7 +137,9 @@ class MainFactory(
         override fun executeIntent(intent: MainStore.Intent, getState: () -> MainStore.State) {
             when (intent) {
                 is MainStore.Intent.OnOpenFreeRoomModal ->
-                    navigate(MainComponent.ModalWindowsConfig.FreeRoom(getState().run { roomList[indexSelectRoom].currentEvent!! }))
+                    navigate(MainComponent.ModalWindowsConfig.FreeRoom(
+                        getState().run { roomList[indexSelectRoom].currentEvent!! }
+                    ))
 
                 is MainStore.Intent.RebootRequest -> reboot(state = getState(), refresh = true)
                 is MainStore.Intent.OnChangeEventRequest -> navigate(
@@ -190,6 +191,12 @@ class MainFactory(
                             intent.updateInDays
                         )
                     }
+
+                    val newDateWithoutTime = removeTimeFromCalendar(newDate.clone() as Calendar)
+                    val currentDateWithoutTime = removeTimeFromCalendar(Calendar.getInstance())
+
+                    if (newDateWithoutTime.before(currentDateWithoutTime)) return
+
                     dispatch(Message.UpdateDate(newDate))
                     updateDate(newDate)
                 }
@@ -198,6 +205,15 @@ class MainFactory(
                     updateDate(GregorianCalendar())
                     dispatch(Message.UpdateDate(GregorianCalendar()))
                 }
+            }
+        }
+
+        private fun removeTimeFromCalendar(calendar: Calendar): Calendar {
+            return calendar.apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
             }
         }
 

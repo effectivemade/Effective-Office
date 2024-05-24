@@ -1,6 +1,5 @@
 package band.effective.office.tablet.ui.updateEvent.store
 
-import androidx.compose.ui.graphics.Color
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
@@ -118,9 +117,7 @@ class UpdateEventStoreFactory(
                 )
 
                 is UpdateEventStore.Intent.OnOpenSelectDateDialog -> dispatch(
-                    Message.ChangeShowSelectDateModal(
-                        true
-                    )
+                    Message.ChangeShowSelectDateModal(true)
                 )
 
                 is UpdateEventStore.Intent.OnSetDate -> setDay(
@@ -134,7 +131,6 @@ class UpdateEventStoreFactory(
         }
 
         fun createEvent(state: UpdateEventStore.State) {
-
             val event = EventInfo(
                 startTime = state.date,
                 organizer = state.selectOrganizer,
@@ -147,7 +143,6 @@ class UpdateEventStoreFactory(
                 id = ""
             )
             scope.launch {
-
                 if ((checkBookingUseCase.busyEvents(
                         event = event,
                         room = room
@@ -266,21 +261,15 @@ class UpdateEventStoreFactory(
                     )
                 )
                 dispatch(Message.BusyEvent(busyEvent.isNotEmpty()))
-                checkEnableButton(state.isInputError, busyEvent.isNotEmpty() )
+                checkEnableButton(state.isInputError, busyEvent.isNotEmpty())
             }
         }
 
         private fun checkEnableButton(
             inputError: Boolean,
             busyEvent: Boolean
-        ){
-            if(!inputError && !busyEvent) {
-                dispatch(Message.EnableButton(isEnable = true))
-            }
-            else {
-                dispatch(Message.EnableButton(isEnable = false))
-            }
-
+        ) {
+            dispatch(Message.EnableButton(isEnable = !inputError && !busyEvent))
         }
 
         private fun today() = GregorianCalendar().apply {

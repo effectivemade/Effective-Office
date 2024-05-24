@@ -94,7 +94,7 @@ class MainComponent(
                 event = modalWindows.event,
                 room = modalWindows.room,
                 onDelete = { slot ->
-                    slotComponent.sendIntent(SlotStore.Intent.Delete(slot, {
+                    slotComponent.sendIntent(SlotStore.Intent.Delete(slot) {
                         CoroutineScope(Dispatchers.IO).launch {
                             (slot as? Slot.EventSlot)?.eventInfo?.apply {
                                 deleteCachedEventUseCase(
@@ -104,12 +104,20 @@ class MainComponent(
                                 cancelUseCase(this)
                             }
                         }
-                    }))
+                    })
 
                 },
                 onCloseRequest = { closeModalWindow() },
                 onTempLoading = {
-                    slotComponent.sendIntent(SlotStore.Intent.Loading(Slot.LoadingEventSlot(start = it.startTime, finish = it.finishTime, it)))
+                    slotComponent.sendIntent(
+                        SlotStore.Intent.Loading(
+                            Slot.LoadingEventSlot(
+                                start = it.startTime,
+                                finish = it.finishTime,
+                                it
+                            )
+                        )
+                    )
                 }
             )
         }

@@ -41,7 +41,7 @@ class DateTimePickerStoreFactory(
 
     private sealed interface Message {
         data class UpdateDateTime(val newValue: Calendar) : Message
-        data class EnableDateButton(val isEnabled: Boolean): Message
+        data class ChangeDateButtonState(val newState: DateTimePickerStore.DateTimeButtonState): Message
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -83,12 +83,20 @@ class DateTimePickerStoreFactory(
                 set(Calendar.MONTH, month - 1)
                 set(Calendar.DAY_OF_MONTH, dayOfMonth)
             }
+
+            if (newDate.before(Calendar.getInstance())) {
+                dispatch(Message.UpdateDateTime(newDate))
+                dispatch(Message.ChangeDateButtonState(DateTimePickerStore.DateTimeButtonState.IncorrectDate()))
+                return@launch
+            }
+
             val finishDate = (newDate.clone() as Calendar).apply {
                 add(
                     Calendar.MINUTE,
                     duration
                 )
             }
+
             dispatch(Message.UpdateDateTime(newDate))
             checkEnableDateButton(newDate, finishDate)
         }
@@ -101,12 +109,20 @@ class DateTimePickerStoreFactory(
                 set(Calendar.HOUR_OF_DAY, hour)
                 set(Calendar.MINUTE, minute)
             }
+
+            if (newDate.before(Calendar.getInstance())) {
+                dispatch(Message.UpdateDateTime(newDate))
+                dispatch(Message.ChangeDateButtonState(DateTimePickerStore.DateTimeButtonState.IncorrectDate()))
+                return@launch
+            }
+
             val finishDate = (newDate.clone() as Calendar).apply {
                 add(
                     Calendar.MINUTE,
                     duration
                 )
             }
+
             dispatch(Message.UpdateDateTime(newDate))
             checkEnableDateButton(newDate, finishDate)
         }
@@ -120,10 +136,14 @@ class DateTimePickerStoreFactory(
                 room = room
             ).unbox({ it.saveData })?.filter { it.startTime != startDate } ?: listOf()
             if (busyEvent.isNotEmpty()){
-                dispatch(Message.EnableDateButton(false))
+                dispatch(Message.ChangeDateButtonState(
+                    DateTimePickerStore.DateTimeButtonState.TimeBooked()
+                ))
             }
-            else{
-                dispatch(Message.EnableDateButton(true))
+            else {
+                dispatch(Message.ChangeDateButtonState(
+                    DateTimePickerStore.DateTimeButtonState.Enabled()
+                ))
             }
         }
 
@@ -133,7 +153,7 @@ class DateTimePickerStoreFactory(
         override fun DateTimePickerStore.State.reduce(msg: Message): DateTimePickerStore.State =
             when (msg) {
                 is Message.UpdateDateTime -> copy(currentDate = msg.newValue)
-                is Message.EnableDateButton -> copy(isEnabledButton = msg.isEnabled)
+                is Message.ChangeDateButtonState -> copy(dateTimeButtonState = msg.newState)
             }
     }
 }

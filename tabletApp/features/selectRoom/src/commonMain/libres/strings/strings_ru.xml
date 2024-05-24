@@ -22,4 +22,5 @@
     <string name="update_button">Изменить</string>
     <string name="delete_button">Удалить бронь</string>
     <string name="time_booked">Это время уже занято</string>
+    <string name="incorrect_date">Бронировать в прошлое приложение пока не умеет</string>
 </resources>

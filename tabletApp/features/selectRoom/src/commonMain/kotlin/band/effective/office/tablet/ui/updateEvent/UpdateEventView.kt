@@ -1,7 +1,6 @@
 package band.effective.office.tablet.ui.updateEvent
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -93,8 +92,8 @@ fun UpdateEventView(
                             component.sendIntent(UpdateEventStore.Intent.OnUpdateLength(-15))
                         },
                         onExpandedChange = { component.sendIntent(UpdateEventStore.Intent.OnExpandedChange) },
-                        onSelectOrganizer = {
-                            component.sendIntent(UpdateEventStore.Intent.OnSelectOrganizer(it))
+                        onSelectOrganizer = { organizer ->
+                            component.sendIntent(UpdateEventStore.Intent.OnSelectOrganizer(organizer))
                         },
                         selectData = state.date,
                         selectDuration = state.duration,
@@ -106,7 +105,7 @@ fun UpdateEventView(
                         },
                         onDeleteEvent = { component.sendIntent(UpdateEventStore.Intent.OnDeleteEvent) },
                         inputText = state.inputText,
-                        onInput = { component.sendIntent(UpdateEventStore.Intent.OnInput(it)) },
+                        onInput = { input -> component.sendIntent(UpdateEventStore.Intent.OnInput(input)) },
                         isInputError = state.isInputError,
                         onDoneInput = { component.sendIntent(UpdateEventStore.Intent.OnDoneInput) },
                         isUpdateError = state.isErrorUpdate,

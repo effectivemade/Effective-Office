@@ -91,7 +91,7 @@ fun DateTimePickerModalView(
         onChangeTime = {
             dateTimePickerComponent.sendIntent(DateTimePickerStore.Intent.OnChangeTime(it))
         },
-        enableDateButton = stateDateTime.isEnabledButton
+        dateTimeButtonState = stateDateTime.dateTimeButtonState
     )
 }
 
@@ -104,7 +104,7 @@ fun DateTimePickerModalView(
     onCloseRequest: () -> Unit,
     onChangeDate: (LocalDate) -> Unit,
     onChangeTime: (LocalTime) -> Unit,
-    enableDateButton: Boolean
+    dateTimeButtonState: DateTimePickerStore.DateTimeButtonState
 ) {
     Dialog(
         onDismissRequest = onCloseRequest,
@@ -149,15 +149,16 @@ fun DateTimePickerModalView(
                         onClick = {
                             onCloseRequest()
                         },
-                        enabled = enableDateButton,
+                        enabled = dateTimeButtonState.isEnabled,
                         colors = buttonColors(
                             containerColor = LocalCustomColorsPalette.current.pressedPrimaryButton
                         )
                     ) {
                         Text(
-                            text = when (enableDateButton) {
-                                true -> SimpleDateFormat("dd MMMM HH:mm").format(currentDate.time)
-                                false -> MainRes.string.time_booked
+                            text = when (dateTimeButtonState) {
+                                is DateTimePickerStore.DateTimeButtonState.Enabled -> SimpleDateFormat("dd MMMM HH:mm").format(currentDate.time)
+                                is DateTimePickerStore.DateTimeButtonState.TimeBooked -> MainRes.string.time_booked
+                                is DateTimePickerStore.DateTimeButtonState.IncorrectDate -> MainRes.string.incorrect_date
                             },
                             style = header8,
                             color = LocalCustomColorsPalette.current.primaryTextAndIcon,

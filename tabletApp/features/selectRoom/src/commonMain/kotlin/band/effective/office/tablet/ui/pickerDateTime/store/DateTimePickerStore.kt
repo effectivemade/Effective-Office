@@ -16,14 +16,21 @@ interface DateTimePickerStore :
 
     data class State(
         val currentDate: Calendar,
-        val isEnabledButton: Boolean
+        val dateTimeButtonState: DateTimeButtonState
     ) {
         companion object {
             val default = State(
                 currentDate = Calendar.getInstance(),
-                isEnabledButton = true
+                dateTimeButtonState = DateTimeButtonState.Enabled()
             )
         }
+    }
+
+    sealed interface DateTimeButtonState {
+        val isEnabled: Boolean
+        data class Enabled(override val isEnabled: Boolean = true) : DateTimeButtonState
+        data class TimeBooked(override val isEnabled: Boolean = false) : DateTimeButtonState
+        data class IncorrectDate(override val isEnabled: Boolean = false) : DateTimeButtonState
     }
 }
 
