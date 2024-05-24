@@ -22,7 +22,8 @@ class SlotUseCase {
         events: List<EventInfo>,
         currentEvent: EventInfo?
     ): List<Slot> {
-        return events.filter { it.startTime > start && it.startTime < finish }
+        return events
+            .filter { it.startTime in start..finish }
             .fold(
                 getEmptyMinSlots(
                     start = start,
@@ -68,8 +69,9 @@ class SlotUseCase {
     private fun MutableList<Slot>.removeEmptySlot(eventInfo: EventInfo?) {
         if (eventInfo != null) {
             removeIf { slot ->
-                slot.start > eventInfo.startTime && slot.start < eventInfo.finishTime ||
-                        eventInfo.startTime > slot.start && eventInfo.startTime < slot.finish
+                slot.start >= eventInfo.startTime && slot.start <= eventInfo.finishTime
+                        ||
+                        eventInfo.startTime >= slot.start && eventInfo.startTime < slot.finish
             }
         }
     }
