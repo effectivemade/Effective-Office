@@ -109,7 +109,6 @@ class MainComponent(
                 },
                 onCloseRequest = { closeModalWindow() },
                 onTempLoading = {
-                    //Here is loading event
                     slotComponent.sendIntent(SlotStore.Intent.Loading(Slot.LoadingEventSlot(start = it.startTime, finish = it.finishTime, it)))
                 }
             )

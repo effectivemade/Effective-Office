@@ -280,7 +280,6 @@ class SlotStoreFactory(
             is SlotUi.SimpleSlot -> slot.execute(state)
             is SlotUi.NestedSlot -> slot.execute(state)
             is SlotUi.LoadingSlot -> {
-//                Log.i("TAG", state.slots.toString())
                 slot.execute(state)
             }
         }

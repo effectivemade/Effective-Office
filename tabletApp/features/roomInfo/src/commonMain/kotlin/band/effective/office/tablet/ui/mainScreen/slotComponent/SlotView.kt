@@ -227,7 +227,7 @@ private fun LoadingSlotView(
     ) {
         Column {
             Text(
-                text = "Загрузка слота на время: ${slot.start.toFormattedString("HH:mm")} - ${slot.finish.toFormattedString("HH:mm")}", //TODO() replace this hard str
+                text = "Загрузка слота на время: ${slot.start.toFormattedString("HH:mm")} - ${slot.finish.toFormattedString("HH:mm")}",
                 style = MaterialTheme.typography.h5,
                 color = MaterialTheme.colors.onPrimary
             )

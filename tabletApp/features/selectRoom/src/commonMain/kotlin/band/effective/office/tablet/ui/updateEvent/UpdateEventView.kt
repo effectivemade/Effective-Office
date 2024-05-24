@@ -239,7 +239,6 @@ fun UpdateEventView(
                     enable = enableUpdateButton
                 ) {
                     when {
-//                        isUpdateLoad -> Loader()
                         isUpdateError -> Text(
                             text = MainRes.string.try_again,
                             style = MaterialTheme.typography.h6
