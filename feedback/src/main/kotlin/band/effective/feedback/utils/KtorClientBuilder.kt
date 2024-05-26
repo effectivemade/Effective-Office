@@ -27,6 +27,8 @@ class KtorClientBuilder {
                 isLenient = true
                 encodeDefaults = true
                 ignoreUnknownKeys = true
+                encodeDefaults = true
+              //  classDiscriminator = "classDiscriminator"
             })
         }
     }

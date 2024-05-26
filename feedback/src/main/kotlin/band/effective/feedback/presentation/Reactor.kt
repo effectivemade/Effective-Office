@@ -24,19 +24,21 @@ class Reactor(private val mattermostApi: MattermostApi) {
         }
     }
 
-    suspend inline fun <T> Result<T>.foldWithReaction(
+    suspend inline fun <T,R> Result<T>.foldWithReaction(
         dto: WebHookDto,
-        onSuccess: (T) -> Unit,
-        onFailure: (Throwable) -> Unit
+        onSuccess: (T) -> R,
+        onFailure: (Throwable) -> R
     ) =
         fold(
             onSuccess = {
-                onSuccess(it)
+                val result = onSuccess(it)
                 runCatching { makeReaction(dto, Reaction.SUCCESS) }.getOrNull()
+                result
             },
             onFailure = {
-                onFailure(it)
+                val result = onFailure(it)
                 runCatching { makeReaction(dto, Reaction.FAIL) }.getOrNull()
+                result
             }
         )
 }

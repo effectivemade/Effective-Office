@@ -8,6 +8,8 @@ object Env {
     val mattermostServer by EnvGetter("MattermostServer")
     val ydbKeyJson by EnvGetter("YdbKeyJson")
     val ydbConnectionString by EnvGetter("YdbConnectionString")
+    val myUrl by EnvGetter("URL")
+
 
     private class EnvGetter(private val key: String) {
         operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
