@@ -11,7 +11,7 @@ import office.effective.model.Workspace
  * Converts the [Workspace] and list of its [Booking]
  * to [FcmWorkspaceWithBookingsDTO]
  */
-object FcmWorkspaceWithBookingsDTOModelConverter {
+class FcmWorkspaceWithBookingsDTOModelConverter {
     /**
      * Converts the [Workspace] and list of its [Booking]
      * to [FcmWorkspaceWithBookingsDTO]

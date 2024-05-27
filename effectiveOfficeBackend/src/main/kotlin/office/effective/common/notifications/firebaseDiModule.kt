@@ -22,7 +22,11 @@ val firebaseDiModule  = module(createdAtStart = true) {
     single<FirebaseMessaging> {
         FirebaseMessaging.getInstance(get<FirebaseApp>())
     }
+    single { FcmWorkspaceWithBookingsDTOModelConverter() }
     single<INotificationSender> {
-        FcmNotificationSender(get<FirebaseMessaging>(), get<CalendarIdsRepository>(), get<IBookingService>())
+        FcmNotificationSender(
+            get<FirebaseMessaging>(), get<CalendarIdsRepository>(),
+            get<IBookingService>(), get<FcmWorkspaceWithBookingsDTOModelConverter>()
+        )
     }
 }

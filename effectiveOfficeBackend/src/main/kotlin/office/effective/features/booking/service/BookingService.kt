@@ -86,6 +86,8 @@ class BookingService(
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @param bookingRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
+     * @param shouldFindIntegrationsAndUtilities whether function should find all
+     * workspace utilities and user integrations or not
      * @throws InstanceNotFoundException if [UserModel] or [Workspace] with the given id doesn't exist in database
      * @author Daniil Zavyalov
      */
@@ -94,7 +96,8 @@ class BookingService(
         workspaceId: UUID?,
         returnInstances: Boolean,
         bookingRangeTo: Long?,
-        bookingRangeFrom: Long
+        bookingRangeFrom: Long,
+        shouldFindIntegrationsAndUtilities: Boolean
     ): List<Booking> {
         //TODO move switch-case construction to facade
         val bookingList = when {
@@ -187,7 +190,10 @@ class BookingService(
             }
         }
         if (bookingList.isEmpty()) return bookingList
-        return findIntegrationsAndUtilities(bookingList)
+        if (shouldFindIntegrationsAndUtilities) {
+            return findIntegrationsAndUtilities(bookingList)
+        }
+        return bookingList
     }
 
     /**

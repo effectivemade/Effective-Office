@@ -11,6 +11,7 @@ import office.effective.dto.*
 import office.effective.features.calendar.repository.CalendarIdsRepository
 import office.effective.serviceapi.IBookingService
 import org.slf4j.LoggerFactory
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -21,7 +22,8 @@ import java.util.UUID
 class FcmNotificationSender(
     private val fcm: FirebaseMessaging,
     private val calendarIdsRepository: CalendarIdsRepository,
-    private val bookingService: IBookingService
+    private val bookingService: IBookingService,
+    private val fcmWorkspaceConverter: FcmWorkspaceWithBookingsDTOModelConverter
 ): INotificationSender {
     private val logger = LoggerFactory.getLogger(FcmNotificationSender::class.java)
 
@@ -30,7 +32,6 @@ class FcmNotificationSender(
         // 196 bytes for default structure (token, message) and message id
         private const val MAX_MESSAGE_SIZE = 3900
         const val MAX_BOOKING_EVENTS_IN_MESSAGE = MAX_MESSAGE_SIZE / AVG_BOOKING_EVENT_SIZE
-        private const val ONE_WEEK_IN_MILLISECONDS = 7L * 24 * 60 * 60 * 1000
     }
     /**
      * Sends empty FCM message on topic
@@ -47,29 +48,33 @@ class FcmNotificationSender(
     }
     
     override fun sendUpdateContentMessages(topic: String, resourceId: String) {
-        logger.info("[fcmNotificationSender] Received update on {} calendar id", resourceId)
+        logger.info("[sendUpdateContentMessages] Received update on {} calendar id", resourceId)
         val workspace = calendarIdsRepository.findWorkspaceById(resourceId)
         if (workspace.tag != "meeting") return
-        
+
         val startTime = ZonedDateTime
             .now(ZoneId.of(BookingConstants.DEFAULT_TIMEZONE_ID))
-            .toEpochSecond() * 1000
-        val endTime = startTime + ONE_WEEK_IN_MILLISECONDS
+        val endTime = startTime
+            .with(LocalTime.MAX)
+            .plusDays(7)
+        
+        val startTimeMs = startTime.toEpochSecond() * 1000
+        val endTimeMs = endTime.toEpochSecond() * 1000
         
         val bookings = bookingService.findAll(
             workspaceId = workspace.id,
-            bookingRangeFrom = startTime,
-            bookingRangeTo = endTime
+            bookingRangeFrom = startTimeMs,
+            bookingRangeTo = endTimeMs
         )
         
         if (bookings.isEmpty()) {
-            logger.info("[fcmNotificationSender] Bookings on 1 week from now for {} workspace were empty", workspace.name)
+            logger.info("[sendUpdateContentMessages] Bookings on 1 week from now for {} workspace were empty", workspace.name)
             return
         }
         
         val messageId = UUID.randomUUID().toString()
         val messageBatches = bookings.chunked(MAX_BOOKING_EVENTS_IN_MESSAGE) { bookingList ->
-            val fcmWorkspace = FcmWorkspaceWithBookingsDTOModelConverter
+            val fcmWorkspace = fcmWorkspaceConverter
                 .fromModelsToDTO(workspace, bookingList)
             
             val json = Json.encodeToString(fcmWorkspace)
@@ -88,7 +93,7 @@ class FcmNotificationSender(
     private fun handleFcmResponses(batchResponse: BatchResponse) {
         for (response in batchResponse.responses) {
             if (!response.isSuccessful) {
-                logger.error("[fcmNotificationSender] Message was not successfully delivered, exception: {}, error code: {}",
+                logger.error("[handleFcmResponses] Message was not successfully delivered, exception: {}, error code: {}",
                     response.exception.message, response.exception.errorCode
                 )
             }
