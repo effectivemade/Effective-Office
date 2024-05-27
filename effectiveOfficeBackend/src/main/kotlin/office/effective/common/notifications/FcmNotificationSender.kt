@@ -64,7 +64,8 @@ class FcmNotificationSender(
         val bookings = bookingService.findAll(
             workspaceId = workspace.id,
             bookingRangeFrom = startTimeMs,
-            bookingRangeTo = endTimeMs
+            bookingRangeTo = endTimeMs,
+            shouldFindIntegrationsAndUtilities = false
         )
         
         if (bookings.isEmpty()) {
