@@ -98,7 +98,7 @@ class FcmNotificationSender(
                 )
             }
         }
-        logger.info("[fcmNotificationSender] {} messages have been sent, {} of them successful, {} - failures",
+        logger.info("[handleFcmResponses] {} messages have been sent, {} of them successful, {} - failures",
             batchResponse.responses.size, batchResponse.successCount, batchResponse.failureCount
         )
     }
