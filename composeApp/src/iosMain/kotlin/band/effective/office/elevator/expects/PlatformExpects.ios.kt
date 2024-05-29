@@ -1,6 +1,9 @@
 package band.effective.office.elevator.expects
 
-actual fun setClipboardText(text: String, toastMessage: String) {
+import dev.icerock.moko.resources.StringResource
+import dev.icerock.moko.resources.desc.desc
+
+actual fun setClipboardText(text: String, label: String, toastMessage: StringResource) {
     UIPasteboard.general.string = text
-    showToast("Text compiled")
+    showToast(toastMessage.desc().localized())
 }

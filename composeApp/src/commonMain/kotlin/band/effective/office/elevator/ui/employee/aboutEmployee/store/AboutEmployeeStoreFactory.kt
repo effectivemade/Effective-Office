@@ -1,5 +1,6 @@
 package band.effective.office.elevator.ui.employee.aboutEmployee.store
 
+import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.domain.models.EmployeeInfo
 import band.effective.office.elevator.domain.models.User
 import band.effective.office.elevator.domain.useCase.AboutEmployeeInteractor
@@ -183,13 +184,25 @@ class AboutEmployeeStoreFactory(
                         dispatch(Msg.UpdateLoadingBookingState(false))
                     }
                 }
-                //TODO: Change toast message on string resource
+
                 Intent.OnClickCopyPhone ->
-                    setClipboardText(text = getState().user.phoneNumber, toastMessage = "Phone")
+                    setClipboardText(
+                        text = getState().user.phoneNumber,
+                        label = "Phone",
+                        toastMessage = MainRes.strings.phone_clipboard
+                    )
                 Intent.OnClickCopyTelegram ->
-                    setClipboardText(text = "https://t.me/${getState().user.telegram}", toastMessage = "Telegram")
+                    setClipboardText(
+                        text = "https://t.me/${getState().user.telegram}",
+                        label = "Telegram",
+                        toastMessage = MainRes.strings.telegram_clipboard
+                    )
                 Intent.OnClickCopyEmail ->
-                    setClipboardText(text = getState().user.email, toastMessage = "Email")
+                    setClipboardText(
+                        text = getState().user.email,
+                        label = "Email",
+                        toastMessage = MainRes.strings.email_clipboard
+                    )
             }
         }
 
