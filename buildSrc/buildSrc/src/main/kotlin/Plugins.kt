@@ -22,7 +22,7 @@ object Plugins {
     }
 
     object Kotlin {
-        const val implementation = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0"
+        const val implementation = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20"
         const val plugin = "org.jetbrains.kotlin.multiplatform"
     }
 
@@ -36,7 +36,7 @@ object Plugins {
     }
 
     object MultiplatformCompose {
-        const val implementation = "org.jetbrains.compose:compose-gradle-plugin:1.5.2"
+        const val implementation = "org.jetbrains.compose:compose-gradle-plugin:1.5.10"
         const val plugin = "org.jetbrains.compose"
     }
 
@@ -62,7 +62,7 @@ object Plugins {
     }
 
     object Moko {
-        const val implementation = "dev.icerock.moko:resources-generator:0.23.0"
+        const val implementation = "dev.icerock.moko:resources-generator:0.24.0-beta-5"
         const val plugin = "dev.icerock.mobile.multiplatform-resources"
     }
 

@@ -95,7 +95,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("dev.icerock.moko:resources-test:0.23.0")
+                implementation("dev.icerock.moko:resources-test:0.24.0-beta-5")
             }
         }
 
@@ -208,10 +208,10 @@ android {
 
 
 multiplatformResources {
-    multiplatformResourcesPackage = "band.effective.office.elevator"
-    multiplatformResourcesVisibility = Public
-    multiplatformResourcesClassName = "MainRes"
-    iosBaseLocalizationRegion = "ru" // optional, default "en"
+    resourcesPackage.set("band.effective.office.elevator")
+    resourcesVisibility.set(Public)
+    resourcesClassName.set("MainRes")
+    iosBaseLocalizationRegion.set("ru") // optional, default "en"
 }
 
 buildConfig {
