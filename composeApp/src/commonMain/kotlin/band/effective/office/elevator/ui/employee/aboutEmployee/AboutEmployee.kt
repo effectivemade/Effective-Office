@@ -2,6 +2,7 @@ package band.effective.office.elevator.ui.employee.aboutEmployee
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -115,14 +116,18 @@ fun AboutEmployee(component: AboutEmployeeComponent) {
                         it
                     )
                 )
-            }
+            },
+            onClickCopyEmail = { component.onEvent(AboutEmployeeStore.Intent.OnClickCopyEmail) },
+            onClickCopyPhone = { component.onEvent(AboutEmployeeStore.Intent.OnClickCopyPhone) },
+            onClickCopyTelegram = { component.onEvent(AboutEmployeeStore.Intent.OnClickCopyTelegram) }
         )
 
         if (showModalCalendar) {
             Dialog(
-                onDismissRequest = { component.onEvent(AboutEmployeeStore.Intent.CloseCalendarClicked)},
+                onDismissRequest = { component.onEvent(AboutEmployeeStore.Intent.CloseCalendarClicked) },
                 properties = DialogProperties(usePlatformDefaultWidth = false)
-            ) { ModalCalendarDateRange(
+            ) {
+                ModalCalendarDateRange(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .align(Alignment.Center),
@@ -156,6 +161,9 @@ private fun AboutEmployeeContent(
     onClickOpenCalendar: () -> Unit,
     onClickOpenBottomDialog: () -> Unit,
     onClickCloseBottomDialog: (BookingsFilter) -> Unit,
+    onClickCopyPhone: () -> Unit,
+    onClickCopyEmail: () -> Unit,
+    onClickCopyTelegram: () -> Unit,
     isLoading: Boolean,
     isLoadingBooking: Boolean
 ) {
@@ -219,12 +227,16 @@ private fun AboutEmployeeContent(
                                 ContactUserUIComponent(
                                     MainRes.images.icon_telegram,
                                     telegram,
-                                    modifier = Modifier.padding(top = 18.dp)
+                                    modifier = Modifier
+                                        .clickable(onClick = onClickCopyTelegram)
+                                        .padding(top = 18.dp)
                                 )
                                 ContactUserUIComponent(
                                     MainRes.images.mail,
                                     email,
-                                    modifier = Modifier.padding(top = 10.dp)
+                                    modifier = Modifier
+                                        .clickable(onClick = onClickCopyEmail)
+                                        .padding(top = 10.dp)
                                 )
                             }
                             Spacer(modifier = Modifier.weight(.1f))
@@ -263,7 +275,7 @@ private fun AboutEmployeeContent(
                     EffectiveOutlinedButton(
                         MainRes.images.spb_icon,
                         text = MainRes.strings.transfer,
-                        onClick = onClickOpenSpb,
+                        onClick = onClickCopyPhone,
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }

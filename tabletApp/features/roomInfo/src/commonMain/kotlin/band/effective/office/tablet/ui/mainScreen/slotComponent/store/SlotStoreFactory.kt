@@ -1,6 +1,7 @@
 package band.effective.office.tablet.ui.mainScreen.slotComponent.store
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.OfficeTime
@@ -34,7 +35,7 @@ import kotlin.time.Duration.Companion.minutes
 class SlotStoreFactory(
     private val storeFactory: StoreFactory,
     private val roomName: () -> String,
-    private val openBookingDialog: (event: EventInfo, room: String) -> Unit
+    private val openBookingDialog: (event: EventInfo, room: String) -> Unit,
 ) :
     KoinComponent {
     private val slotUseCase: SlotUseCase by inject()
@@ -97,6 +98,8 @@ class SlotStoreFactory(
                 subSlots = it.events.map { slot -> SlotUi.NestedSlot(slot) },
                 isOpen = false
             )
+
+            is Slot.LoadingEventSlot -> SlotUi.LoadingSlot(it)
         }
     }
 
@@ -152,7 +155,7 @@ class SlotStoreFactory(
             when (intent) {
                 is SlotStore.Intent.ClickOnSlot -> intent.slot.execute(getState())
                 is SlotStore.Intent.UpdateRequest -> {
-                    if (!getState().slots.any { it is SlotUi.DeleteSlot } || intent.refresh){
+                    if (!getState().slots.any { it is SlotUi.DeleteSlot } || intent.refresh) {
                         updateSlot(intent.room, intent.refresh)
                     }
                 }
@@ -240,6 +243,16 @@ class SlotStoreFactory(
                     }
                     dispatch(Message.UpdateSlots(newSlots))
                 }
+
+                is SlotStore.Intent.Loading -> {
+                    val allSlots = getState().slots
+                    val slot = intent.slot
+                    val newSlot = SlotUi.LoadingSlot(slot)
+                    val list = allSlots.toMutableList()
+                    list.add(newSlot)
+                    list.sortBy { it.slot.start }
+                    dispatch(Message.UpdateSlots(list))
+                }
             }
         }
 
@@ -266,6 +279,9 @@ class SlotStoreFactory(
             is SlotUi.MultiSlot -> openMultislot(this, state)
             is SlotUi.SimpleSlot -> slot.execute(state)
             is SlotUi.NestedSlot -> slot.execute(state)
+            is SlotUi.LoadingSlot -> {
+                slot.execute(state)
+            }
         }
 
         private fun openMultislot(multislot: SlotUi.MultiSlot, state: SlotStore.State) {
@@ -279,6 +295,9 @@ class SlotStoreFactory(
             is Slot.EmptySlot -> executeFreeSlot(this)
             is Slot.EventSlot -> executeEventSlot(this)
             is Slot.MultiEventSlot -> {}
+            is Slot.LoadingEventSlot -> {
+
+            }
         }
 
         private fun executeFreeSlot(slot: Slot.EmptySlot) {

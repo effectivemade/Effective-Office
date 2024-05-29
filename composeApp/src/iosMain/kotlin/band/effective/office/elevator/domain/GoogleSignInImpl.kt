@@ -8,6 +8,7 @@ import cocoapods.GoogleSignIn.GIDConfiguration
 import cocoapods.GoogleSignIn.GIDGoogleUser
 import cocoapods.GoogleSignIn.GIDSignIn
 import dev.icerock.moko.resources.desc.desc
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.round
 
+@OptIn(ExperimentalForeignApi::class)
 class GoogleSignInImpl(gidClientId: String, serverClientId: String) : GoogleSignIn {
 
     private val scope = CoroutineScope(Dispatchers.Main)

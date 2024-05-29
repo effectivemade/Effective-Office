@@ -42,4 +42,5 @@
     <string name="event_slot">Занято ${organizer}</string>
     <string name="multislot">${size} брони</string>
     <string name="cancel">Отмена</string>
+    <string name="loading_slot">Слот загружается</string>
 </resources>

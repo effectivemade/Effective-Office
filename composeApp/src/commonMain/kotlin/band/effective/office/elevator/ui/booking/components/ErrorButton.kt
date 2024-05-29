@@ -27,7 +27,7 @@ fun ErrorButton(
     Button(
         onClick,
         shape = RectangleShape,
-        contentPadding = PaddingValues(0.dp),
+        contentPadding = PaddingValues(8.dp),
         elevation = ButtonDefaults.elevatedButtonElevation(
             defaultElevation = 0.dp,
             pressedElevation = 0.5.dp

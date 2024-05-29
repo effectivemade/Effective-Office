@@ -2,7 +2,6 @@ package band.effective.office.tablet.ui.mainScreen.mainScreen
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -40,7 +39,6 @@ import band.effective.office.tablet.ui.mainScreen.mainScreen.uiComponents.Discon
 import band.effective.office.tablet.ui.mainScreen.roomInfoComponents.RoomInfoComponent
 import band.effective.office.tablet.ui.mainScreen.roomInfoComponents.uiComponent.RoomProperty
 import band.effective.office.tablet.ui.mainScreen.slotComponent.SlotComponent
-import band.effective.office.tablet.ui.mainScreen.slotComponent.SlotList
 import band.effective.office.tablet.ui.mainScreen.slotComponent.SlotView
 import band.effective.office.tablet.ui.mainScreen.slotComponent.store.SlotStore
 import band.effective.office.tablet.ui.theme.LocalCustomColorsPalette
@@ -117,7 +115,8 @@ fun MainScreenView(
                             .padding(horizontal = 30.dp)) {
                             SlotView(
                                 slotUi = it,
-                                onClick = { slotComponent.sendIntent(
+                                onClick = {
+                                    slotComponent.sendIntent(
                                         SlotStore.Intent.ClickOnSlot(
                                             this
                                         )

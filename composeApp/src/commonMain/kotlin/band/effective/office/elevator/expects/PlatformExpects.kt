@@ -1,6 +1,7 @@
 package band.effective.office.elevator.expects
 
 import com.seiko.imageloader.component.ComponentRegistryBuilder
+import dev.icerock.moko.resources.StringResource
 import okio.Path
 
 expect fun showToast(message: String)
@@ -16,3 +17,5 @@ expect fun pickSBP(phoneNumber: String)
 internal expect fun ComponentRegistryBuilder.setupDefaultComponents()
 
 internal expect fun getImageCacheDirectoryPath(): Path
+
+expect fun setClipboardText(text: String, label: String, toastMessage: StringResource)
