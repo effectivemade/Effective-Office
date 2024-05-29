@@ -45,7 +45,7 @@ fun PhotoUIItem(image: Photo, modifier: Modifier = Modifier, okHttpClient: OkHtt
             model = image.photoThumb,
             loading = { LoadScreen(stringResource(id = R.string.photo_title)) },
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.Fit,
             error = {
                 Text(
                     text = stringResource(id = R.string.error_show_photo),

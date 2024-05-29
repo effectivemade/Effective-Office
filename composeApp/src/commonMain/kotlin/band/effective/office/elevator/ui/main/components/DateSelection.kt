@@ -83,23 +83,13 @@ fun CalendarTitle(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text =
-                if (currentDate == beginDate && endDate == null) {
-                    stringResource(
-                        if (fromMainScreen) MainRes.strings.on_today
-                        else MainRes.strings.by_date
-                    )
-                }
-                else {
-                    if (endDate == null)
-                        dateFormat(beginDate)
-                    else
-                        "${dateFormat(beginDate)} - ${dateFormat(endDate)}"
-                },
+            text = if (beginDate == endDate || endDate == null) dateFormat(beginDate)
+            else "${dateFormat(beginDate)} - ${dateFormat(endDate)}",
             color = MaterialTheme.colors.secondaryVariant,
             fontSize = 15.sp
         )
     }
 }
+
 
 

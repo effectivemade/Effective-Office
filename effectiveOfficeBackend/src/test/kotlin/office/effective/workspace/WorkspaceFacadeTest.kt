@@ -2,7 +2,7 @@ package office.effective.workspace
 
 import junit.framework.TestCase.assertEquals
 import office.effective.common.exception.InstanceNotFoundException
-import office.effective.common.utils.DatabaseTransactionManager
+import office.effective.common.utils.impl.DatabaseTransactionManagerImpl
 import office.effective.common.utils.UuidValidator
 import office.effective.features.workspace.converters.WorkspaceFacadeConverter
 import office.effective.dto.WorkspaceDTO
@@ -28,7 +28,7 @@ class WorkspaceFacadeTest {
     @Mock
     private lateinit var mockConverter: WorkspaceFacadeConverter
     @Mock
-    private lateinit var mockTransactionManager: DatabaseTransactionManager
+    private lateinit var mockTransactionManager: DatabaseTransactionManagerImpl
     @Mock
     private lateinit var mockUuidValidator: UuidValidator
 
@@ -63,7 +63,7 @@ class WorkspaceFacadeTest {
     fun testFindById() {
         val workspaceId = UUID.randomUUID()
         val existingWorkspace = Workspace(workspaceId, "Workspace 1", "Tag", emptyList())
-        val expectedWorkspaceDTO = WorkspaceDTO(workspaceId.toString(), "Workspace 1", emptyList())
+        val expectedWorkspaceDTO = WorkspaceDTO(workspaceId.toString(), "Workspace 1", emptyList(), null, "Tag")
 
         setUpMockTransactionManager()
         setUpMockService(existingWorkspace)
@@ -95,8 +95,8 @@ class WorkspaceFacadeTest {
             Workspace(workspace2Id, "Workspace 2", "Tag", emptyList())
         )
         val expectedList = listOf(
-            WorkspaceDTO(workspace1Id.toString(), "Workspace 1", emptyList()),
-            WorkspaceDTO(workspace2Id.toString(), "Workspace 2", emptyList())
+            WorkspaceDTO(workspace1Id.toString(), "Workspace 1", emptyList(), null, "Tag"),
+            WorkspaceDTO(workspace2Id.toString(), "Workspace 2", emptyList(), null, "Tag")
         )
 
         setUpMockTransactionManager()

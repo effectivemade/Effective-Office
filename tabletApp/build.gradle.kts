@@ -13,8 +13,8 @@ android {
 
     defaultConfig {
         applicationId = "band.effective.office.tablet"
-        versionCode = 3
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.1.0"
 
         minSdk = 26
         targetSdk = 34
@@ -30,6 +30,7 @@ android {
 
     signingConfigs {
         getByName("debug") {
+            keyAlias = "androiddebugkey"
             keyPassword = "android"
             storeFile = file("${rootDir}/keystore/debug.keystore")
             storePassword = "android"
@@ -48,9 +49,9 @@ android {
             isDebuggable = true
         }
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
             isDebuggable = false
-            isMinifyEnabled = true
+            isMinifyEnabled = false
         }
     }
 }
@@ -85,8 +86,8 @@ kotlin {
 
                 implementation(project(":tabletApp:features:selectRoom"))
                 implementation(project(":tabletApp:features:roomInfo"))
-                implementation(project(":tabletApp:features:freeNegotiationsScreen"))
                 implementation(project(":tabletApp:features:core"))
+                implementation(project(":tabletApp:features:di"))
 
             }
         }

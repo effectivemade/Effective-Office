@@ -11,3 +11,11 @@ enum class WorkSpaceType( val type: String){
     MEETING_ROOM("meeting"),
     WORK_PLACE("regular")
 }
+
+fun List<WorkSpaceUI>.mapWorkspaceToZone() =
+    map {
+        WorkspaceZoneUI (
+            name = it.zoneName,
+            isSelected = false
+        )
+    }

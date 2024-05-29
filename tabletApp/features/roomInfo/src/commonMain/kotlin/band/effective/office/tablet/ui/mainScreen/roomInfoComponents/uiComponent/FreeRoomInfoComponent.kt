@@ -1,18 +1,12 @@
 package band.effective.office.tablet.ui.mainScreen.roomInfoComponents.uiComponent
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.features.roomInfo.MainRes
 import band.effective.office.tablet.ui.theme.LocalCustomColorsPalette
 import band.effective.office.tablet.ui.theme.roomInfoColor
-import band.effective.office.tablet.utils.CalendarStringConverter
-import java.util.Calendar
 
 @Composable
 fun FreeRoomInfoComponent(
@@ -21,8 +15,6 @@ fun FreeRoomInfoComponent(
     capacity: Int,
     isHaveTv: Boolean,
     electricSocketCount: Int,
-    nextEvent: EventInfo,
-    timeToNextEvent: Int,
     isError: Boolean,
 ) {
     CommonRoomInfoComponent(
@@ -34,24 +26,10 @@ fun FreeRoomInfoComponent(
         backgroundColor = LocalCustomColorsPalette.current.freeStatus,
         isError = isError
     ) {
-        if (nextEvent != EventInfo.emptyEvent) {
-            Text(
-                text = "${MainRes.string.free_room_occupancy_date.format(time = nextEvent.startTime.time())} ${
-                    if (timeToNextEvent > 0) MainRes.string.free_room_occupancy_time.format(
-                        timeToNextEvent.getDuration()
-                    ) else ""
-                }",
-                style = MaterialTheme.typography.h5,
-                color = roomInfoColor
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = nextEvent.organizer.fullName,
-                style = MaterialTheme.typography.h5,
-                color = roomInfoColor
-            )
-        }
+        Text(
+            text = if (isError) MainRes.string.data_not_upd else MainRes.string.free_now,
+            style = MaterialTheme.typography.h5,
+            color = roomInfoColor
+        )
     }
 }
-
-private fun Calendar.time() = CalendarStringConverter.calendarToString(this, "HH:mm")

@@ -5,7 +5,7 @@ import com.google.api.services.calendar.model.Event
 import com.google.api.services.calendar.model.Event.Organizer
 import com.google.api.services.calendar.model.EventAttendee
 import com.google.api.services.calendar.model.EventDateTime
-import model.Recurrence.Companion.toRecurrence
+import office.effective.model.Recurrence.Companion.toRecurrence
 import office.effective.common.constants.BookingConstants
 import office.effective.common.utils.UuidValidator
 import office.effective.dto.BookingDTO
@@ -62,7 +62,7 @@ class GoogleCalendarConverter(
         val recurrence = event.recurrence?.toString()?.getRecurrence()?.toDto()
         val dto = BookingDTO(
             owner = getUser(email),
-            participants = event.attendees?.filter { !(it?.resource ?: true) }?.map { getUser(it.email) } ?: listOf(),
+            participants = event.attendees?.filter { !(it?.resource ?: false) }?.map { getUser(it.email) } ?: listOf(),
             workspace = getWorkspace(
                 event.attendees?.firstOrNull { it?.resource ?: false }?.email
                     ?: run {
@@ -184,9 +184,8 @@ class GoogleCalendarConverter(
     fun toGoogleEvent(dto: BookingDTO): Event {
         logger.debug("[toGoogleEvent] converting meeting room booking dto to calendar event")
         val event = Event().apply {
-            summary = "${dto.owner.fullName}: create from office application"
-            description =
-                "${dto.owner.email} - почта организатора"//"${dto.owner.integrations?.first { it.name == "email" }} - почта организатора"
+            summary = createDetailedEventSummary(dto)
+            description = "${dto.owner.email} - почта организатора"
             organizer = dto.owner.toGoogleOrganizer()
             attendees = dto.participants.map { it.toAttendee() } + dto.owner.toAttendee()
                 .apply { organizer = true } + dto.workspace.toAttendee()
@@ -264,6 +263,10 @@ class GoogleCalendarConverter(
         return bookingConverter.dtoToModel(toBookingDTO(event));
     }
 
+    private fun createDetailedEventSummary(dto: BookingDTO): String {
+        return "Meet ${dto.owner.fullName}"
+    }
+
     /**
      * Converts milliseconds to [EventDateTime]
      *
@@ -272,7 +275,7 @@ class GoogleCalendarConverter(
      */
     private fun Long.toGoogleDateTime(): EventDateTime {
         return EventDateTime().also {
-            it.dateTime = DateTime(this)
+            it.dateTime = DateTime(this - TimeZone.getDefault().rawOffset)
             it.timeZone = TimeZone.getDefault().id
         }
     }

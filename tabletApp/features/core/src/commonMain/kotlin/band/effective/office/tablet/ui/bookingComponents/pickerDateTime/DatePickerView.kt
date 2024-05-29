@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -46,35 +45,36 @@ import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DatePickerView(epicDatePickerState: EpicDatePickerState) {
+fun DatePickerView(
+    modifier: Modifier = Modifier,
+    epicDatePickerState: EpicDatePickerState
+) {
     val coroutineScope = rememberCoroutineScope()
-    Box(modifier = Modifier.fillMaxWidth(0.4f)) {
-        Column {
-            DatePickerTitleView(
-                epicDatePickerState = epicDatePickerState,
-                onClickNextMonth = {
-                    scrollMonth(
-                        coroutineScope = coroutineScope,
-                        pagerState = epicDatePickerState.pagerState,
-                        amount = 1
-                    )
+    Column(modifier = modifier) {
+        DatePickerTitleView(
+            epicDatePickerState = epicDatePickerState,
+            onClickNextMonth = {
+                scrollMonth(
+                    coroutineScope = coroutineScope,
+                    pagerState = epicDatePickerState.pagerState,
+                    amount = 1
+                )
 
-                },
-                onClickPreviousMonth = {
-                    scrollMonth(
-                        coroutineScope = coroutineScope,
-                        pagerState = epicDatePickerState.pagerState,
-                        amount = -1
-                    )
-                }
-            )
-            EpicDatePicker(
-                state = epicDatePickerState,
-                dayOfWeekContent = CustomDayOfWeekContent,
-                dayOfMonthContent = CustomDayOfMonthContent,
-                modifier = Modifier.background(Color.Transparent),
-            )
-        }
+            },
+            onClickPreviousMonth = {
+                scrollMonth(
+                    coroutineScope = coroutineScope,
+                    pagerState = epicDatePickerState.pagerState,
+                    amount = -1
+                )
+            }
+        )
+        EpicDatePicker(
+            state = epicDatePickerState,
+            dayOfWeekContent = CustomDayOfWeekContent,
+            dayOfMonthContent = CustomDayOfMonthContent,
+            modifier = Modifier.background(Color.Transparent),
+        )
     }
 }
 
@@ -85,10 +85,14 @@ private fun DatePickerTitleView(
     onClickNextMonth: () -> Unit,
     onClickPreviousMonth: () -> Unit
 ) {
-    Row(modifier = Modifier
-        .background(LocalCustomColorsPalette.current.mountainBackground, RoundedCornerShape(12.dp))
-        .fillMaxWidth().fillMaxHeight(0.15f)
-        .clip(RoundedCornerShape(12.dp)),
+    Row(
+        modifier = Modifier
+            .background(
+                LocalCustomColorsPalette.current.mountainBackground,
+                RoundedCornerShape(12.dp)
+            )
+            .fillMaxWidth().fillMaxHeight(0.15f)
+            .clip(RoundedCornerShape(12.dp)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -110,7 +114,10 @@ private fun DatePickerTitleView(
             text = if (epicDatePickerState.selectedDates.isNotEmpty()) {
                 stringFormat(epicDatePickerState.selectedDates.firstOrNull())
             } else {
-                epicDatePickerState.pagerState.currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale("ru")).lowercase() ?: ""
+                epicDatePickerState.pagerState.currentMonth.month.getDisplayName(
+                    TextStyle.FULL_STANDALONE,
+                    Locale("ru")
+                ).lowercase() ?: ""
             },
             style = header6,
             color = LocalCustomColorsPalette.current.primaryTextAndIcon,
@@ -169,7 +176,8 @@ private val CustomDayOfMonthContent: BasisDayOfMonthContent = { date ->
             }
 
             is EpicDatePickerState.SelectionMode.Single -> {
-                date in selectedDays}
+                date in selectedDays
+            }
         }
     }
 

@@ -9,6 +9,7 @@ import band.effective.office.tv.network.synology.models.response.SynologyAlbumsR
 import band.effective.office.tv.repository.synology.PhotoSynologyRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.util.Calendar
 import javax.inject.Inject
 
 class PhotoSynologyRepositoryImpl @Inject constructor(
@@ -28,7 +29,7 @@ class PhotoSynologyRepositoryImpl @Inject constructor(
                     )
             ) {
                 is Either.Success -> {
-                    res.data.albumsData.albums.filter { it.name.contains("Best of") }.forEach { album ->
+                    res.data.albumsData.albums.filter { it.name.contains("Best of ${getCurrentYear()}") }.forEach { album ->
                         when (
                             val files = synologyApi.getPhotosFromAlbum(
                                 sid = sid,
@@ -53,4 +54,10 @@ class PhotoSynologyRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    private fun getCurrentYear(): Int {
+        val cal = Calendar.getInstance()
+        val year = cal.get(Calendar.YEAR)
+        return year
+    }
 }

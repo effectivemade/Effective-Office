@@ -31,7 +31,7 @@ class ChooseZoneSheetComponent(
         val state by store.stateFlow.collectAsState()
         ChooseZone(
             sheetTile = stringResource(sheetTile),
-            workSpacecZone = state.zones,
+            workSpacesZone = state.zones,
             onClickCloseChoseZone = { store.accept(ChooseZoneStore.Intent.onCloseRequest) },
             onClickConfirmSelectedZone = { store.accept(ChooseZoneStore.Intent.onConfirmRequest) },
             onClickZone = { store.accept(ChooseZoneStore.Intent.onZoneClick(it)) }

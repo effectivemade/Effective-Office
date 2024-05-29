@@ -269,7 +269,7 @@ class BookingRepositoryImpl(
             },
             until = when (typeEndPeriod) {
                 is TypeEndPeriodBooking.DatePeriodEnd ->
-                    localDateTimeToUnix(typeEndPeriod.date.atTime(hour = 0, minute = 0))
+                    localDateTimeToUnix(typeEndPeriod.date.atTime(hour = 23, minute = 59))
 
                 else -> null
             },

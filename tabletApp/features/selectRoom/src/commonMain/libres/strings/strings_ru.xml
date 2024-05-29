@@ -15,9 +15,11 @@
     <string name="on_main">На главную</string>
     <string name="see_free_room">Смотреть другие переговорки</string>
     <string name="failure_text">Вас кто-то опередил</string>
-    <string name="select_other_room">Выберите другую переговорку</string>
+    <string name="select_other_room">Попробуйте занять другую переговорку, либо выберите другое время брони</string>
     <string name="try_again">Попробовать ещё раз</string>
-    <string name="booking_view_title">Изменение брони</string>
+    <string name="booking_view_title">Измененить бронь</string>
+    <string name="create_view_title">Занять ${room}</string>
     <string name="update_button">Изменить</string>
-    <string name="delete_button">Удалить</string>
+    <string name="delete_button">Удалить бронь</string>
+    <string name="time_booked">Это время уже занято</string>
 </resources>

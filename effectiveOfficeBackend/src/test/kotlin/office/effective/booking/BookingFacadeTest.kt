@@ -2,7 +2,7 @@ package office.effective.booking
 
 import junit.framework.TestCase.assertEquals
 import office.effective.common.exception.InstanceNotFoundException
-import office.effective.common.utils.DatabaseTransactionManager
+import office.effective.common.utils.impl.DatabaseTransactionManagerImpl
 import office.effective.common.utils.UuidValidator
 import office.effective.features.booking.converters.BookingFacadeConverter
 import office.effective.dto.BookingDTO
@@ -33,7 +33,7 @@ class BookingFacadeTest {
     @Mock
     private lateinit var uuidValidator: UuidValidator
     @Mock
-    private lateinit var transactionManager: DatabaseTransactionManager
+    private lateinit var transactionManager: DatabaseTransactionManagerImpl
     @Mock
     private lateinit var bookingFacadeConverter: BookingFacadeConverter
     @Mock
@@ -75,19 +75,20 @@ class BookingFacadeTest {
 
     @Test
     fun testFindById() {
-        val bookingId = UUID.fromString("8896abc1-457b-41e4-b80b-2fe7cfb3dbaf")
         val instant = Instant.now()
         val existingBooking = Booking(
             user,
             emptyList(),
             workspace,
-            bookingId,
+            "8896abc1-457b-41e4-b80b-2fe7cfb3dbaf",
             instant,
-            instant)
+            instant,
+            null)
         val expectedBookingDTO = BookingDTO(
-            userDto, emptyList(),
+            userDto,
+            emptyList(),
             workspaceDto,
-            bookingId.toString(),
+            "8896abc1-457b-41e4-b80b-2fe7cfb3dbaf",
             instant.toEpochMilli(),
             instant.toEpochMilli())
 
@@ -95,7 +96,7 @@ class BookingFacadeTest {
         whenever(service.findById(anyOrNull())).thenReturn(existingBooking)
         setUpMockConverter(existingBooking, expectedBookingDTO)
 
-        val result = facade.findById(bookingId.toString())
+        val result = facade.findById("8896abc1-457b-41e4-b80b-2fe7cfb3dbaf")
 
         assertEquals(expectedBookingDTO, result)
     }
@@ -118,12 +119,14 @@ class BookingFacadeTest {
         val expectedList = listOf(bookingMockDto, bookingMockDto)
 
         setUpMockTransactionManager()
-        whenever(service.findAll(anyOrNull(), anyOrNull())).thenReturn(existingList)
+        whenever(service.findAll(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(existingList)
         whenever(bookingFacadeConverter.modelToDto(anyOrNull())).thenReturn(expectedList[0], expectedList[1])
 
         val result = facade.findAll(
             "8896abc1-457b-41e4-b80b-2fe7cfb3dbaf",
-            "8896abc2-457b-41e4-b80b-2fe7cfb3dbaf"
+            "8896abc2-457b-41e4-b80b-2fe7cfb3dbaf",
+            null,
+            Instant.now().toEpochMilli()
         )
 
         assertEquals(expectedList, result)
@@ -146,14 +149,22 @@ class BookingFacadeTest {
     @Test
     fun testPut() {
         setUpMockTransactionManager()
+        val instant = Instant.now()
+        val expectedBookingDTO = BookingDTO(
+            userDto,
+            emptyList(),
+            workspaceDto,
+            "8896abc1-457b-41e4-b80b-2fe7cfb3dbaf",
+            instant.toEpochMilli(),
+            instant.toEpochMilli())
         val resultMockDto = mock<BookingDTO>()
         val resultMock = mock<Booking>()
-        whenever(bookingFacadeConverter.dtoToModel(bookingMockDto)).thenReturn(bookingMock)
+        whenever(bookingFacadeConverter.dtoToModel(expectedBookingDTO)).thenReturn(bookingMock)
         whenever(service.update(bookingMock)).thenReturn(resultMock)
-        whenever(bookingFacadeConverter.modelToDto(resultMock)).thenReturn(resultMockDto)
+        whenever(bookingFacadeConverter.modelToDto(resultMock)).thenReturn(expectedBookingDTO)
 
-        val result = facade.put(bookingMockDto)
+        val result = facade.put(expectedBookingDTO)
 
-        assertEquals(resultMockDto, result)
+        assertEquals(expectedBookingDTO, result)
     }
 }

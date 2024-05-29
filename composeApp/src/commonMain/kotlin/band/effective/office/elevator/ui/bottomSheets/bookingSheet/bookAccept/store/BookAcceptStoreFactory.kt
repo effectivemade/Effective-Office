@@ -10,6 +10,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -71,7 +72,7 @@ class BookAcceptStoreFactory(
                     workSpaceId = state.bookingId, //TODO(Replace with value from DB)
                     dateOfStart = startDate,
                     dateOfEnd = if (endDate.date != startDate.date)
-                        startDate
+                        LocalDateTime(date = startDate.date, time = endDate.time)
                     else
                         endDate,
                     bookingPeriod = state.bookingPeriod,

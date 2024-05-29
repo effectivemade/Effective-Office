@@ -52,7 +52,7 @@ or duration of the meeting.
 Allows users to view and manage their existing reservations, including cancelling and changing
 meeting details.
 
-## Used libraries 📚
+# Used libraries 📚
 
 A list of technologies used within the project:
 
@@ -66,7 +66,15 @@ A list of technologies used within the project:
 * UI: [MVI Kotlin](https://github.com/arkivanov/MVIKotlin)
   and [Compose](https://developer.android.com/jetpack/compose/tooling)
 
-## Guidelines for starting up: :computer:
+# Project Structure
+- core - core module with models, material theme, common ui elements and common utils
+- di - dependenci injection modules
+- domain - use cases and other logic
+- network - repositoryes and other classes for i/o information
+- roomInfo - module with main screen and settings screen
+- selectScreen - module with modal windows (name is old)
+
+# Guidelines for starting up: :computer:
 
 In order to build all parts of project, you will need JDK and Android Studio. We are using this
 versions:
@@ -79,17 +87,16 @@ JDK: Version 11.0.15
 
 1. Open the terminal and go to the root directory of the project.
 
-2. Run the ./gradlew assembleDebug command to assemble the project in debug mode.
+2. Run the ./gradlew assembleDebug command to assemble the project in debug mode or ./gradlew assembleRelease command to assemble the project in release mode.
 
-3. To run the application on an emulator or connected device, run the ./gradlew installDebug
-   command.
+3. To run the application on an emulator or connected device, run the ./gradlew installDebug or ./gradlew installRelease command.
 
 4. If you want to run tests, run the command ./gradlew test.
 
 5. If you want to assemble the APK file for the release version, run the command ./gradlew
    assembleRelease.
 
-## Authors: :writing_hand:
+# Authors: :writing_hand:
 
 - [Margarita Ginjolia](https://github.com/MargaritaDj)
 - [Maksim Mishenko](https://github.com/UserNameMax)

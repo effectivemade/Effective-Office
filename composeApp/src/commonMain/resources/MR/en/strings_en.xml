@@ -153,6 +153,7 @@
     <string name="once_per_from">once in %s from</string>
     <string name="to_end_reccurense">by %s</string>
     <string name="repeate_times">repeated %s times</string>
+    <string name="no_free_place">There are no places for this time. Choose another time</string>
 
     <!-- Edit Profile-->
     <string name="profile_data">Profile Data</string>

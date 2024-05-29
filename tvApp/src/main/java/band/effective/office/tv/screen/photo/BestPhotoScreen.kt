@@ -93,7 +93,6 @@ fun BestPhotoScreen(viewModel: PhotoViewModel = hiltViewModel()) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PhotoContent(
     onClickPreviousItemButton: (Int) -> Unit,

@@ -10,8 +10,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:lockTaskMode="if_whitelisted"
-            android:screenOrientation="landscape">
+            android:lockTaskMode="if_whitelisted">
+<!--            android:screenOrientation="landscape"-->
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

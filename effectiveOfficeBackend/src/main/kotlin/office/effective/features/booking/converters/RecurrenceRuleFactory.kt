@@ -1,11 +1,8 @@
 package office.effective.features.booking.converters
 
-import model.Ending
-import model.Freq
-import model.Recurrence
-import java.text.SimpleDateFormat
-import java.util.Formatter
-import java.util.GregorianCalendar
+import office.effective.model.Ending
+import office.effective.model.Freq
+import office.effective.model.Recurrence
 
 /**
  * Object for creating Google calendar recurrence rule

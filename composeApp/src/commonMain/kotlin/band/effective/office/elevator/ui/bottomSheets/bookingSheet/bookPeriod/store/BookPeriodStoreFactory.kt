@@ -11,9 +11,11 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.commandiron.wheel_picker_compose.utils.getCurrentTime
 import dev.icerock.moko.resources.StringResource
 import io.github.aakira.napier.Napier
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 
 class BookPeriodStoreFactory(
     private val storeFactory: StoreFactory,
@@ -131,7 +133,7 @@ class BookPeriodStoreFactory(
         ) {
             val currentTime = getCurrentTime()
             val currentDate = getCurrentDate()
-            when(isStart) {
+            when (isStart) {
                 true -> {
                     if (currentDate == startDate) {
                         if (newTime >= currentTime)
@@ -141,6 +143,7 @@ class BookPeriodStoreFactory(
                     } else
                         dispatch(Message.UpdateStartTime(newTime))
                 }
+
                 false -> {
                     if (newTime > prevStartTime)
                         dispatch(Message.UpdateFinishTime(newTime))
@@ -157,9 +160,10 @@ class BookPeriodStoreFactory(
         ) {
             if (dates.isEmpty()) return
 
-            val startDate = dates.first()
-            val endDate = dates.last()
-            val datePeriod = endDate - startDate
+            val sortedDates = dates.sorted() // if user choose date in another range
+
+            val startDate = sortedDates.first()
+            val endDate = sortedDates.last()
 
             val currentDate = getCurrentDate()
 
@@ -177,13 +181,12 @@ class BookPeriodStoreFactory(
                 dispatch(Message.UpdatePeriod(BookingPeriod.Day))
                 dispatch(
                     Message.UpdateEndType(
-                        TypeEndPeriodBooking.CountRepeat(
-                            datePeriod.days + 1
+                        TypeEndPeriodBooking.DatePeriodEnd(
+                            endDate
                         )
                     )
                 )
-            }
-            else if (prevBookingPeriod is BookingPeriod.Day) {
+            } else if (prevBookingPeriod is BookingPeriod.Day) {
                 setFrequencyTitle(BookingPeriod.NoPeriod)
                 dispatch(Message.UpdatePeriod(BookingPeriod.NoPeriod))
                 dispatch(Message.UpdateEndType(TypeEndPeriodBooking.CountRepeat(1)))

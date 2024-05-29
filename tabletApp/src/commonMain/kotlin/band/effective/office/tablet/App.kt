@@ -1,7 +1,5 @@
 package band.effective.office.tablet
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import band.effective.office.tablet.ui.root.Root
 import band.effective.office.tablet.ui.root.RootComponent
@@ -12,7 +10,5 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 @Composable
 fun App(componentContext: ComponentContext, storeFactory: StoreFactory) {
     val rootComponent = RootComponent(componentContext, storeFactory)
-    AppTheme{
-            Root(rootComponent)
-    }
+    AppTheme{ Root(rootComponent) }
 }

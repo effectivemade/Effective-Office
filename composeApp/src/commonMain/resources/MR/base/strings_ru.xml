@@ -175,6 +175,7 @@
     <string name="once_per_from">раз в %s с</string>
     <string name="to_end_reccurense">по %s</string>
     <string name="repeate_times">повторяется %s раз(а)</string>
+    <string name="no_free_place">На это время нет мест. Выберите другое время</string>
 
     <!-- Employee -->
     <string name="about_the_employee">О сотруднике</string>

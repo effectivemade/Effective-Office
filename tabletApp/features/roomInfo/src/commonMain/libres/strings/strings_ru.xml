@@ -34,4 +34,13 @@
     <string name="exit">Выход</string>
     <string name="rooms">Переговорки</string>
     <string name="choose_room">Выбрать ${nameRoom}</string>
+    <string name="free_now">Сейчас свободна</string>
+    <string name="data_not_upd">Данные брони могут быть неактуальны</string>
+    <string name="fastbooking_button">${time} мин</string>
+    <string name="fastbooking_title">Занять любую переговорку на:</string>
+    <string name="empty_slot">Свободно ${freeTime} мин</string>
+    <string name="event_slot">Занято ${organizer}</string>
+    <string name="multislot">${size} брони</string>
+    <string name="cancel">Отмена</string>
+    <string name="loading_slot">Слот загружается</string>
 </resources>
