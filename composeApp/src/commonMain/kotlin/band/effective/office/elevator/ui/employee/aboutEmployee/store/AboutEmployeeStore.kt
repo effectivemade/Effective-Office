@@ -19,6 +19,11 @@ interface AboutEmployeeStore : Store<AboutEmployeeStore.Intent,AboutEmployeeStor
         object OpenBottomDialog: Intent
         data class CloseBottomDialog(val bookingsFilter: BookingsFilter): Intent
 
+        data object OnClickCopyTelegram : Intent
+
+        data object OnClickCopyEmail : Intent
+
+        data object OnClickCopyPhone : Intent
     }
 
     data class State(

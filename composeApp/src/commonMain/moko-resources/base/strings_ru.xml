@@ -185,4 +185,9 @@
     <string name="none_such_booking_seats_by_the_employee">У этого сотрудника пока нет таких бронирований</string>
     <string name="none_booking_seats_on_this_date">У этого сотрудника нет бронирований на этот день</string>
     <string name="none_such_booking_seats_on_this_date">У этого сотрудника нет таких бронирований на этот день</string>
+  
+    <!-- Clipboard -->
+    <string name="phone_clipboard">Номер телефона был успешно скопирован!</string>
+    <string name="email_clipboard">Почта была успешно скопирована!</string>
+    <string name="telegram_clipboard">Телеграм был успешно скопирован!</string>
 </resources>
