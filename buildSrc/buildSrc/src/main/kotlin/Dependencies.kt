@@ -25,7 +25,7 @@ object Dependencies {
         const val essenty = "1.1.0"
         const val logback = "1.2.11"
         const val shadow = "7.1.2"
-        const val moko = "0.23.0"
+        const val moko = "0.24.0-beta-5"
         const val calendar = "1.0.5"
         const val sqlDelight = "2.0.0-rc02"
     }
