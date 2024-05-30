@@ -5,7 +5,7 @@ import band.effective.feedback.data.ydb.YdbFeedbackRequestersRepository
 import band.effective.feedback.domain.repository.FeedbackRequestersRepository
 import band.effective.feedback.domain.useCase.SaveFeedbackUseCase
 import band.effective.feedback.domain.useCase.StartFeedbackLoopUseCase
-import band.effective.feedback.presentation.Reactor
+import band.effective.feedback.presentation.utils.Reactor
 import org.koin.dsl.module
 
 fun presentationModule() = module {

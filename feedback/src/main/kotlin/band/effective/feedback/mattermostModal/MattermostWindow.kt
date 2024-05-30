@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class MattermostWindow(
     val title: String,
-    val elements: List<Element.Text>,
+    val elements: List<Element>,
     val introduction_text: String,
     val submit_label: String,
     val callback_id: String = "somecallbackid",

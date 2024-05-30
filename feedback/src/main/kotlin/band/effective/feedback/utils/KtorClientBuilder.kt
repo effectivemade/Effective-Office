@@ -28,7 +28,7 @@ class KtorClientBuilder {
                 encodeDefaults = true
                 ignoreUnknownKeys = true
                 encodeDefaults = true
-              //  classDiscriminator = "classDiscriminator"
+                classDiscriminator = "classDiscriminator"
             })
         }
     }

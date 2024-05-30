@@ -24,7 +24,7 @@ class MattermostWindowBuilder {
 
     fun build() = MattermostWindow(
         title = title,
-        elements = elements.map { it as Element.Text },
+        elements = elements,
         introduction_text = introduction_text,
         submit_label = submit_label,
         state = state

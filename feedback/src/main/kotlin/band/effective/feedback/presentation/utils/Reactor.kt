@@ -1,4 +1,4 @@
-package band.effective.feedback.presentation
+package band.effective.feedback.presentation.utils
 
 import band.effective.feedback.data.mattermost.MattermostApi
 import band.effective.feedback.presentation.model.Reaction

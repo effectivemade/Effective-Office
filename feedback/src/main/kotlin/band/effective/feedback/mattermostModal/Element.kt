@@ -2,9 +2,8 @@ package band.effective.feedback.mattermostModal
 
 import kotlinx.serialization.Serializable
 
-//@Serializable
+@Serializable
 sealed interface Element {
-
     @Serializable
     data class Text(
         val display_name: String,
