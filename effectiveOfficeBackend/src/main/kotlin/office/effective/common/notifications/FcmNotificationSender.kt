@@ -68,11 +68,6 @@ class FcmNotificationSender(
             shouldFindIntegrationsAndUtilities = false
         )
         
-        if (bookings.isEmpty()) {
-            logger.info("[sendUpdateContentMessages] Bookings on 1 week from now for {} workspace were empty", workspace.name)
-            return
-        }
-        
         val messageId = UUID.randomUUID().toString()
         val messageBatches = bookings.chunked(MAX_BOOKING_EVENTS_IN_MESSAGE) { bookingList ->
             val fcmWorkspace = fcmWorkspaceConverter
