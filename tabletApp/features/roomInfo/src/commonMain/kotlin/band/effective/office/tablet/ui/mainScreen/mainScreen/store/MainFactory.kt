@@ -1,7 +1,6 @@
 package band.effective.office.tablet.ui.mainScreen.mainScreen.store
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.ErrorWithData
@@ -115,10 +114,10 @@ class MainFactory(
         ) : Message
 
         data class UpdateDisconnect(val newValue: Boolean) : Message
-        object Reboot : Message
-        object OnSettings : Message
+        data object Reboot : Message
+        data object OnSettings : Message
         data class SelectRoom(val index: Int) : Message
-        object UpdateTimer : Message
+        data object UpdateTimer : Message
         data class UpdateDate(val newDate: Calendar) : Message
     }
 
@@ -126,10 +125,10 @@ class MainFactory(
         data class OnLoad(val RoomInfoEither: Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>) :
             Action
 
-        object OnSettings : Action
-        object OnUpdateTimer : Action
-        object OnUpdateRoomInfo : Action
-        object RefreshDate : Action
+        data object OnSettings : Action
+        data object OnUpdateTimer : Action
+        data object OnUpdateRoomInfo : Action
+        data object RefreshDate : Action
     }
 
     private inner class ExecutorImpl() :
@@ -293,6 +292,7 @@ class MainFactory(
     }
 
     private object ReducerImpl : Reducer<MainStore.State, Message> {
+        @RequiresApi(Build.VERSION_CODES.N)
         override fun MainStore.State.reduce(message: Message): MainStore.State =
             when (message) {
                 is Message.Load -> copy(

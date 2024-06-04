@@ -9,8 +9,8 @@ interface BookingRepository {
     /**Create booking
      * @param eventInfo info about new event
      * @param room booking room name
-     * @return if create booking return "ok", else return ErrorResponse*/
-    suspend fun bookingRoom(eventInfo: EventInfo, room: RoomInfo): Either<ErrorResponse, String>
+     * @return if booking is created - [EventInfo], else - [ErrorResponse]*/
+    suspend fun bookingRoom(eventInfo: EventInfo, room: RoomInfo): Either<ErrorResponse, EventInfo>
     /**Update booking
      * @param eventInfo new info about event
      * @param room booking room name

@@ -8,15 +8,17 @@ import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.network.repository.BookingRepository
 import band.effective.office.tablet.utils.Converter.toDto
+import band.effective.office.tablet.utils.Converter.toOrganizer
 import band.effective.office.tablet.utils.map
+import java.util.GregorianCalendar
 
 class BookingRepositoryImpl(private val api: Api) :
     BookingRepository {
     override suspend fun bookingRoom(
         eventInfo: EventInfo,
         room: RoomInfo
-    ): Either<ErrorResponse, String> = api.createBooking(eventInfo.toBookingInfo(room))
-        .map(errorMapper = { it }, successMapper = { "ok" })
+    ): Either<ErrorResponse, EventInfo> = api.createBooking(eventInfo.toBookingInfo(room))
+        .map(errorMapper = { it }, successMapper = { it.toEventInfo() })
 
     override suspend fun updateBooking(
         eventInfo: EventInfo,
@@ -35,6 +37,13 @@ class BookingRepositoryImpl(private val api: Api) :
         workspace = room.toDto()
     )
 
+    /**Map DTO to domain model*/
+    private fun BookingDTO.toEventInfo(): EventInfo = EventInfo(
+        id = id ?: "",
+        startTime = GregorianCalendar().apply { timeInMillis = beginBooking },
+        finishTime = GregorianCalendar().apply { timeInMillis = endBooking },
+        organizer = owner.toOrganizer()
+    )
 }
 
 

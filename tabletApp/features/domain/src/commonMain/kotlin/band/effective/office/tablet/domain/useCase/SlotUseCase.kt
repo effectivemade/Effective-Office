@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import band.effective.office.tablet.domain.OfficeTime
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Slot
+import band.effective.office.tablet.utils.oneDay
 import java.util.Calendar
 /**use case for generate slots*/
 class SlotUseCase {
@@ -20,7 +21,8 @@ class SlotUseCase {
         finish: Calendar = OfficeTime.finishWorkTime(),
         minSlotDur: Int = 15,
         events: List<EventInfo>,
-        currentEvent: EventInfo?
+        currentEvent: EventInfo?,
+        loadingSlots: List<Slot.LoadingEventSlot>
     ): List<Slot> {
         return events
             .filter { it.startTime in start..finish }
@@ -32,8 +34,25 @@ class SlotUseCase {
                 )
             ) { acc, eventInfo -> acc.addEvent(eventInfo) }
             .addCurrentEvent(currentEvent)
+            .addLoadingSlots(loadingSlots)
             .mergeEmptySlots()
             .mergeEventSlot()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun List<Slot>.addLoadingSlots(loadingSlots: List<Slot.LoadingEventSlot>): List<Slot> {
+        val mutableList = this.toMutableList()
+        for (slot in loadingSlots) {
+            mutableList.removeEmptySlot(slot.eventInfo)
+            val prevSlot = mutableList.firstOrNull {
+                it.start.oneDay(slot.eventInfo.startTime)
+                        && it.finish > slot.eventInfo.startTime
+            }
+                ?: continue
+            val prevSlotIndex = mutableList.indexOf(prevSlot)
+            mutableList.add(prevSlotIndex, slot)
+        }
+        return mutableList
     }
 
     private fun getEmptyMinSlots(

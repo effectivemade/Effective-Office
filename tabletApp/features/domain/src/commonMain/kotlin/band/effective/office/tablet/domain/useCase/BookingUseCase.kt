@@ -29,7 +29,7 @@ class BookingUseCase(
     suspend operator fun invoke(
         eventInfo: EventInfo,
         room: String
-    ): Either<ErrorResponse, String> =
+    ): Either<ErrorResponse, EventInfo> =
         with(getRoom(room)) {
             when (this) {
                 is Either.Error -> this

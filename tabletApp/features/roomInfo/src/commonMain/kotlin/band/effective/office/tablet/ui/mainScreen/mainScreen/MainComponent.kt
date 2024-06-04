@@ -2,9 +2,12 @@ package band.effective.office.tablet.ui.mainScreen.mainScreen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.model.Slot
+import band.effective.office.tablet.domain.useCase.AddCachedEventUseCase
+import band.effective.office.tablet.domain.useCase.BookingUseCase
 import band.effective.office.tablet.domain.useCase.CancelUseCase
 import band.effective.office.tablet.domain.useCase.DeleteCachedEventUseCase
 import band.effective.office.tablet.ui.freeSelectRoom.FreeSelectRoomComponent
@@ -42,6 +45,8 @@ class MainComponent(
 
     val cancelUseCase by inject<CancelUseCase>()
     val deleteCachedEventUseCase: DeleteCachedEventUseCase by inject()
+    private val bookingUseCase: BookingUseCase by inject()
+    private val addEventUseCase: AddCachedEventUseCase by inject()
 
     val slotComponent = SlotComponent(
         componentContext = componentContext,
@@ -69,8 +74,7 @@ class MainComponent(
     )
 
     fun openModalWindow(dist: ModalWindowsConfig) {
-        navigation.activate(dist)
-    }
+        navigation.activate(dist) }
 
     fun closeModalWindow() {
         navigation.dismiss()
@@ -86,6 +90,14 @@ class MainComponent(
                 componentContext = componentContext,
                 storeFactory = storeFactory,
                 eventInfo = modalWindows.event,
+                onRemoveEvent = { event ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        deleteCachedEventUseCase(
+                            roomName = state.value.run { roomList[indexSelectRoom].name },
+                            eventInfo = event
+                        )
+                    }
+                },
                 onCloseRequest = { closeModalWindow() })
 
             is ModalWindowsConfig.UpdateEvent -> UpdateEventComponent(
@@ -94,7 +106,7 @@ class MainComponent(
                 event = modalWindows.event,
                 room = modalWindows.room,
                 onDelete = { slot ->
-                    slotComponent.sendIntent(SlotStore.Intent.Delete(slot, {
+                    slotComponent.sendIntent(SlotStore.Intent.Delete(slot) {
                         CoroutineScope(Dispatchers.IO).launch {
                             (slot as? Slot.EventSlot)?.eventInfo?.apply {
                                 deleteCachedEventUseCase(
@@ -104,12 +116,73 @@ class MainComponent(
                                 cancelUseCase(this)
                             }
                         }
-                    }))
-
+                    })
                 },
                 onCloseRequest = { closeModalWindow() },
-                onTempLoading = {
-                    slotComponent.sendIntent(SlotStore.Intent.Loading(Slot.LoadingEventSlot(start = it.startTime, finish = it.finishTime, it)))
+                onEventCreation = { eventInfo ->
+                    slotComponent.sendIntent(
+                        SlotStore.Intent.Loading(
+                            Slot.LoadingEventSlot(
+                                start = eventInfo.startTime,
+                                finish = eventInfo.finishTime,
+                                eventInfo
+                            )
+                        )
+                    )
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val roomName = modalWindows.room
+                        val result = bookingUseCase.invoke(
+                            eventInfo = eventInfo,
+                            room = roomName
+                        )
+                        when (result) {
+                            is Either.Error -> {
+                                slotComponent.sendIntent(
+                                    SlotStore.Intent.CancelLoading(eventInfo)
+                                )
+                            }
+                            is Either.Success -> {
+                                slotComponent.sendIntent(
+                                    SlotStore.Intent.CancelLoading(eventInfo)
+                                )
+                                addEventUseCase(roomName, result.data)
+                            }
+                        }
+                    }
+                },
+                onEventUpdate = { eventInfo ->
+                    val roomName = modalWindows.room
+                    slotComponent.sendIntent(
+                        SlotStore.Intent.Loading(
+                            Slot.LoadingEventSlot(
+                                start = eventInfo.startTime,
+                                finish = eventInfo.finishTime,
+                                eventInfo
+                            )
+                        )
+                    )
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val result = bookingUseCase.update(
+                            eventInfo = eventInfo,
+                            room = roomName
+                        )
+                        when (result) {
+                            is Either.Error -> {
+                                slotComponent.sendIntent(
+                                    SlotStore.Intent.CancelLoading(eventInfo)
+                                )
+                            }
+                            is Either.Success -> {
+                                deleteCachedEventUseCase(roomName, eventInfo)
+                                slotComponent.sendIntent(
+                                    SlotStore.Intent.CancelLoading(eventInfo)
+                                )
+                                addEventUseCase(roomName, eventInfo)
+                            }
+                        }
+                    }
                 }
             )
         }

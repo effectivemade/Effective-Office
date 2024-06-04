@@ -15,7 +15,8 @@ import org.koin.core.component.inject
 
 class FreeSelectStoreFactory(
     private val storeFactory: StoreFactory,
-    private val eventInfo: EventInfo
+    private val eventInfo: EventInfo,
+    private val onRemoveEvent: (EventInfo) -> Unit
 ) : KoinComponent {
     val cancelUseCase: CancelUseCase by inject()
 
@@ -31,10 +32,10 @@ class FreeSelectStoreFactory(
             ) {}
 
     private sealed interface Message {
-        object Success : Message
-        object Load : Message
-        object Fail : Message
-        object Reset : Message
+        data object Success : Message
+        data object Load : Message
+        data object Fail : Message
+        data object Reset : Message
     }
 
     private inner class ExecutorImpl() :
@@ -56,6 +57,7 @@ class FreeSelectStoreFactory(
         private fun freeRoom() = scope.launch() {
             dispatch(Message.Load)
             if (cancelUseCase(eventInfo) is Either.Success) {
+                onRemoveEvent(eventInfo)
                 publish(FreeSelectStore.Label.Close)
                 dispatch(Message.Success)
                 dispatch(Message.Reset)

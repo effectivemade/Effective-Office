@@ -62,7 +62,13 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
         fun MutableList<RoomInfo>.updList() {
             firstOrNull { it.name == roomName }?.let {
                 val index = indexOf(it)
-                this[index] = this[index].copy(eventList = it.eventList.minus(eventInfo))
+                // this needed for updates because update event
+                // components only stores event with new params
+                val cachedEvent = it.eventList.first { event ->
+                    event == eventInfo
+                            || event.id == eventInfo.id
+                }
+                this[index] = this[index].copy(eventList = it.eventList.minus(cachedEvent))
             }
         }
 
@@ -106,6 +112,21 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
             is Either.Success -> eventResponse.data.map { it.toEvent() }
         }
         return copy(eventList = events)
+    }
+
+    suspend fun addCachedEvent(roomName: String, eventInfo: EventInfo) {
+        fun MutableList<RoomInfo>.updList() {
+            firstOrNull { it.name == roomName }?.let {
+                val index = indexOf(it)
+                this[index] = this[index].copy(eventList = it.eventList.plus(eventInfo))
+            }
+        }
+
+        val newBufferValue = roomsBuffer.bufferedValue().map(
+            errorMapper = { it.map { rooms -> rooms.toMutableList().apply { updList() } } },
+            successMapper = { it.toMutableList().apply { updList() } }
+        )
+        roomsBuffer.update(newBufferValue)
     }
 
     private fun RoomInfo.updateCurrentEvent(): RoomInfo {

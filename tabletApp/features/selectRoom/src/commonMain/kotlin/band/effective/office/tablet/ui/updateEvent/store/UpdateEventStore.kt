@@ -15,16 +15,16 @@ interface UpdateEventStore :
             val calendar: Calendar
         ) : Intent
 
-        object OnExpandedChange : Intent
+        data object OnExpandedChange : Intent
         data class OnSelectOrganizer(val newOrganizer: Organizer) : Intent
         data class OnUpdateEvent(val room: String) : Intent
-        object OnDeleteEvent : Intent
+        data object OnDeleteEvent : Intent
         data class OnInput(val input: String) : Intent
-        object OnDoneInput : Intent
-        object OnOpenSelectDateDialog : Intent
-        object OnCloseSelectDateDialog : Intent
-        object OnClose: Intent
-        object OnBooking: Intent
+        data object OnDoneInput : Intent
+        data object OnOpenSelectDateDialog : Intent
+        data object OnCloseSelectDateDialog : Intent
+        data object OnClose: Intent
+        data object OnBooking: Intent
     }
 
     data class State(
@@ -35,8 +35,6 @@ interface UpdateEventStore :
         val selectOrganizer: Organizer,
         val expanded: Boolean,
         val event: EventInfo,
-        val isLoadUpdate: Boolean,
-        val isErrorUpdate: Boolean,
         val inputText: String,
         val isInputError: Boolean,
         val isLoadDelete: Boolean,
@@ -54,8 +52,6 @@ interface UpdateEventStore :
                 selectOrganizer = Organizer.default,
                 expanded = false,
                 event = EventInfo.emptyEvent,
-                isLoadUpdate = false,
-                isErrorUpdate = false,
                 inputText = "",
                 isInputError = false,
                 isLoadDelete = false,
