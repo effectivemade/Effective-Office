@@ -74,7 +74,6 @@ class UpdateEventStoreFactory(
 
     private sealed interface Action {
         data class LoadOrganizers(val orgList: List<Organizer>) : Action
-        data object CloseModals : Action
     }
 
     private inner class ExecutorImpl :
@@ -267,9 +266,6 @@ class UpdateEventStoreFactory(
         override fun executeAction(action: Action, getState: () -> UpdateEventStore.State) {
             when (action) {
                 is Action.LoadOrganizers -> dispatch(Message.LoadOrganizers(action.orgList))
-                is Action.CloseModals -> {
-                    onCloseRequest()
-                }
             }
         }
     }

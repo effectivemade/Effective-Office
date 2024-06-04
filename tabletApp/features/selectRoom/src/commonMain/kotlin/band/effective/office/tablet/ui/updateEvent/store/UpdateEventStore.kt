@@ -65,7 +65,5 @@ interface UpdateEventStore :
         fun isCreatedEvent() = !event.isNotCreated()
     }
 
-    sealed interface Label {
-        object Close : Label
-    }
+    sealed interface Label
 }
