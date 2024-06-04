@@ -5,9 +5,7 @@ import band.effective.office.tablet.domain.model.Organizer
 import band.effective.office.tablet.domain.model.Slot
 import band.effective.office.tablet.domain.useCase.CheckBookingUseCase
 import band.effective.office.tablet.domain.useCase.OrganizersInfoUseCase
-import band.effective.office.tablet.domain.useCase.TimerUseCase
 import band.effective.office.tablet.ui.updateEvent.UpdateEventComponent
-import band.effective.office.tablet.utils.BootstrapperTimer
 import band.effective.office.tablet.utils.removeSeconds
 import band.effective.office.tablet.utils.unbox
 import com.arkivanov.mvikotlin.core.store.Reducer
@@ -16,14 +14,11 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.core.utils.ExperimentalMviKotlinApi
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Calendar
 import java.util.GregorianCalendar
-import kotlin.time.Duration.Companion.seconds
 
 class UpdateEventStoreFactory(
     private val storeFactory: StoreFactory,
@@ -37,9 +32,6 @@ class UpdateEventStoreFactory(
 
     val organizersInfoUseCase: OrganizersInfoUseCase by inject()
     val checkBookingUseCase: CheckBookingUseCase by inject()
-
-    private val timerUseCase: TimerUseCase by inject()
-    private val modalTimer = BootstrapperTimer<Action>(timerUseCase)
 
     @OptIn(ExperimentalMviKotlinApi::class)
     fun create(defaultValue: UpdateEventStore.State = UpdateEventStore.State.defaultValue): UpdateEventStore =
@@ -57,16 +49,6 @@ class UpdateEventStoreFactory(
                                     })
                             )
                         )
-                    }
-                    timerUseCase.timer(this, 1.seconds) { _ ->
-                        withContext(Dispatchers.Main) {
-                            //dispatch(Action.OnUpdateTimer)
-                        }
-                    }
-                    modalTimer.start(this, 60.seconds) {
-                        withContext(Dispatchers.Main) {
-                            dispatch(Action.CloseModals)
-                        }
                     }
                 },
                 executorFactory = ::ExecutorImpl,
