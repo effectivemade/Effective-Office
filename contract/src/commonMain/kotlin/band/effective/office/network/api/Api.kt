@@ -110,12 +110,12 @@ interface Api {
     fun subscribeOnBookingsList(
         workspaceId: String,
         scope: CoroutineScope
-    ): Flow<Either<ErrorResponse, List<BookingDTO>>>
+    ): Flow<Either<ErrorResponse, List<BookingResponseDTO>>>
 
     suspend fun getUserByEmail(email: String): Either<ErrorResponse, UserDTO>
 
     suspend fun getBookings(
         rangeFrom: Long? = null,
         rangeTo: Long? = null
-    ): Either<ErrorResponse, List<BookingDTO>>
+    ): Either<ErrorResponse, List<BookingResponseDTO>>
 }

@@ -85,6 +85,7 @@ fun BookingInfo.toRequestDTOModel(userEmail: String, workSpaceId: String, recurr
         workspaceId = workSpaceId,
         beginBooking = localDateTimeToUnix(dateOfStart)!!,
         endBooking = localDateTimeToUnix(dateOfEnd)!!,
+        recurrence = recurrence
     )
 
 fun BookingInfo.toUiModel() = ReservedSeat(

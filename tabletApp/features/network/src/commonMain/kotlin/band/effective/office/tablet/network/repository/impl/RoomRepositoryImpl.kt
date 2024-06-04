@@ -2,6 +2,7 @@ package band.effective.office.tablet.network.repository.impl
 
 import band.effective.office.network.api.Api
 import band.effective.office.network.dto.BookingDTO
+import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.WorkspaceDTO
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
@@ -172,6 +173,13 @@ class RoomRepositoryImpl(
         finishTime = GregorianCalendar().apply { time = Date(endBooking) },
         organizer = getOrgById(owner.id),
         id = id ?: "empty id"
+    )
+
+    private suspend fun BookingResponseDTO.toEventInfo() = EventInfo(
+        startTime = GregorianCalendar().apply { time = Date(beginBooking) },
+        finishTime = GregorianCalendar().apply { time = Date(endBooking) },
+        organizer = getOrgById(owner?.id ?: ""),
+        id = id
     )
 
     /**Get organizer by id*/

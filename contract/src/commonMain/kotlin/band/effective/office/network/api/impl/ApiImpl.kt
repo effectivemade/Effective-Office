@@ -94,7 +94,7 @@ class ApiImpl : Api {
 
     override suspend fun getBooking(id: String): Either<ErrorResponse, BookingResponseDTO> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
         ) {
             url {
                 appendPathSegments(id)
@@ -107,7 +107,7 @@ class ApiImpl : Api {
         endDate: Long
     ): Either<ErrorResponse, List<BookingResponseDTO>> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
         ) {
             url {
                 parameters.append("user_id", userId)
@@ -122,7 +122,7 @@ class ApiImpl : Api {
         to: Long?
     ): Either<ErrorResponse, List<BookingResponseDTO>> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
         ) {
             url {
                 parameters.append("workspace_id", workspaceId)
@@ -137,7 +137,7 @@ class ApiImpl : Api {
 
     override suspend fun createBooking(bookingInfo: BookingRequestDTO): Either<ErrorResponse, BookingResponseDTO> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
             method = KtorEtherClient.RestMethod.Post
         ) {
             contentType(ContentType.Application.Json)
@@ -148,7 +148,7 @@ class ApiImpl : Api {
         bookingInfo: BookingRequestDTO
     ): Either<ErrorResponse, BookingResponseDTO> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
             method = KtorEtherClient.RestMethod.Put
         ) {
             contentType(ContentType.Application.Json)
@@ -159,7 +159,7 @@ class ApiImpl : Api {
 
     override suspend fun deleteBooking(bookingId: String): Either<ErrorResponse, SuccessResponse> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
             method = KtorEtherClient.RestMethod.Delete
         ) {
             url {
@@ -185,7 +185,7 @@ class ApiImpl : Api {
 
 
     override suspend fun getUserByEmail(email: String): Either<ErrorResponse, UserDTO> =
-        client.securityResponse("$baseUrl/users") {
+        client.securityResponse("$baseUrl/api/v1/users") {
             url {
                 parameters.append(name = "email", value = email)
             }
@@ -194,7 +194,7 @@ class ApiImpl : Api {
     override suspend fun getBookings(
         rangeFrom: Long?,
         rangeTo: Long?
-    ): Either<ErrorResponse, List<BookingDTO>> =
+    ): Either<ErrorResponse, List<BookingResponseDTO>> =
         client.securityResponse(
             urlString = "$baseUrl/api/v1/bookings",
         ) {
@@ -211,7 +211,7 @@ class ApiImpl : Api {
     override fun subscribeOnBookingsList(
         workspaceId: String,
         scope: CoroutineScope
-    ): Flow<Either<ErrorResponse, List<BookingDTO>>> =
+    ): Flow<Either<ErrorResponse, List<BookingResponseDTO>>> =
         collector.flow(scope).filter { it == "booking" }
             .map { Either.Success(listOf()) }
 }
