@@ -62,10 +62,10 @@ dependencies {
     implementation("io.ktor:ktor-server-swagger:$ktor_version")
     implementation("io.github.smiley4:ktor-swagger-ui:2.2.0")
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.32.1")
-    implementation("com.google.apis:google-api-services-calendar:v3-rev411-1.25.0")
+    implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.3.0")
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
-    implementation("com.google.firebase:firebase-admin:8.2.0")
+    implementation("com.google.firebase:firebase-admin:9.3.0")
 
     liquibaseRuntime("org.liquibase:liquibase-core:$liquibase_version")
     liquibaseRuntime("org.postgresql:postgresql:$postgresql_driver_version")

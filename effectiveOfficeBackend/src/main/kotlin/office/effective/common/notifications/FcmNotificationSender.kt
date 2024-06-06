@@ -9,6 +9,8 @@ import kotlinx.serialization.json.Json
 import office.effective.common.constants.BookingConstants
 import office.effective.dto.*
 import office.effective.features.calendar.repository.CalendarIdsRepository
+import office.effective.model.Booking
+import office.effective.model.Workspace
 import office.effective.serviceapi.IBookingService
 import org.slf4j.LoggerFactory
 import java.time.LocalTime
@@ -29,8 +31,8 @@ class FcmNotificationSender(
 
     companion object {
         private const val AVG_BOOKING_EVENT_SIZE = 260
-        // 196 bytes for default structure (token, message) and message id
-        private const val MAX_MESSAGE_SIZE = 3900
+        // 296 bytes for default structure (token, message) and message id
+        private const val MAX_MESSAGE_SIZE = 3800
         const val MAX_BOOKING_EVENTS_IN_MESSAGE = MAX_MESSAGE_SIZE / AVG_BOOKING_EVENT_SIZE
     }
     /**
@@ -49,7 +51,8 @@ class FcmNotificationSender(
     
     override fun sendUpdateContentMessages(topic: String, resourceId: String) {
         logger.info("[sendUpdateContentMessages] Received update on {} calendar id", resourceId)
-        val workspace = calendarIdsRepository.findWorkspaceById(resourceId)
+        val workspace = calendarIdsRepository
+            .findWorkspaceById(resourceId, shouldFindUtilities = false)
         if (workspace.tag != "meeting") return
 
         val startTime = ZonedDateTime
@@ -68,23 +71,50 @@ class FcmNotificationSender(
             shouldFindIntegrationsAndUtilities = false
         )
         
-        val messageId = UUID.randomUUID().toString()
-        val messageBatches = bookings.chunked(MAX_BOOKING_EVENTS_IN_MESSAGE) { bookingList ->
-            val fcmWorkspace = fcmWorkspaceConverter
-                .fromModelsToDTO(workspace, bookingList)
-            
-            val json = Json.encodeToString(fcmWorkspace)
-
-            Message.builder()
-                .setTopic(topic)
-                .putData("id", messageId)
-                .putData("object", json)
-                .build()
-        }
-        
-        val batchResponse = fcm.sendAll(messageBatches)
+        val messages = buildMessagesList(workspace, bookings, topic)
+        val batchResponse = fcm.sendEach(messages)
         handleFcmResponses(batchResponse)
     }
+    
+    private fun buildMessagesList(workspace: Workspace, bookings: List<Booking>, topic: String): List<Message> {
+        val messageId = UUID.randomUUID().toString()
+        if (bookings.isEmpty()) {
+            val message = buildMessage(messageId, workspace, emptyList(), topic, "1", "1")
+            return listOf(message)
+        }
+        
+        val bookingChunks = bookings.chunked(MAX_BOOKING_EVENTS_IN_MESSAGE)
+        val messages = bookingChunks.mapIndexed { index, bookingList ->
+            buildMessage(
+                messageId, workspace, bookingList, topic,
+                index.toString(), bookingChunks.size.toString()
+            )
+        }
+        
+        return messages
+    }
+    
+    private fun buildMessage(
+        messageId: String,
+        workspace: Workspace,
+        bookingList: List<Booking>,
+        topic: String,
+        messageNum: String,
+        maxMessages: String
+    ): Message {
+        val fcmWorkspace = fcmWorkspaceConverter
+            .fromModelsToDTO(workspace, bookingList)
+        val json = Json.encodeToString(fcmWorkspace)
+
+        return Message.builder()
+            .setTopic(topic)
+            .putData("id", messageId)
+            .putData("workspace", json)
+            .putData("messageNum", messageNum)
+            .putData("maxMessages", maxMessages)
+            .build()
+    }
+    
     
     private fun handleFcmResponses(batchResponse: BatchResponse) {
         for (response in batchResponse.responses) {

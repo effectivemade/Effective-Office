@@ -1,7 +1,6 @@
 package office.effective.features.calendar.repository
 
 import office.effective.common.exception.InstanceNotFoundException
-import office.effective.config
 import office.effective.features.workspace.converters.WorkspaceRepositoryConverter
 import office.effective.features.workspace.repository.WorkspaceEntity
 import office.effective.features.workspace.repository.WorkspaceRepository
@@ -35,17 +34,22 @@ class CalendarIdsRepository(
 
     /**
      * @param calendarId
+     * @param shouldFindUtilities whether workspace utilities should be found or not
      * @return [Workspace] model by calendar id (String)
      * */
-    fun findWorkspaceById(calendarId: String): Workspace {
+    fun findWorkspaceById(calendarId: String, shouldFindUtilities: Boolean = true): Workspace {
         logger.debug("[findWorkspaceById] retrieving a workspace with calendar id={}", calendarId)
         try {
             val workspaceEntity =
                 db.calendarIds.find { it.calendarId eq calendarId }?.workspace ?: throw InstanceNotFoundException(
                     WorkspaceEntity::class, "Workspace with such google calendar id not found", null
                 )
+            val utilities = if (shouldFindUtilities)
+                workspaceRepository.findUtilitiesByWorkspaceId(workspaceEntity.id)
+            else emptyList()
+            
             return converter.entityToModel(
-                workspaceEntity, workspaceRepository.findUtilitiesByWorkspaceId(workspaceEntity.id)
+                workspaceEntity, utilities
             )
         } catch (ex: InstanceNotFoundException) {
             logger.warn("[findWorkspaceById] can't find a workspace with calendar id ${calendarId}. Creating placeholder.")
