@@ -6,15 +6,13 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import io.ktor.server.application.*
 import office.effective.config
-import office.effective.features.user.service.UserService
-import office.effective.serviceapi.IUserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
  * Implementation of [Authorizer]. Checks GoogleIdTokens
  * */
-class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor(), private val userService: IUserService) : Authorizer {
+class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor()) : Authorizer {
 
     private val verifier: GoogleIdTokenVerifier =
         GoogleIdTokenVerifier.Builder(NetHttpTransport(), GsonFactory()).build()
@@ -56,12 +54,6 @@ class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor(), 
             logger.trace("Token auth with token: {}", tokenString)
             return false
         } else {
-            val user = userService.getUserByEmail(userMail)
-            if(user == null) {
-                logger.info("Token auth failed")
-                logger.trace("Token auth with token: {}", tokenString)
-                return false
-            }
             logger.info("Token auth succeed")
             return true
         }

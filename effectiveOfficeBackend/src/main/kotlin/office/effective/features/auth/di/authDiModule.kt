@@ -9,7 +9,7 @@ val authDiModule = module(createdAtStart = true) {
     single {
         AuthorizationPipeline()
             .addAuthorizer(PermitAuthorizer(listOf("/swagger/", "/notifications" )))
-            .addAuthorizer(TokenAuthorizer(get(), get()))
+            .addAuthorizer(TokenAuthorizer(get()))
             .addAuthorizer(RequestAuthorizer(get()))
             .addAuthorizer(ApiKeyAuthorizer())
     }
