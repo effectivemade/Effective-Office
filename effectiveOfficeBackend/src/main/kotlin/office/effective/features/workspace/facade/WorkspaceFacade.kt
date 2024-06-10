@@ -36,7 +36,6 @@ class WorkspaceFacade(private val service: IWorkspaceService,
      * @param id id of requested workspace. Should be valid UUID
      * @return [WorkspaceResponseDTO] with the given [id]
      * @throws InstanceNotFoundException if workspace with the given id doesn't exist in database
-     * @author Daniil Zavyalov
      */
     fun findById(id: String): WorkspaceResponseDTO {
         val uuid = uuidValidator.uuidFromString(id)
@@ -55,7 +54,6 @@ class WorkspaceFacade(private val service: IWorkspaceService,
      *
      * @param tag tag name of requested workspaces
      * @return List of [WorkspaceResponseDTO] with the given [tag]
-     * @author Daniil Zavyalov
      */
     fun findAllByTag(tag: String): List<WorkspaceResponseDTO> {
         val result = transactionManager.useTransaction({
@@ -74,7 +72,6 @@ class WorkspaceFacade(private val service: IWorkspaceService,
      * @return List of [WorkspaceResponseDTO] with the given [tag]
      * @throws ValidationException if begin or end timestamp less than 0, greater than max timestamp
      * or if end timestamp less than or equal to begin timestamp
-     * @author Daniil Zavyalov
      */
     fun findAllFreeByPeriod(tag: String, beginTimestamp: Long, endTimestamp: Long): List<WorkspaceResponseDTO> {
         if (beginTimestamp < 0L || beginTimestamp >= 2147483647000L)
@@ -99,7 +96,6 @@ class WorkspaceFacade(private val service: IWorkspaceService,
      * Returns all workspace zones
      *
      * @return List of all [WorkspaceZoneDTO]
-     * @author Daniil Zavyalov
      */
     fun findAllZones(): List<WorkspaceZoneDTO> {
         return transactionManager.useTransaction({

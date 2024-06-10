@@ -13,7 +13,6 @@ interface IBookingRepository {
      *
      * @param id booking id
      * @return true if booking exists
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun existsById(id: String): Boolean
 
@@ -21,7 +20,6 @@ interface IBookingRepository {
      * Deletes the booking with the given id
      *
      * @param id booking id
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun deleteById(id: String)
 
@@ -31,7 +29,6 @@ interface IBookingRepository {
      *
      * @param bookingId booking id
      * @return [Booking] with the given [bookingId] or null if booking with the given id doesn't exist
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun findById(bookingId: String): Booking?
 
@@ -44,7 +41,6 @@ interface IBookingRepository {
      * @param returnInstances return recurring bookings as non-recurrent instances
      *
      * @return List of all user [Booking]
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun findAllByOwnerId(
         ownerId: UUID,
@@ -61,7 +57,6 @@ interface IBookingRepository {
      * @param eventRangeTo lover bound for filtering bookings by start time
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all workspace [Booking]
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun findAllByWorkspaceId(
         workspaceId: UUID,
@@ -79,7 +74,6 @@ interface IBookingRepository {
      * @param eventRangeTo lover bound for filtering bookings by start time
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all [Booking]s with the given workspace and owner id
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun findAllByOwnerAndWorkspaceId(
         ownerId: UUID,
@@ -96,7 +90,6 @@ interface IBookingRepository {
      * @param eventRangeTo lover bound for filtering bookings by start time
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return All [Booking]s
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun findAll(eventRangeFrom: Long, eventRangeTo: Long? = null, returnInstances: Boolean = true): List<Booking>
 
@@ -106,7 +99,6 @@ interface IBookingRepository {
      *
      * @param booking [Booking] to be saved
      * @return saved [Booking]
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun save(booking: Booking): Booking
 
@@ -116,7 +108,6 @@ interface IBookingRepository {
      * @param booking changed booking
      * @return [Booking] after change saving
      * @throws InstanceNotFoundException if booking given id doesn't exist in the database
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun update(booking: Booking): Booking
 }

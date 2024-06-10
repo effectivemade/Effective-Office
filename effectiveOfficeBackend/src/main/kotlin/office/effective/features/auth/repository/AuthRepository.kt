@@ -13,8 +13,6 @@ class AuthRepository(private val db: Database) {
      * @return encrypted api key [String]
      * @param keyEncrypted encrypted input [String]
      * @throws InstanceNotFoundException(ApiKeyEntity::class, "No such key found")
-     *
-     * @author Kiselev Danil
      * */
     fun findApiKey(keyEncrypted: String): String? {
         return db.apikeys.find { it.value.eq(keyEncrypted) }?.keyValue

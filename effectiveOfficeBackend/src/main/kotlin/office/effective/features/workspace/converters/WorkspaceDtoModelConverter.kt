@@ -21,7 +21,6 @@ class WorkspaceDtoModelConverter(private val uuidValidator: UuidValidator) {
      * @param model The [Workspace] object to be converted
      * @param bookings bookings of this workspace
      * @return The resulting [WorkspaceDTO] object
-     * @author Daniil Zavyalov
      */
     fun modelToDto(model: Workspace, bookings: List<BookingResponseDTO>? = null): WorkspaceDTO {
         val utilities = model.utilities.map { utilityModelToDto(it) }
@@ -40,7 +39,6 @@ class WorkspaceDtoModelConverter(private val uuidValidator: UuidValidator) {
      * to [WorkspaceDTO] with [WorkspaceZoneDTO] and [UtilityDTO]s
      * @param model The [Workspace] object to be converted
      * @return The resulting [WorkspaceDTO] object
-     * @author Daniil Zavyalov
      */
     @Deprecated(
         message = "Deprecated since 1.0 api version",
@@ -62,7 +60,6 @@ class WorkspaceDtoModelConverter(private val uuidValidator: UuidValidator) {
      *
      * @param model The [Utility] object to be converted
      * @return The resulting [UtilityDTO] object
-     * @author Daniil Zavyalov
      */
     private fun utilityModelToDto(model: Utility): UtilityDTO {
         return UtilityDTO(model.id.toString(), model.name, model.iconUrl, model.count)
@@ -73,7 +70,6 @@ class WorkspaceDtoModelConverter(private val uuidValidator: UuidValidator) {
      *
      * @param model The [WorkspaceZone] object to be converted
      * @return The resulting [WorkspaceZoneDTO] object
-     * @author Daniil Zavyalov
      */
     fun zoneModelToDto(model: WorkspaceZone): WorkspaceZoneDTO {
         return WorkspaceZoneDTO(model.id.toString(), model.name)
@@ -85,7 +81,6 @@ class WorkspaceDtoModelConverter(private val uuidValidator: UuidValidator) {
      * Uses [UuidValidator] to convert workspace id to UUID, but if [WorkspaceDTO.id]=="null" [Workspace.id] will be null
      * @param dto The WorkspaceDTO object to be converted
      * @return The resulting Workspace object
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun dtoToModel(dto: WorkspaceDTO): Workspace {
         var workspaceId: UUID? = null
@@ -109,7 +104,6 @@ class WorkspaceDtoModelConverter(private val uuidValidator: UuidValidator) {
      * Uses [UuidValidator] to convert workspace id to UUID, but if [WorkspaceResponseDTO.id]=="null" [Workspace.id] will be null
      * @param dto The WorkspaceDTO object to be converted
      * @return The resulting Workspace object
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     @Deprecated(
         message = "Deprecated since 1.0 api version",
@@ -136,7 +130,6 @@ class WorkspaceDtoModelConverter(private val uuidValidator: UuidValidator) {
      *
      * @param dto The [UtilityDTO] object to be converted
      * @return The resulting [Utility] object
-     * @author Daniil Zavyalov
      */
     private fun utilityDtoToModel(dto: UtilityDTO): Utility {
         return Utility(uuidValidator.uuidFromString(dto.id), dto.name, dto.iconUrl, dto.count)
@@ -147,7 +140,6 @@ class WorkspaceDtoModelConverter(private val uuidValidator: UuidValidator) {
      *
      * @param dto The [WorkspaceZoneDTO] object to be converted
      * @return The resulting [WorkspaceZone] object
-     * @author Daniil Zavyalov
      */
     private fun zoneDtoToModel(dto: WorkspaceZoneDTO): WorkspaceZone {
         return WorkspaceZone(uuidValidator.uuidFromString(dto.id), dto.name)

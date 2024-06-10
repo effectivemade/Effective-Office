@@ -17,8 +17,6 @@ class UserService(private val repository: UserRepository) : IUserService {
     /**
      * Retrieves all users
      * @return [Set]<[UserModel]>
-     *
-     * @author Daniil Zavyalov
      * */
     override fun getAll(): Set<UserModel> {
         return repository.findAll()
@@ -33,7 +31,6 @@ class UserService(private val repository: UserRepository) : IUserService {
      *
      * @param user User's model
      * @return [UserModel]
-     * @author Kiselev Danil
      */
     override fun updateUser(user: UserModel): UserModel {
         return repository.updateUser(user)
@@ -44,7 +41,6 @@ class UserService(private val repository: UserRepository) : IUserService {
      *
      * @param emailStr user email
      * @return [UserModel]
-     * @author Kiselev Danil
      * */
     override fun getUserByEmail(emailStr: String): UserModel? {
         return repository.findByEmail(emailStr)

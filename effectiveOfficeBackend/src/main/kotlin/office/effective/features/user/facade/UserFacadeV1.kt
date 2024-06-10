@@ -21,7 +21,6 @@ class UserFacadeV1(
      *
      * @param tagStr name of the tag
      * @return [Set]<[UserDTO]>
-     * @author Kiselev Danil, Daniil Zavyalov
      * */
     fun getUsersByTag(tagStr: String): Set<UserDTO> {
         val models: Set<UserModel> =
@@ -35,8 +34,6 @@ class UserFacadeV1(
      * Retrieves all users
      * @return [Set]<[UserDTO]>
      * @throws InstanceNotFoundException(UserModel::class, "User with id ${userIdStr} not found", null)
-     *
-     * @author Daniil Zavyalov
      * */
     fun getUsers(): Set<UserDTO> {
         return transactionManager.useTransaction({
@@ -54,7 +51,6 @@ class UserFacadeV1(
      * @param userIdStr string value of user id
      * @return [UserDTO]
      * @throws InstanceNotFoundException(UserModel::class, "User with id ${userIdStr} not found", null)
-     * @author Kiselev Danil
      * */
     fun getUserById(userIdStr: String): UserDTO {
         return transactionManager.useTransaction<UserDTO>({
@@ -72,7 +68,6 @@ class UserFacadeV1(
      * @param email user email
      * @return [UserDTO]
      * @throws InstanceNotFoundException(UserModel::class, "User with email $email not found", null)
-     * @author Kiselev Danil, Daniil Zavyalov
      * */
     fun getUserByEmail(email: String): UserDTO {
         return transactionManager.useTransaction<UserDTO>({
@@ -89,8 +84,6 @@ class UserFacadeV1(
      *
      * @param user [UserDTO] - user dto with changed information
      * @return [UserDTO] - updated user
-     *
-     * @author Danil Kiselev, Daniil Zavyalov
      */
     fun updateUser(user: UserDTO): UserDTO {
         return transactionManager.useTransaction({

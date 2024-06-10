@@ -6,13 +6,15 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import io.ktor.server.application.*
 import office.effective.config
+import office.effective.features.user.service.UserService
+import office.effective.serviceapi.IUserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
  * Implementation of [Authorizer]. Checks GoogleIdTokens
  * */
-class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor()) : Authorizer {
+class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor(), private val userService: IUserService) : Authorizer {
 
     private val verifier: GoogleIdTokenVerifier =
         GoogleIdTokenVerifier.Builder(NetHttpTransport(), GsonFactory()).build()
@@ -25,11 +27,8 @@ class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor()) 
      * Check Google ID Token using google library
      *
      * @param call [String] which contains token to verify
-     * @author Kiselev Danil
      * @throws Exception("Token wasn't verified by Google") if token does not contain payload
      * @return is token correct
-     *
-     * @author Kiselev Danil
      * */
     override suspend fun authorize(call: ApplicationCall): Boolean {
         var userMail: String? = null
@@ -57,6 +56,12 @@ class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor()) 
             logger.trace("Token auth with token: {}", tokenString)
             return false
         } else {
+            val user = userService.getUserByEmail(userMail)
+            if(user == null) {
+                logger.info("Token auth failed")
+                logger.trace("Token auth with token: {}", tokenString)
+                return false
+            }
             logger.info("Token auth succeed")
             return true
         }
@@ -67,8 +72,6 @@ class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor()) 
      * @param email - [String] from Bearer auth header, which must contains email
      * @throws Exception("Email is empty") if input line is null
      * @return [String], which contains email address
-     *
-     * @author Kiselev Danil
      * */
     private fun extractDomain(email: String?): String {
         email ?: throw Exception("Email is empty")

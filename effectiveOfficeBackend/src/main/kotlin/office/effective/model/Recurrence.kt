@@ -46,7 +46,6 @@ data class Recurrence(
          *
          * @param millisDate - date in milliseconds ([Long])
          * @return [String] - date in DATE-TIME (RFC5545). Example: [BookingConstants.UNTIL_FORMAT]
-         * @author Kiselev Danil
          * */
         private fun toDateRfc5545(millisDate: Long): String {
             val time = GregorianCalendar().apply { timeInMillis = millisDate + 86400000 }

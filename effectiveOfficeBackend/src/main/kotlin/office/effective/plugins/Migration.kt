@@ -10,8 +10,6 @@ import java.sql.DriverManager
 
 /**
  * Run database migrations at application startup if MIGRATIONS_ENABLE is true
- *
- * @author Daniil Zavyalov
  */
 fun Application.configureMigration() {
     val host: String? = System.getenv("DATABASE_HOST")

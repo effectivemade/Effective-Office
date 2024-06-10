@@ -12,7 +12,6 @@ interface IUserService {
      *
      * @param tagStr name of the tag
      * @return Set<UserModel>
-     * @author Kiselev Danil
      * */
     fun getUsersByTag(tagStr: String): Set<UserModel>;
 
@@ -20,7 +19,6 @@ interface IUserService {
      * Return all users in database
      *
      * @return Set<UserModel>
-     * @author Daniil Zavyalov
      * */
     fun getAll(): Set<UserModel>
 
@@ -29,7 +27,6 @@ interface IUserService {
      *
      * @param userIdStr string value of user id
      * @return UserModel or null
-     * @author Kiselev Danil
      * */
     fun getUserById(userIdStr: String): UserModel?;
 
@@ -38,7 +35,6 @@ interface IUserService {
      *
      * @param user User's model
      * @return UserModel
-     * @author Kiselev Danil
      * */
     fun updateUser(user: UserModel): UserModel;
 
@@ -47,7 +43,6 @@ interface IUserService {
      *
      * @param emailStr user email
      * @return UserModel
-     * @author Kiselev Danil
      * */
     fun getUserByEmail(emailStr: String): UserModel?;
 }

@@ -15,7 +15,6 @@ interface IWorkspaceService {
      *
      * @param id id of requested workspace
      * @return [Workspace] with the given [id] or null if workspace with the given id doesn't exist
-     * @author Daniil Zavyalov
      */
     fun findById(id: UUID): Workspace?
 
@@ -24,7 +23,6 @@ interface IWorkspaceService {
      *
      * @param tag tag name of requested workspaces
      * @return List of [Workspace] with the given [tag]
-     * @author Daniil Zavyalov
      */
     fun findAllByTag(tag: String): List<Workspace>
 
@@ -35,7 +33,6 @@ interface IWorkspaceService {
      * @param beginTimestamp period start time
      * @param endTimestamp period end time
      * @return List of [Workspace] with the given [tag]
-     * @author Daniil Zavyalov
      */
     fun findAllFreeByPeriod(tag: String, beginTimestamp: Instant, endTimestamp: Instant): List<Workspace>
 
@@ -43,7 +40,6 @@ interface IWorkspaceService {
      * Returns all workspace zones
      *
      * @return List of all [WorkspaceZone]
-     * @author Daniil Zavyalov
      */
     fun findAllZones(): List<WorkspaceZone>
 }

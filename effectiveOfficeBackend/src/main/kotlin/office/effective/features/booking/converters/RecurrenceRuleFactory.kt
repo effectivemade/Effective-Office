@@ -6,14 +6,9 @@ import office.effective.model.Recurrence
 
 /**
  * Object for creating Google calendar recurrence rule
- *
- * @author Max Mishenko
  */
 object RecurrenceRuleFactory {
 
-    /**
-     * @author Max Mishenko
-     */
     fun String.getRecurrence(): Recurrence = trim('[', ']').substringAfter(":").split(";").fold(
         Recurrence(
             interval = 0,
@@ -44,9 +39,6 @@ object RecurrenceRuleFactory {
         }
     }
 
-    /**
-     * @author Max Mishenko
-     */
     fun Recurrence.rule() =
         "RRULE:".let { it + "FREQ=${freq.name};" }.let { if (interval != 0) it + "INTERVAL=${interval};" else it }.let {
             it + when (ending) {
@@ -68,9 +60,7 @@ object RecurrenceRuleFactory {
                 .trim(',') + ";" else it
         }
 
-    /**
-     * @author Max Mishenko
-     */
+
     private fun Int.toName(): String = when (this) {
         1 -> "MO"
         2 -> "TU"
@@ -82,9 +72,7 @@ object RecurrenceRuleFactory {
         else -> ""
     }
 
-    /**
-     * @author Max Mishenko
-     */
+
     private fun String.toDayNum(): Int = when (this) {
         "MO" -> 1
         "TU" -> 2

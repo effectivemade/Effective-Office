@@ -19,7 +19,6 @@ object RecurrenceConverter {
      *
      * @param model [RecurrenceModel] to be converted
      * @return The resulting [RecurrenceDTO] object
-     * @author Max Mishenko
      */
     fun modelToDto(model: RecurrenceModel): RecurrenceDTO {
         return RecurrenceDTO(
@@ -39,7 +38,6 @@ object RecurrenceConverter {
      *
      * @param dto [RecurrenceDTO] to be converted
      * @return The resulting [RecurrenceModel] object
-     * @author Max Mishenko
      */
     fun dtoToModel(dto: RecurrenceDTO): RecurrenceModel {
         if (dto.count != null && dto.until != null)

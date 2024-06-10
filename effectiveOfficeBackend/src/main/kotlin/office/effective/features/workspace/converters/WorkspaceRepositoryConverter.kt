@@ -28,7 +28,6 @@ class WorkspaceRepositoryConverter(private val database: Database) {
      * @param entity The [WorkspaceEntity] object to be converted
      * @param utilities [Utilities][Utility] for [Workspace]
      * @return The resulting [Workspace] object
-     * @author Daniil Zavyalov
      */
     fun entityToModel(entity: WorkspaceEntity, utilities: List<Utility>): Workspace {
         return Workspace(
@@ -46,7 +45,6 @@ class WorkspaceRepositoryConverter(private val database: Database) {
      * @param entity The [WorkspaceEntity] object to be converted
      * @param count The number of this utility in the workspace
      * @return The resulting [Utility] object
-     * @author Daniil Zavyalov
      */
     fun utilityEntityToModel(entity: UtilityEntity, count: Int): Utility {
         return Utility(entity.id, entity.name, entity.iconUrl, count)
@@ -57,7 +55,6 @@ class WorkspaceRepositoryConverter(private val database: Database) {
      *
      * @param zoneEntity The [WorkspaceZoneEntity] object to be converted
      * @return The resulting [WorkspaceZone] object
-     * @author Daniil Zavyalov
      */
     fun zoneEntityToModel(zoneEntity: WorkspaceZoneEntity): WorkspaceZone {
         return WorkspaceZone(zoneEntity.id, zoneEntity.name)
@@ -68,8 +65,6 @@ class WorkspaceRepositoryConverter(private val database: Database) {
      * Use database connection to find [WorkspaceTagEntity] by [Workspace.tag]
      *
      * @throws InstanceNotFoundException if tag doesn't exist in the database
-     *
-     * @author Daniil Zavyalov
      */
     fun modelToEntity(model: Workspace): WorkspaceEntity {
         val tagEntity: WorkspaceTagEntity = database.workspaceTags.find { it.name eq model.tag }
@@ -91,7 +86,6 @@ class WorkspaceRepositoryConverter(private val database: Database) {
      *
      * @param zoneModel The [WorkspaceZone] object to be converted
      * @return The resulting [WorkspaceZoneEntity] object
-     * @author Daniil Zavyalov
      */
     fun zoneModelToEntity(zoneModel: WorkspaceZone): WorkspaceZoneEntity {
         return WorkspaceZoneEntity {

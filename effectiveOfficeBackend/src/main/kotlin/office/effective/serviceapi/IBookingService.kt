@@ -14,7 +14,6 @@ interface IBookingService {
      *
      * @param id booking id
      * @return true if booking exists
-     * @author Daniil Zavyalov
      */
     fun existsById(id: String): Boolean
 
@@ -22,7 +21,6 @@ interface IBookingService {
      * Deletes the booking with the given id
      *
      * @param id booking id
-     * @author Daniil Zavyalov
      */
     fun deleteById(id: String)
 
@@ -31,7 +29,6 @@ interface IBookingService {
      *
      * @param id - booking id
      * @return [Booking] with the given [id] or null if workspace with the given id doesn't exist
-     * @author Daniil Zavyalov
      */
     fun findById(id: String): Booking?
 
@@ -44,7 +41,6 @@ interface IBookingService {
      * @param bookingRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * @throws InstanceNotFoundException if [UserModel] or [Workspace] with the given id doesn't exist in database
-     * @author Daniil Zavyalov
      */
     fun findAll(
         userId: UUID? = null,
@@ -59,7 +55,6 @@ interface IBookingService {
      *
      * @param booking [Booking] to be saved
      * @return saved [Booking]
-     * @author Daniil Zavyalov
      */
     fun save(booking: Booking): Booking
 
@@ -68,7 +63,6 @@ interface IBookingService {
      *
      * @param booking changed booking
      * @return [Booking] after change saving
-     * @author Daniil Zavyalov
      */
     fun update(booking: Booking): Booking
 }

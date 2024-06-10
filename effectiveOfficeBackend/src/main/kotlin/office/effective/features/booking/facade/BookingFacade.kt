@@ -35,7 +35,6 @@ class BookingFacade(
      * Deletes the booking with the given id
      *
      * @param id booking id
-     * @author Daniil Zavyalov
      */
     fun deleteById(id: String) {
         transactionManager.useTransaction({
@@ -49,7 +48,6 @@ class BookingFacade(
      * @param id id of requested booking
      * @return [BookingDTO] with the given id
      * @throws InstanceNotFoundException if booking with the given id doesn't exist in database
-     * @author Daniil Zavyalov
      */
     fun findById(id: String): BookingDTO {
         val dto: BookingDTO = transactionManager.useTransaction({
@@ -70,7 +68,6 @@ class BookingFacade(
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * Should be lover than [bookingRangeFrom]. Default value: [BookingConstants.MIN_SEARCH_START_TIME]
      * @return [BookingDTO] list
-     * @author Daniil Zavyalov
      */
     fun findAll(
         userId: String?,
@@ -100,7 +97,6 @@ class BookingFacade(
      *
      * @param bookingDTO [BookingDTO] to be saved
      * @return saved [BookingDTO]
-     * @author Daniil Zavyalov
      */
     fun post(bookingDTO: BookingDTO): BookingDTO {
         val model = bookingConverter.dtoToModel(bookingDTO)
@@ -117,7 +113,6 @@ class BookingFacade(
      * @param bookingDTO changed booking
      * @return [BookingDTO] after change saving
      * @throws BadRequestException if booking id is null
-     * @author Daniil Zavyalov
      */
     fun put(bookingDTO: BookingDTO): BookingDTO {
         if (bookingDTO.id == null) throw BadRequestException("Missing booking id")

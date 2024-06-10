@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 /**
  * Authorizer to permit routes. Permit all child routes, if parent permitted.
  * Example: "/workspaces" permission allow access to "/workspaces/zones" routes.
- * @author Danil Kiselev
  * */
 class PermitAuthorizer(private val permittedPaths: Iterable<String>) : Authorizer {
 

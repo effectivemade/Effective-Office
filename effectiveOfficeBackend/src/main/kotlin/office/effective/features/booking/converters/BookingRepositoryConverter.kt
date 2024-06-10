@@ -44,7 +44,6 @@ class BookingRepositoryConverter(private val database: Database,
      * @param bookingEntity [WorkspaceBookingEntity] to be converted
      * @param participants users who participate in the booking
      * @return The resulting [Booking] object
-     * @author Daniil Zavyalov
      */
     fun entityToModel(bookingEntity: WorkspaceBookingEntity,
                       participants: List<UserEntity>): Booking {
@@ -71,7 +70,6 @@ class BookingRepositoryConverter(private val database: Database,
      * @return The resulting [WorkspaceBookingEntity] object
      * @throws MissingIdException if the booking, owner or workspace id is null
      * @throws InstanceNotFoundException if the given user or workspace don't exist
-     * @author Daniil Zavyalov
      */
     fun modelToEntity(bookingModel: Booking): WorkspaceBookingEntity {
         logger.trace("Converting booking model to entity")
@@ -101,7 +99,6 @@ class BookingRepositoryConverter(private val database: Database,
      * @return the [UserEntity] for the given booking model
      * @throws MissingIdException if the user id is null
      * @throws InstanceNotFoundException if the given user don't exist
-     * @author Daniil Zavyalov
      */
     private fun findOwnerEntity(ownerModel: UserModel): UserEntity {
         val ownerId: UUID = ownerModel.id
@@ -118,7 +115,6 @@ class BookingRepositoryConverter(private val database: Database,
      * @return the [WorkspaceEntity] for the given booking model
      * @throws MissingIdException if the workspace id is null
      * @throws InstanceNotFoundException if the given workspace don't exist
-     * @author Daniil Zavyalov
      */
     private fun findWorkspaceEntity(workspaceModel: Workspace): WorkspaceEntity {
         val workspaceId: UUID = workspaceModel.id

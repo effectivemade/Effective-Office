@@ -32,7 +32,6 @@ class BookingService(
      *
      * @param id booking id
      * @return true if booking exists
-     * @author Daniil Zavyalov
      */
     override fun existsById(id: String): Boolean {
         return bookingMeetingRepository.existsById(id) || bookingRegularRepository.existsById(id)
@@ -42,7 +41,6 @@ class BookingService(
      * Deletes the booking with the given id
      *
      * @param id booking id
-     * @author Daniil Zavyalov
      */
     override fun deleteById(id: String) {
         bookingMeetingRepository.deleteById(id)
@@ -54,7 +52,6 @@ class BookingService(
      *
      * @param id - booking id
      * @return [Booking] with the given [id] or null if workspace with the given id doesn't exist
-     * @author Daniil Zavyalov
      */
     override fun findById(id: String): Booking? {
         val booking = bookingMeetingRepository.findById(id)
@@ -87,7 +84,6 @@ class BookingService(
      * @param bookingRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
      * @throws InstanceNotFoundException if [UserModel] or [Workspace] with the given id doesn't exist in database
-     * @author Daniil Zavyalov
      */
     override fun findAll(
         userId: UUID?,
@@ -197,7 +193,6 @@ class BookingService(
      * @param bookingList bookings for which user integrations and workspace utilities need to be found and added.
      * @return bookings with user integrations and workspace utilities
      * @throws MissingIdException if user or workspace doesn't have an id
-     * @author Daniil Zavyalov
      */
     private fun findIntegrationsAndUtilities(bookingList: List<Booking>): List<Booking> {
         val userIds = mutableSetOf<UUID>()
@@ -227,7 +222,6 @@ class BookingService(
      * @param bookingList bookings for which user integrations and workspace utilities need to be added.
      * @return bookings with user integrations and workspace utilities
      * @throws MissingIdException if user model doesn't have an id
-     * @author Daniil Zavyalov
      */
     private fun addIntegrationsAndUtilities(
         bookingList: List<Booking>,
@@ -252,7 +246,6 @@ class BookingService(
      * @param user for which integrations need to be added
      * @return List of [IntegrationModel] for the given [UserModel]
      * @throws MissingIdException if user model doesn't have an id
-     * @author Daniil Zavyalov
      */
     private fun findIntegrations(user: UserModel): Set<IntegrationModel> {
         val userId = user.id ?: throw MissingIdException("User with name ${user.fullName} doesn't have an id")
@@ -265,7 +258,6 @@ class BookingService(
      * @param workspace for which utilities need to be added
      * @return List of [Utility] for the given [Workspace]
      * @throws MissingIdException if workspace doesn't have an id
-     * @author Daniil Zavyalov
      */
     private fun findUtilities(workspace: Workspace): List<Utility> {
         val workspaceId =
@@ -279,7 +271,6 @@ class BookingService(
      * @param booking [Booking] to be saved
      * @return saved [Booking]
      * @throws InstanceNotFoundException if workspace with the given id not found
-     * @author Daniil Zavyalov
      */
     override fun save(booking: Booking): Booking {
         val workspaceId = booking.workspace.id ?: throw MissingIdException("Missing booking workspace id")
@@ -303,7 +294,6 @@ class BookingService(
      *
      * @param booking changed booking
      * @return [Booking] after change saving
-     * @author Daniil Zavyalov
      */
     override fun update(booking: Booking): Booking {
         return when (booking.workspace.tag) {

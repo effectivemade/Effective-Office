@@ -195,7 +195,6 @@ class BookingMeetingRepository(
      * @param event
      * @param email
      * @return List of all user [Booking]
-     * @author Danil Kiselev, Daniil Zavyalov
      */
     private fun checkEventOrganizer(event: Event, email: String): Boolean {
         if (event.organizer?.email == defaultCalendar) {
@@ -211,7 +210,6 @@ class BookingMeetingRepository(
      * @param id
      * @return user email
      * @throws InstanceNotFoundException if user with the given id doesn't exist in database
-     * @author Danil Kiselev
      */
     private fun findUserEmailByUserId(id: UUID): String {
         return userRepository.findById(id)?.email ?: throw InstanceNotFoundException(
@@ -285,7 +283,6 @@ class BookingMeetingRepository(
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all user [Booking]
      * @throws InstanceNotFoundException if user with the given id doesn't exist in database
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     override fun findAllByOwnerId(
         ownerId: UUID,
