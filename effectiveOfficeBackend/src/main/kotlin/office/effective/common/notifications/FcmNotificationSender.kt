@@ -79,7 +79,7 @@ class FcmNotificationSender(
     private fun buildMessagesList(workspace: Workspace, bookings: List<Booking>, topic: String): List<Message> {
         val messageId = UUID.randomUUID().toString()
         if (bookings.isEmpty()) {
-            val message = buildMessage(messageId, workspace, emptyList(), topic, "1", "1")
+            val message = buildMessage(messageId, workspace, bookings, topic, "1", "1")
             return listOf(message)
         }
         
@@ -87,7 +87,7 @@ class FcmNotificationSender(
         val messages = bookingChunks.mapIndexed { index, bookingList ->
             buildMessage(
                 messageId, workspace, bookingList, topic,
-                index.toString(), bookingChunks.size.toString()
+                (index + 1).toString(), bookingChunks.size.toString()
             )
         }
         
