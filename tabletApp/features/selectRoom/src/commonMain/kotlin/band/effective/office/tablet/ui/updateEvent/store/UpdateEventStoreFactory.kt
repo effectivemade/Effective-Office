@@ -196,6 +196,10 @@ class UpdateEventStoreFactory(
                 )
             )
             dispatch(Message.BusyEvent(isBusy = busyEvent.isNotEmpty()))
+            checkEnableButton(
+                inputError = state.isInputError,
+                busyEvent = busyEvent.isNotEmpty()
+            )
         }
 
         fun cancel(state: UpdateEventStore.State) {
