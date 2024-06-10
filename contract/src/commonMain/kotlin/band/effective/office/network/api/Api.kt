@@ -1,6 +1,5 @@
 package band.effective.office.network.api
 
-import band.effective.office.network.dto.BookingDTO
 import band.effective.office.network.dto.BookingRequestDTO
 import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.SuccessResponse

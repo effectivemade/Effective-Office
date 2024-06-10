@@ -6,7 +6,6 @@ import band.effective.office.elevator.utils.MonthLocalizations
 import band.effective.office.elevator.utils.capitalizeFirstLetter
 import band.effective.office.elevator.utils.localDateTimeToUnix
 import band.effective.office.elevator.utils.unixToLocalDateTime
-import band.effective.office.network.dto.BookingDTO
 import band.effective.office.network.dto.BookingRequestDTO
 import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.RecurrenceDTO
@@ -24,16 +23,6 @@ data class BookingInfo(
     val dateOfStart: LocalDateTime,
     val dateOfEnd: LocalDateTime
 )
-
-fun BookingDTO.toDomainModel() =
-    BookingInfo(
-        id = id!!,
-        ownerId = owner.id,
-        workSpaceId = workspace.id,
-        seatName = "${workspace.zone?.name.orEmpty()} ${workspace.name}",
-        dateOfStart = unixToLocalDateTime(beginBooking),
-        dateOfEnd = unixToLocalDateTime(endBooking),
-    )
 
 fun BookingResponseDTO.toDomainModel() =
     BookingInfo(
@@ -65,17 +54,6 @@ fun emptyWorkSpaceDTO(id: String) =
         utilities = listOf(),
         zone = null,
         tag = "regular"
-    )
-
-fun BookingInfo.toDTOModel(userDTO: UserDTO, workspaceDTO: WorkspaceDTO, recurrence: RecurrenceDTO?) =
-    BookingDTO(
-        owner = userDTO,
-        participants = listOf(),
-        workspace = workspaceDTO,
-        id = id,
-        beginBooking = localDateTimeToUnix(dateOfStart)!!,
-        endBooking = localDateTimeToUnix(dateOfEnd)!!,
-        recurrence = recurrence
     )
 
 fun BookingInfo.toRequestDTOModel(userEmail: String, workSpaceId: String, recurrence: RecurrenceDTO?) =

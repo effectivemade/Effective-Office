@@ -1,9 +1,7 @@
 package band.effective.office.tablet.network.repository.impl
 
 import band.effective.office.network.api.Api
-import band.effective.office.network.dto.BookingDTO
 import band.effective.office.network.dto.BookingResponseDTO
-import band.effective.office.network.dto.UserDTO
 import band.effective.office.network.dto.WorkspaceDTO
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
@@ -125,13 +123,6 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
             currentEvent = currentEvent
         )
     }
-
-    private fun BookingDTO.toEvent() = EventInfo(
-        startTime = GregorianCalendar().apply { time = Date(beginBooking) },
-        finishTime = GregorianCalendar().apply { time = Date(endBooking) },
-        organizer = this.owner.toOrganizer(),
-        id = id!!
-    )
 
     private fun BookingResponseDTO.toEvent() = EventInfo(
         startTime = GregorianCalendar().apply { time = Date(beginBooking) },

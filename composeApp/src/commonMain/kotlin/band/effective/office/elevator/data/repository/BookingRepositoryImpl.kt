@@ -6,9 +6,6 @@ import band.effective.office.elevator.domain.models.CreatingBookModel
 import band.effective.office.elevator.domain.models.ErrorWithData
 import band.effective.office.elevator.domain.models.TypeEndPeriodBooking
 import band.effective.office.elevator.domain.models.User
-import band.effective.office.elevator.domain.models.emptyUserDTO
-import band.effective.office.elevator.domain.models.emptyWorkSpaceDTO
-import band.effective.office.elevator.domain.models.toDTOModel
 import band.effective.office.elevator.domain.models.toDomainModel
 import band.effective.office.elevator.domain.models.toDomainZone
 import band.effective.office.elevator.domain.models.toRequestDTO
@@ -19,7 +16,6 @@ import band.effective.office.elevator.ui.employee.aboutEmployee.models.BookingsF
 import band.effective.office.elevator.utils.localDateTimeToUnix
 import band.effective.office.elevator.utils.map
 import band.effective.office.network.api.Api
-import band.effective.office.network.dto.BookingDTO
 import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.RecurrenceDTO
 import band.effective.office.network.model.Either
@@ -77,12 +73,12 @@ class BookingRepositoryImpl(
             typeEndPeriod = typeEndPeriod
         )
 
-        val bookingDTO = bookingInfo.toRequestDTOModel(
+        val bookingRequestDTO = bookingInfo.toRequestDTOModel(
             userEmail = user?.email ?: "",
             workSpaceId = bookingInfo.workSpaceId,
             recurrence = recurrence
         )
-        api.updateBooking(bookingInfo = bookingDTO)
+        api.updateBooking(bookingInfo = bookingRequestDTO)
     }
 
     override suspend fun deleteBooking(bookingInfo: BookingInfo) {
@@ -127,7 +123,7 @@ class BookingRepositoryImpl(
         }
 
         val bookingRequestDTO = creatingBookModel.toRequestDTO(
-            userEmail =user.email,
+            userEmail = user.email,
             workspaceId = creatingBookModel.workSpaceId,
             recurrence = recurrence
         )

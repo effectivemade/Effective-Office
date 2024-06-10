@@ -1,7 +1,6 @@
 package band.effective.office.tablet.network.repository.impl
 
 import band.effective.office.network.api.Api
-import band.effective.office.network.dto.BookingDTO
 import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.WorkspaceDTO
 import band.effective.office.network.model.Either
@@ -168,13 +167,6 @@ class RoomRepositoryImpl(
         )
 
     /**Convert DTO to domain model*/
-    private suspend fun BookingDTO.toEventInfo() = EventInfo(
-        startTime = GregorianCalendar().apply { time = Date(beginBooking) },
-        finishTime = GregorianCalendar().apply { time = Date(endBooking) },
-        organizer = getOrgById(owner.id),
-        id = id ?: "empty id"
-    )
-
     private suspend fun BookingResponseDTO.toEventInfo() = EventInfo(
         startTime = GregorianCalendar().apply { time = Date(beginBooking) },
         finishTime = GregorianCalendar().apply { time = Date(endBooking) },
@@ -202,17 +194,6 @@ class RoomRepositoryImpl(
         currentEvent = null,
         id = id
     )
-
-    /**Add load event in Either contain model of room*/
-    private suspend fun Either<ErrorWithData<RoomInfo>, RoomInfo>.addEvents(loadEvents: Either<ErrorResponse, List<BookingDTO>>): Either<ErrorWithData<RoomInfo>, RoomInfo> =
-        if (loadEvents is Either.Success) {
-            when (this) {
-                is Either.Error -> this
-                is Either.Success -> if (data.eventList.isEmpty() && data.currentEvent == null) Either.Success(
-                    data.addEvents(loadEvents.data.map { it.toEventInfo() })
-                ) else this
-            }
-        } else this
 
     /**Add event in room*/
     private fun RoomInfo.addEvents(events: List<EventInfo>): RoomInfo =
