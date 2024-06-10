@@ -32,7 +32,6 @@ class WorkspaceFacadeV1(
      * @param id id of requested workspace. Should be valid UUID
      * @return [WorkspaceDTO] with the given [id]
      * @throws InstanceNotFoundException if workspace with the given id doesn't exist in database
-     * @author Daniil Zavyalov
      */
     fun findById(id: String): WorkspaceDTO {
         val uuid = uuidValidator.uuidFromString(id)
@@ -53,7 +52,6 @@ class WorkspaceFacadeV1(
      * @param withBookingsFrom lower bound (exclusive) for a booking.endBooking to filter by.
      * @param withBookingsUntil upper bound (exclusive) for a booking.beginBooking to filter by.
      * @return List of [WorkspaceDTO] with their bookings
-     * @author Daniil Zavyalov
      */
     fun findAllByTag(
         tag: String,
@@ -90,7 +88,6 @@ class WorkspaceFacadeV1(
      *
      * @param tag tag name of requested workspaces
      * @return List of [Workspace] with the given [tag]
-     * @author Daniil Zavyalov
      */
     private fun findAllByTag(tag: String): List<Workspace> {
         return transactionManager.useTransaction({
@@ -107,7 +104,6 @@ class WorkspaceFacadeV1(
      * @return List of [WorkspaceDTO] with the given [tag]
      * @throws ValidationException if begin or end timestamp less than 0, greater than max timestamp
      * or if end timestamp less than or equal to begin timestamp
-     * @author Daniil Zavyalov
      */
     fun findAllFreeByPeriod(tag: String, beginTimestamp: Long, endTimestamp: Long): List<WorkspaceDTO> {
         if (beginTimestamp < 0L)
@@ -132,7 +128,6 @@ class WorkspaceFacadeV1(
      * Returns all workspace zones
      *
      * @return List of all [WorkspaceZoneDTO]
-     * @author Daniil Zavyalov
      */
     fun findAllZones(): List<WorkspaceZoneDTO> {
         return transactionManager.useTransaction({

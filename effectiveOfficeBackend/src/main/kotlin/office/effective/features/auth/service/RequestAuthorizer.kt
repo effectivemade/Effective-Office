@@ -20,8 +20,6 @@ class RequestAuthorizer(private val extractor: TokenExtractor = TokenExtractor()
      *
      * @param call [ApplicationCall] which contains token to verify
      * @return is token correct
-     *
-     * @author Kiselev Danil
      * */
     override suspend fun authorize(call: ApplicationCall): Boolean {
         val tokenString = extractor.extractToken(call) ?: run {

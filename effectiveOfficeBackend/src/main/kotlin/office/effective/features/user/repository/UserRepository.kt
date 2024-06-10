@@ -28,7 +28,6 @@ class UserRepository(
      *
      * @return [Boolean] (true - exists)
      * @param userId user id in [UUID] format
-     * @author Danil Kiselev
      * */
     fun existsById(userId: UUID): Boolean {
         logger.debug("[existsById] checking whether a user with id={} exists", userId.toString())
@@ -40,7 +39,6 @@ class UserRepository(
      *
      * @return [UserModel] if user exists
      * @param userId user id in [UUID] format
-     * @author Danil Kiselev, Daniil Zavyalov
      * */
     fun findById(userId: UUID): UserModel? {
         logger.debug("[findById] retrieving a user with id={}", userId.toString())
@@ -54,8 +52,6 @@ class UserRepository(
     /**
      * Retrieves all users
      * @return [Set]<[UserModel]>
-     *
-     * @author Daniil Zavyalov
      * */
     fun findAll(): Set<UserModel> {
         logger.debug("[findAll] retrieving all users")
@@ -79,8 +75,6 @@ class UserRepository(
     /**
      * Used to find multiple users with one tag
      * @return [Set]<[UserModel]> - users with tag name like input
-     *
-     * @author Danil Kiselev, Daniil Zavyalov
      * */
     fun findByTag(tagId: UUID): Set<UserModel> {
         logger.debug("[findByTag] retrieving users with tag with id={}", tagId.toString())
@@ -100,7 +94,6 @@ class UserRepository(
      *
      * @return [UserModel]
      * @throws InstanceNotFoundException if user with the given email doesn't exist in database
-     * @author Daniil Zavyalov
      */
     fun findByEmail(email: String): UserModel? {
         logger.debug("[findByEmail] retrieving a user with email {}", email)
@@ -119,7 +112,6 @@ class UserRepository(
      * If a user with one of the specified emails does not exist, that email will be ignored.
      *
      * @return users with integrations
-     * @author Daniil Zavyalov
      */
     fun findAllByEmails(emails: Collection<String>): List<UserModel> {
         logger.debug("[findAllByEmails] retrieving users with emails {}", emails.joinToString())
@@ -141,8 +133,6 @@ class UserRepository(
      * Returns Integration entity by id
      * @return [IntegrationEntity]
      * @throws InstanceNotFoundException([IntegrationEntity], "Integration with id ${id} not found")
-     *
-     * @author Danil Kiselev
      * */
     private fun findIntegrationById(id: UUID): IntegrationEntity {
         logger.trace("[findIntegrationById] retrieving integrations for user with id={}", id.toString())
@@ -156,7 +146,6 @@ class UserRepository(
      * @return [MutableSet]<[IntegrationModel]>
      * @throws InstanceNotFoundException([UserEntity]::class, "User $userId")
      * @param userId user id in [UUID] format
-     * @author Danil Kiselev, Daniil Zavyalov
      * */
     fun findSetOfIntegrationsByUser(userId: UUID): MutableSet<IntegrationModel> {
         logger.trace("[findSetOfIntegrationsByUser] retrieving integrations for user with id={}", userId)
@@ -186,7 +175,6 @@ class UserRepository(
      * @return [HashMap]<[UUID], [MutableSet]<[IntegrationModel]>>
      * @throws InstanceNotFoundException if user with the given id doesn't exist in the database
      * @param ids [Collection]<[UUID]> of users id
-     * @author Daniil Zavyalov, Danil Kiselev
      * */
     fun findAllIntegrationsByUserIds(ids: Collection<UUID>): HashMap<UUID, MutableSet<IntegrationModel>> {
         logger.debug(
@@ -219,7 +207,6 @@ class UserRepository(
      * @return [UserTagModel]
      * @throws InstanceNotFoundException([UsersTagEntity]::class, "Tag with name ${tagName} not found")
      * @param tagName name of the tag
-     * @author Danil Kiselev
      * */
     fun findTagByName(tagName: String): UserTagModel {
         logger.debug("[findTagByName] retrieving users with tag {}", tagName)
@@ -235,8 +222,6 @@ class UserRepository(
      * @throws MissingIdException if the user or integration id is null
      * @throws InstanceNotFoundException if the given user or integration don't exist
      * @param model [UserModel] with updated information
-     *
-     * @author Danil Kiselev, Daniil Zavyalov
      */
     fun updateUser(model: UserModel): UserModel {
         logger.debug("[updateUser] updating user with id {}", model.id)
@@ -268,8 +253,6 @@ class UserRepository(
      * @param integrationModels [Set]<[IntegrationModel]> set of integrations to save
      * @param userId user id in [UUID] format
      * @throws InstanceNotFoundException if the given integration don't exist
-     *
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     private fun saveIntegrations(integrationModels: Set<IntegrationModel>, userId: UUID) {
         logger.trace("[saveIntegrations] saving set of integrations for user with id={}", userId)
@@ -293,7 +276,6 @@ class UserRepository(
      * Returns Tag entity or null, if user with such id doesn't exist
      * @return UsersTagEntity?
      * @param userId user id in [UUID] format
-     * @author Danil Kiselev
      * */
     fun findTagByUserOrNull(userId: UUID): UsersTagEntity? {
         logger.debug("[findTagByUserOrNull] retrieving tag for user with id={}", userId)

@@ -35,7 +35,6 @@ class BookingDtoModelConverter(
      *
      * @param booking [Booking] to be converted
      * @return The resulting [BookingDTO] object
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     @Deprecated(
         message = "Deprecated since 1.0 api version",
@@ -65,7 +64,6 @@ class BookingDtoModelConverter(
      * @throws [MissingIdException] if [booking] doesn't contain an id
      * @param booking [Booking] to be converted
      * @return The resulting [BookingResponseDTO] object
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun modelToResponseDto(booking: Booking): BookingResponseDTO {
         logger.trace("Converting booking model to response dto")
@@ -96,7 +94,6 @@ class BookingDtoModelConverter(
      *
      * @param bookingDTO [BookingDTO] to be converted
      * @return The resulting [Booking] object
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     @Deprecated(
         message = "Deprecated since 1.0 api version",
@@ -127,7 +124,6 @@ class BookingDtoModelConverter(
      * @return The resulting [Booking] object
      * @throws [InstanceNotFoundException] if user with the given email or
      * workspace with the given id doesn't exist in database
-     * @author Daniil Zavyalov, Danil Kiselev
      */
     fun requestDtoToModel(bookingDto: BookingRequestDTO, id: String? = null): Booking {
         logger.trace("Converting booking response dto to model")

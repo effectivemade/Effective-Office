@@ -18,8 +18,6 @@ class FcmNotificationSender(private val fcm: FirebaseMessaging): INotificationSe
 
     /**
      * Sends empty FCM message on topic
-     *
-     * @author Daniil Zavyalov
      */
     override fun sendEmptyMessage(topic: String) {
         logger.info("Sending an FCM message on $topic topic")
@@ -35,8 +33,6 @@ class FcmNotificationSender(private val fcm: FirebaseMessaging): INotificationSe
      *
      * @param action will be put as "action" in message data
      * @param modifiedWorkspace will be put as "object" in message data
-     *
-     * @author Daniil Zavyalov
      */
     override fun sendContentMessage(action: HttpMethod, modifiedWorkspace: WorkspaceDTO) {
         logger.info("Sending an FCM message on workspace topic")
@@ -54,8 +50,6 @@ class FcmNotificationSender(private val fcm: FirebaseMessaging): INotificationSe
      *
      * @param action will be put as "action" in message data
      * @param modifiedUser will be put as "object" in message data
-     *
-     * @author Daniil Zavyalov
      */
     override fun sendContentMessage(action: HttpMethod, modifiedUser: UserDTO) {
         logger.info("Sending an FCM message on user topic")
@@ -73,8 +67,6 @@ class FcmNotificationSender(private val fcm: FirebaseMessaging): INotificationSe
      *
      * @param action will be put as "action" in message data
      * @param modifiedBooking will be put as "object" in message data
-     *
-     * @author Daniil Zavyalov
      */
     override fun sendContentMessage(action: HttpMethod, modifiedBooking: BookingDTO) {
         logger.info("Sending an FCM message on booking topic")

@@ -8,7 +8,6 @@ import io.ktor.server.application.*
 interface Authorizer {
     /**
      * @param call [ApplicationCall] incoming call to authorize
-     * @author Kiselev Danil
      * */
     suspend fun authorize(call: ApplicationCall): Boolean
 }

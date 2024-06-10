@@ -32,7 +32,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      * TODO: existence check temporary always returns true
      * @param workspaceId id of requested workspace
      * @return true if [Workspace] with the given [workspaceId] exists in the database
-     * @author Daniil Zavyalov
      */
     fun workspaceExistsById(workspaceId: UUID): Boolean {
         logger.debug("[workspaceExistsById] checking whether a workspace with id={} exists", workspaceId)
@@ -44,7 +43,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      *
      * @param utilityId id of requested utility
      * @return true if [Utility] with the given [utilityId] exists in the database
-     * @author Daniil Zavyalov
      */
     fun utilityExistsById(utilityId: UUID): Boolean {
         logger.debug("[utilityExistsById] checking whether a utility with id={} exists", utilityId)
@@ -57,7 +55,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      * @param workspaceId
      * @return List of [Utility] for [Workspace] with the given id
      * @throws InstanceNotFoundException if workspace with given id doesn't exist in the database
-     * @author Daniil Zavyalov
      */
     fun findUtilitiesByWorkspaceId(workspaceId: UUID): List<Utility> {
         logger.debug(
@@ -77,7 +74,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      *
      * @param workspaceId
      * @return List of [Utility] for [Workspace] with the given id
-     * @author Daniil Zavyalov
      */
     private fun findUtilityModels(workspaceId: UUID): List<Utility> {
         logger.trace(
@@ -100,8 +96,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      *
      * @return Returns a HashMap that maps user ids and lists with their integrations
      * @throws InstanceNotFoundException if user with the given id doesn't exist in the database
-     *
-     * @author Daniil Zavyalov
      * */
     fun findAllUtilitiesByWorkspaceIds(ids: Collection<UUID>): HashMap<UUID, MutableList<Utility>> {
         logger.debug(
@@ -138,7 +132,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      *
      * @param workspaceId id of requested workspace
      * @return [Workspace] with the given [workspaceId] or null if workspace with the given id doesn't exist
-     * @author Daniil Zavyalov
      */
     fun findById(workspaceId: UUID): Workspace? {
         logger.debug("[findById] retrieving a workspace with id={}", workspaceId)
@@ -153,7 +146,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      * @param tag tag name of requested workspaces
      * @return List of [Workspace] with the given [tag]
      * @throws InstanceNotFoundException if tag doesn't exist in the database
-     * @author Daniil Zavyalov
      */
     fun findAllByTag(tag: String): List<Workspace> {
         logger.debug("[findAllByTag] retrieving workspaces with tag {}", tag)
@@ -177,7 +169,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      * @param endTimestamp period end time
      * @return List of [Workspace] with the given [tag]
      * @throws InstanceNotFoundException if tag doesn't exist in the database
-     * @author Daniil Zavyalov
      */
     fun findAllFreeByPeriod(tag: String, beginTimestamp: Instant, endTimestamp: Instant): List<Workspace> {
         logger.debug(
@@ -202,7 +193,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
     }
 
     /**
-     * @author Danil Kiselev
      * @return workspace id of the given bookings
      * */
     private fun findAllWorkspacesIdFromBookings(bookings: List<Booking>): List<String> {
@@ -219,7 +209,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      * Returns all workspace zones
      *
      * @return List of all [WorkspaceZone]
-     * @author Daniil Zavyalov
      */
     fun findAllZones(): List<WorkspaceZone> {
         logger.debug("[findAllZones] retrieving all workspace zones")
@@ -234,7 +223,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      * @param workspaceId
      * @param count quantity of the given utility in the workspace
      * @throws InstanceNotFoundException if workspace or utility with given id doesn't exist in the database
-     * @author Daniil Zavyalov
      */
     @Deprecated("API does not involve adding utility to workspaces")
     fun addUtilityToWorkspace(utilityId: UUID, workspaceId: UUID, count: UInt) {
@@ -261,7 +249,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      *
      * @param workspace [Workspace] to be saved
      * @return saved [Workspace]
-     * @author Daniil Zavyalov
      */
     @Deprecated("API does not involve saving workspace entities")
     fun save(workspace: Workspace): Workspace {
@@ -279,7 +266,6 @@ class WorkspaceRepository(private val database: Database, private val converter:
      * If the workspace is not found in the database it is silently ignored
      *
      * @param workspaceId
-     * @author Daniil Zavyalov
      */
     @Deprecated("API does not involve deleting workspace entities")
     fun deleteById(workspaceId: UUID) {

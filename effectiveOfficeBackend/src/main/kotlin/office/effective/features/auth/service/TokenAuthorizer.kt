@@ -25,11 +25,8 @@ class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor()) 
      * Check Google ID Token using google library
      *
      * @param call [String] which contains token to verify
-     * @author Kiselev Danil
      * @throws Exception("Token wasn't verified by Google") if token does not contain payload
      * @return is token correct
-     *
-     * @author Kiselev Danil
      * */
     override suspend fun authorize(call: ApplicationCall): Boolean {
         var userMail: String? = null
@@ -67,8 +64,6 @@ class TokenAuthorizer(private val extractor: TokenExtractor = TokenExtractor()) 
      * @param email - [String] from Bearer auth header, which must contains email
      * @throws Exception("Email is empty") if input line is null
      * @return [String], which contains email address
-     *
-     * @author Kiselev Danil
      * */
     private fun extractDomain(email: String?): String {
         email ?: throw Exception("Email is empty")

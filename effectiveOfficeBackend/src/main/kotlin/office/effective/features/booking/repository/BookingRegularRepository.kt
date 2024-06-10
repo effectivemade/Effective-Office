@@ -33,7 +33,6 @@ class BookingRegularRepository(
      *
      * @param id booking id
      * @return true if booking exists
-     * @author Daniil Zavyalov
      */
     override fun existsById(id: String): Boolean {
         logger.debug("[existsById] checking whether a booking with id={} exists", id)
@@ -45,7 +44,6 @@ class BookingRegularRepository(
      * Deletes the booking with the given id
      *
      * @param id booking id
-     * @author Daniil Zavyalov
      */
     override fun deleteById(id: String) {
         logger.debug("[deleteById] deleting the booking with id={}", id)
@@ -64,7 +62,6 @@ class BookingRegularRepository(
      *
      * @param bookingId booking id
      * @return [Booking] with the given [bookingId] or null if booking with the given id doesn't exist
-     * @author Daniil Zavyalov
      */
     override fun findById(bookingId: String): Booking? {
         logger.debug("[findById] retrieving a booking with id={}", bookingId)
@@ -81,7 +78,6 @@ class BookingRegularRepository(
      * @param calendarId the calendar in which to search for the event
      * @return [Event] with the given [bookingId] from calendar with [calendarId]
      * or null if event with the given id doesn't exist
-     * @author Daniil Zavyalov
      */
     private fun findByCalendarIdAndBookingId(bookingId: String, calendarId: String = regularWorkspacesCalendar): Event? {
         return try {
@@ -100,7 +96,6 @@ class BookingRegularRepository(
      * @param timeMax
      * @param singleEvents
      * @param calendarId
-     * @author Daniil Zavyalov
      */
     private fun basicQuery(
         timeMin: Long,
@@ -123,7 +118,6 @@ class BookingRegularRepository(
      * @param eventRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all workspace [Booking]
-     * @author Daniil Zavyalov
      */
     override fun findAllByWorkspaceId(
         workspaceId: UUID,
@@ -158,7 +152,6 @@ class BookingRegularRepository(
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all user [Booking]
      * @throws InstanceNotFoundException if user with the given id doesn't exist in database
-     * @author Daniil Zavyalov
      */
     override fun findAllByOwnerId(
         ownerId: UUID,
@@ -192,7 +185,6 @@ class BookingRegularRepository(
      * @param eventRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return List of all [Booking]s with the given workspace and owner id
-     * @author Daniil Zavyalov
      */
     override fun findAllByOwnerAndWorkspaceId(
         ownerId: UUID,
@@ -226,7 +218,6 @@ class BookingRegularRepository(
      * @param eventRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return All [Booking]s
-     * @author Daniil Zavyalov
      */
     override fun findAll(eventRangeFrom: Long, eventRangeTo: Long?, returnInstances: Boolean): List<Booking> {
         logger.debug(

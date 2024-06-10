@@ -17,7 +17,6 @@ class WorkspaceService(private val workspaceRepository: WorkspaceRepository): IW
      *
      * @param id id of requested workspace
      * @return [Workspace] with the given [id] or null if workspace with the given id doesn't exist
-     * @author Daniil Zavyalov
      */
     override fun findById(id: UUID): Workspace? {
         return workspaceRepository.findById(id)
@@ -28,7 +27,6 @@ class WorkspaceService(private val workspaceRepository: WorkspaceRepository): IW
      *
      * @param tag tag name of requested workspaces
      * @return List of [Workspace] with the given [tag]
-     * @author Daniil Zavyalov
      */
     override fun findAllByTag(tag: String): List<Workspace> {
         return workspaceRepository.findAllByTag(tag)
@@ -41,7 +39,6 @@ class WorkspaceService(private val workspaceRepository: WorkspaceRepository): IW
      * @param beginTimestamp period start time
      * @param endTimestamp period end time
      * @return List of [Workspace] with the given [tag]
-     * @author Daniil Zavyalov
      */
     override fun findAllFreeByPeriod(tag: String, beginTimestamp: Instant, endTimestamp: Instant): List<Workspace> {
         return workspaceRepository.findAllFreeByPeriod(tag, beginTimestamp, endTimestamp)
@@ -51,7 +48,6 @@ class WorkspaceService(private val workspaceRepository: WorkspaceRepository): IW
      * Returns all workspace zones
      *
      * @return List of all [WorkspaceZone]
-     * @author Daniil Zavyalov
      */
     override fun findAllZones(): List<WorkspaceZone> {
         return workspaceRepository.findAllZones()

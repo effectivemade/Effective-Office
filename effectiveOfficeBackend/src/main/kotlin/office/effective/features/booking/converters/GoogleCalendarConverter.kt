@@ -77,7 +77,6 @@ class GoogleCalendarConverter(
      *
      * @param event
      * @return [UserModel] with data from database or [UserModel] placeholder
-     * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
      */
     private fun getUserModel(event: Event): UserModel {
         val userId: UUID = try {
@@ -145,7 +144,6 @@ class GoogleCalendarConverter(
      * @param workspace specify this parameter to reduce the number
      * of database queries if workspace have already been retrieved
      * @return The resulting [BookingDTO] object
-     * @author Danil Kiselev, Max Mishenko
      */
     fun toMeetingWorkspaceBooking(
         event: Event,
@@ -187,7 +185,6 @@ class GoogleCalendarConverter(
      *
      * @param email
      * @return [UserModel] with data from database or [UserModel] placeholder with the given [email]
-     * @author Danil Kiselev, Max Mishenko, Daniil Zavyalov
      */
     private fun getUserModel(email: String?): UserModel? {
         if (email == null) {
@@ -241,7 +238,6 @@ class GoogleCalendarConverter(
      *
      * @param calendarId Google id of calendar of workspace
      * @return [WorkspaceDTO]
-     * @author Danil Kiselev, Max Mishenko
      */
     private fun getWorkspaceModel(calendarId: String?): Workspace {
         if (calendarId == null) {
@@ -258,7 +254,6 @@ class GoogleCalendarConverter(
      *
      * @param model [Booking] to be converted
      * @return The resulting [Event] object
-     * @author Daniil Zavyalov
      */
     fun toGoogleWorkspaceRegularEvent(model: Booking): Event {
         logger.debug("[toGoogleWorkspaceRegularEvent] converting regular workspace booking to calendar event")
@@ -294,7 +289,6 @@ class GoogleCalendarConverter(
      *
      * @param model [Booking] to be converted
      * @return The resulting [Event] object
-     * @author Daniil Zavyalov
      */
     fun toGoogleWorkspaceMeetingEvent(model: Booking): Event {
         logger.debug("[toGoogleWorkspaceMeetingEvent] converting meeting room booking to calendar event")
@@ -388,7 +382,6 @@ class GoogleCalendarConverter(
      * Converts [UserModel] of owner to [Organizer]
      *
      * @return [Organizer]
-     * @author Danil Kiselev
      */
     private fun userModelToGoogleOrganizer(model: UserModel?): Organizer {
         if (model == null) {
@@ -404,7 +397,6 @@ class GoogleCalendarConverter(
      *
      * @param id workspace id. Should be valid UUID
      * @return calendar id by workspace id in database
-     * @author Danil Kiselev, Max Mishenko
      */
     private fun getCalendarIdByWorkspaceId(id: String): String {
         return calendarIdsRepository.findByWorkspace(verifier.uuidFromString(id))

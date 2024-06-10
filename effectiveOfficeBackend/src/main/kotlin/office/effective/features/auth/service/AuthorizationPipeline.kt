@@ -31,7 +31,6 @@ class AuthorizationPipeline : Authorizer {
      * Allow you to add authorizer to pipeline
      * @param authorizer [Authorizer]
      * @return [AuthorizationPipeline] - instance of pipeline
-     * @author Danil Kiselev
      * */
     fun addAuthorizer(authorizer: Authorizer): AuthorizationPipeline {
         authorizers.add(authorizer)

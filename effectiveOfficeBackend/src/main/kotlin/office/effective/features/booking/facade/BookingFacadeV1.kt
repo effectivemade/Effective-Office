@@ -29,7 +29,6 @@ class BookingFacadeV1(
      * Deletes the booking with the given id
      *
      * @param id booking id
-     * @author Daniil Zavyalov
      */
     fun deleteById(id: String) {
         transactionManager.useTransaction({
@@ -43,7 +42,6 @@ class BookingFacadeV1(
      * @param id id of requested booking
      * @return [BookingResponseDTO] with the given id
      * @throws InstanceNotFoundException if booking with the given id doesn't exist in database
-     * @author Daniil Zavyalov
      */
     fun findById(id: String): BookingResponseDTO {
         val dto: BookingResponseDTO = transactionManager.useTransaction({
@@ -65,7 +63,6 @@ class BookingFacadeV1(
      * Should be lover than [bookingRangeFrom]. Default value: [BookingConstants.MIN_SEARCH_START_TIME]
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @return [BookingResponseDTO] list
-     * @author Daniil Zavyalov
      */
     fun findAll(
         userId: String?,
@@ -96,7 +93,6 @@ class BookingFacadeV1(
      *
      * @param bookingDTO [BookingRequestDTO] to be saved
      * @return saved [BookingResponseDTO]
-     * @author Daniil Zavyalov
      */
     fun post(bookingDTO: BookingRequestDTO): BookingResponseDTO {
         val model = bookingConverter.requestDtoToModel(bookingDTO)
@@ -113,7 +109,6 @@ class BookingFacadeV1(
      * @param bookingDTO changed booking
      * @param bookingId booking id
      * @return updated booking
-     * @author Daniil Zavyalov
      */
     fun put(bookingDTO: BookingRequestDTO, bookingId: String): BookingResponseDTO {
         val model = bookingConverter.requestDtoToModel(bookingDTO, bookingId)

@@ -11,8 +11,6 @@ class IntegrationModelEntityConverter {
      * Converts [IntegrationModel] to [IntegrationEntity]
      * @param integrationModel [IntegrationModel] input to convert to [IntegrationEntity]
      * @return resulting [IntegrationEntity] object
-     *
-     * @author Kiselev Danil
      * */
     fun modelToEntity(integrationModel: IntegrationModel): IntegrationEntity {
         return IntegrationEntity {
@@ -27,8 +25,6 @@ class IntegrationModelEntityConverter {
      * @param integrationEntity [IntegrationEntity] input to convert to [IntegrationModel]
      * @param valueStr [String] users_integrations value
      * @return resulting [IntegrationModel] object
-     *
-     * @author Kiselev Danil
      * */
     fun entityToModel(integrationEntity: IntegrationEntity, valueStr: String): IntegrationModel {
         return IntegrationModel(

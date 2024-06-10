@@ -22,8 +22,6 @@ class UserDTOModelConverter(
      * Converts [UserDTO] to [UserModel]. Search user tags in [UserRepository] by id. Takes user's integrations from DTO.
      * @param userDTO [UserDTO] to be converted
      * @return converted [UserModel]
-     *
-     * @author Danil Kiselev, Daniil Zavyalov
      */
     fun dTOToModel(userDTO: UserDTO): UserModel {
         var userId: UUID? = null;
@@ -55,8 +53,6 @@ class UserDTOModelConverter(
      * Converts [UserModel] to [UserDTO]
      * @param userModel [UserModel] to be converted
      * @return converted [UserDTO]
-     *
-     * @author Danil Kiselev, Daniil Zavyalov
      */
     fun modelToDTO(userModel: UserModel): UserDTO {
         val integrations: MutableList<IntegrationDTO> = mutableListOf()

@@ -9,7 +9,6 @@ class TokenExtractor {
     /**
      * @param call [ApplicationCall] incoming call
      * @return token from Bearer Auth header or null, if
-     * @author Danil Kiselev
      * */
     fun extractToken(call: ApplicationCall): String? {
         val logger = LoggerFactory.getLogger(this::class.java)

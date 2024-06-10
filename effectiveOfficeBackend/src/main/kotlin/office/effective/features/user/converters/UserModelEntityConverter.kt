@@ -16,8 +16,6 @@ class UserModelEntityConverter {
      * @throws MissingIdException if the user id is null
      * @param userModel [UserModel] to be converted
      * @return converted [UserEntity]
-     *
-     * @author Danil Kiselev, Daniil Zavyalov
      */
     fun modelToEntity(userModel: UserModel): UserEntity {
         return UserEntity {
@@ -37,8 +35,6 @@ class UserModelEntityConverter {
      * @param userEntity [UserEntity] to be converted
      * @param integrations [Set]<[IntegrationModel]>? to add into user model
      * @return converted [UserModel]
-     *
-     * @author Danil Kiselev, Daniil Zavyalov
      */
     fun entityToModel(userEntity: UserEntity, integrations: Set<IntegrationModel>?): UserModel {
         return UserModel(
