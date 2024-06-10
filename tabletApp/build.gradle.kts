@@ -84,6 +84,8 @@ kotlin {
                 api(Dependencies.MviKotlin.mviKotlinMain)
                 api(Dependencies.MviKotlin.mviKotlinExtensionsCoroutines)
 
+                implementation(Dependencies.KotlinxSerialization.json)
+
                 implementation(project(":tabletApp:features:selectRoom"))
                 implementation(project(":tabletApp:features:roomInfo"))
                 implementation(project(":tabletApp:features:core"))

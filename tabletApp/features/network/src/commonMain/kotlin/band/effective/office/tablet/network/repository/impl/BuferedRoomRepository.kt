@@ -3,10 +3,14 @@ package band.effective.office.tablet.network.repository.impl
 import band.effective.office.network.api.Api
 import band.effective.office.network.dto.BookingDTO
 import band.effective.office.network.dto.WorkspaceDTO
+import band.effective.office.network.dto.fcm.FcmEventDTO
+import band.effective.office.network.dto.fcm.FcmOrganizerDTO
+import band.effective.office.network.dto.fcm.FcmWorkspaceWithBookingsDTO
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.ErrorWithData
 import band.effective.office.tablet.domain.model.EventInfo
+import band.effective.office.tablet.domain.model.Organizer
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.network.repository.RoomRepository
 import band.effective.office.tablet.utils.Buffer
@@ -47,11 +51,39 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
 
     override fun subscribeOnUpdates(scope: CoroutineScope): Flow<Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>> {
         scope.launch(Dispatchers.IO) {
-            api.subscribeOnBookingsList("", this).collect {
-                roomsBuffer.refresh()
+            api.subscribeOnBookingsList(this).collect { updatedWorkspace ->
+                updateWorkspace(updatedWorkspace)
             }
         }
         return roomsBuffer.bufferFlow
+    }
+
+    private suspend fun updateWorkspace(workspaceWithBookingsDTO: FcmWorkspaceWithBookingsDTO) {
+        fun MutableList<RoomInfo>.updateRoom() {
+            val index = indexOfFirst { room -> room.id == workspaceWithBookingsDTO.id }
+            if (index == -1) return
+            this[index] = this[index].copy(
+                eventList = workspaceWithBookingsDTO.bookings.map { booking ->
+                    booking.toEventInfo()
+                }
+            )
+        }
+
+        val buffer = roomsBuffer.bufferedValue().map(
+            errorMapper = { save ->
+                save.map {
+                    it.toMutableList().apply {
+                        updateRoom()
+                    }
+                }},
+            successMapper = {
+                it.toMutableList().apply {
+                    updateRoom()
+                }
+            }
+        )
+
+        roomsBuffer.update(buffer)
     }
 
     override suspend fun updateCashe() {
@@ -140,6 +172,19 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
             currentEvent = null,
             id = id
         )
+
+    private fun FcmEventDTO.toEventInfo(): EventInfo = EventInfo(
+        id = id ?: "",
+        startTime = GregorianCalendar().apply { time = Date(startTime) },
+        finishTime =  GregorianCalendar().apply { time = Date(endTime) },
+        organizer = organizer?.toOrganizer() ?: Organizer.default
+    )
+
+    private fun FcmOrganizerDTO.toOrganizer(): Organizer = Organizer(
+        id = id,
+        fullName = fullName,
+        email = email
+    )
 
     private data class DownloadException(val error: ErrorResponse) : Exception(error.description)
 }
