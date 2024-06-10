@@ -1,6 +1,5 @@
 package band.effective.office.tablet.ui.updateEvent.store
 
-import androidx.compose.ui.graphics.Color
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
@@ -210,14 +209,14 @@ class UpdateEventStoreFactory(
 
         fun onDone(state: UpdateEventStore.State) {
             val input = state.inputText.lowercase()
-            val defaultOrganizerId = ""
             val organizer =
                 state.selectOrganizers.firstOrNull { it.fullName.lowercase().contains(input) }
                     ?: state.event.organizer
+            val wrongOrganizer = !state.organizers.contains(organizer)
             dispatch(Message.UpdateOrganizer(organizer))
-            dispatch(Message.InputError(organizer.id == defaultOrganizerId))
+            dispatch(Message.InputError(wrongOrganizer))
             checkEnableButton(
-                inputError = organizer.id == defaultOrganizerId,
+                inputError = wrongOrganizer,
                 busyEvent = state.isBusyEvent
             )
         }
@@ -249,7 +248,6 @@ class UpdateEventStoreFactory(
             val newDuration = state.duration + changeDuration
             val newOrganizer = state.organizers.firstOrNull { it.fullName == newOrg.fullName }
                 ?: state.event.organizer
-            val defaultOrganizerId = ""
             val busyEvent: List<EventInfo> = checkBookingUseCase.busyEvents(
                 event = state.copy(
                     date = newDate,
@@ -268,7 +266,7 @@ class UpdateEventStoreFactory(
                 )
                 dispatch(Message.BusyEvent(busyEvent.isNotEmpty()))
                 checkEnableButton(
-                    inputError = newOrganizer.id == defaultOrganizerId,
+                    inputError = !state.organizers.contains(newOrganizer),
                     busyEvent = busyEvent.isNotEmpty()
                 )
             }
