@@ -175,7 +175,8 @@ class MainFactory(
                         navigate(
                             MainComponent.ModalWindowsConfig.UpdateEvent(
                                 event = event,
-                                room = selectRoom.name
+                                room = selectRoom.name,
+                                isFastBooking = true
                             )
                         )
                     }

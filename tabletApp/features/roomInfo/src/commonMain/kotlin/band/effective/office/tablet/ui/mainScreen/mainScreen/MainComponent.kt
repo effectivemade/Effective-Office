@@ -93,6 +93,7 @@ class MainComponent(
                 storeFactory = storeFactory,
                 event = modalWindows.event,
                 room = modalWindows.room,
+                isFastBooking = modalWindows.isFastBooking,
                 onDelete = { slot ->
                     slotComponent.sendIntent(SlotStore.Intent.Delete(slot, {
                         CoroutineScope(Dispatchers.IO).launch {
@@ -158,7 +159,8 @@ class MainComponent(
         @Parcelize
         data class UpdateEvent(
             val event: EventInfo,
-            val room: String
+            val room: String,
+            val isFastBooking: Boolean = false
         ) : ModalWindowsConfig
 
         @Parcelize

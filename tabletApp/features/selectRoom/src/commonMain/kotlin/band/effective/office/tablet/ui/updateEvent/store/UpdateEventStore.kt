@@ -43,7 +43,8 @@ interface UpdateEventStore :
         val isErrorDelete: Boolean,
         val showSelectDate: Boolean,
         val enableUpdateButton: Boolean,
-        val isBusyEvent: Boolean
+        val isBusyEvent: Boolean,
+        val isFastBooking: Boolean
     ) {
         companion object {
             val defaultValue = State(
@@ -62,7 +63,8 @@ interface UpdateEventStore :
                 isErrorDelete = false,
                 showSelectDate = false,
                 enableUpdateButton = false,
-                isBusyEvent = false
+                isBusyEvent = false,
+                isFastBooking = false
             )
         }
 

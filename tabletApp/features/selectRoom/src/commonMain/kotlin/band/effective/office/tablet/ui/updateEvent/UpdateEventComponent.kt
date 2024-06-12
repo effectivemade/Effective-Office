@@ -24,6 +24,7 @@ class UpdateEventComponent(
     storeFactory: StoreFactory,
     event: EventInfo,
     val room: String,
+    isFastBooking: Boolean,
     onDelete: (Slot) -> Unit,
     onCloseRequest: () -> Unit,
     onTempLoading: (EventInfo) -> Unit
@@ -44,7 +45,8 @@ class UpdateEventComponent(
             navigate = { navigation.push(it) },
             room = room,
             onDelete = onDelete,
-            onTempLoading = onTempLoading
+            onTempLoading = onTempLoading,
+            isFastBooking = isFastBooking
         ).create(defaultValue = event.toState())
     }
 

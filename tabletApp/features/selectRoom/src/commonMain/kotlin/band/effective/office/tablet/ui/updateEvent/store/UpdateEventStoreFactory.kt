@@ -28,6 +28,7 @@ class UpdateEventStoreFactory(
     private val navigate: (UpdateEventComponent.ModalConfig) -> Unit,
     private val room: String,
     private val onDelete: (Slot) -> Unit,
+    private val isFastBooking: Boolean
 ) : KoinComponent {
 
     val bookingUseCase: BookingUseCase by inject()
@@ -40,17 +41,22 @@ class UpdateEventStoreFactory(
             Store<UpdateEventStore.Intent, UpdateEventStore.State, UpdateEventStore.Label> by storeFactory.create(
                 name = "UpdateEventStore",
                 initialState = defaultValue,
-                bootstrapper = coroutineBootstrapper {
-                    launch {
-                        dispatch(
-                            Action.LoadOrganizers(
-                                organizersInfoUseCase()
-                                    .unbox({
-                                        it.saveData ?: listOf()
-                                    })
+                bootstrapper = when (isFastBooking) {
+                    false -> coroutineBootstrapper {
+                        launch {
+                            dispatch(
+                                Action.LoadOrganizers(
+                                    organizersInfoUseCase()
+                                        .unbox({
+                                            it.saveData ?: listOf()
+                                        })
+                                )
                             )
-                        )
+                        }
                     }
+                    true -> coroutineBootstrapper { launch {
+                        dispatch(Action.FastBooking(true))
+                    } }
                 },
                 executorFactory = ::ExecutorImpl,
                 reducer = ReducerImpl
@@ -65,6 +71,7 @@ class UpdateEventStoreFactory(
             val newOrganizer: Organizer,
         ) : Message
 
+        data class FastBooking(val value: Boolean) : Message
         data class EnableButton(val isEnable: Boolean) : Message
         data class BusyEvent(val isBusy: Boolean) : Message
         object LoadUpdate : Message
@@ -77,6 +84,7 @@ class UpdateEventStoreFactory(
 
     private sealed interface Action {
         data class LoadOrganizers(val orgList: List<Organizer>) : Action
+        data class FastBooking(val value: Boolean) : Action
     }
 
     private inner class ExecutorImpl :
@@ -310,6 +318,7 @@ class UpdateEventStoreFactory(
         override fun executeAction(action: Action, getState: () -> UpdateEventStore.State) {
             when (action) {
                 is Action.LoadOrganizers -> dispatch(Message.LoadOrganizers(action.orgList))
+                is Action.FastBooking -> dispatch(Message.FastBooking(action.value))
             }
         }
     }
@@ -320,6 +329,11 @@ class UpdateEventStoreFactory(
                 is Message.LoadOrganizers -> copy(
                     organizers = msg.orgList,
                     selectOrganizers = msg.orgList
+                )
+                is Message.FastBooking -> copy(
+                    isFastBooking = msg.value,
+                    isInputError = false,
+                    enableUpdateButton = true
                 )
                 is Message.ExpandedChange -> copy(expanded = msg.newValue)
                 is Message.UpdateInformation -> copy(

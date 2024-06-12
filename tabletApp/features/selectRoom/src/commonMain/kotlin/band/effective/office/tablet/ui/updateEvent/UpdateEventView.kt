@@ -97,6 +97,7 @@ fun UpdateEventView(
                             component.sendIntent(UpdateEventStore.Intent.OnSelectOrganizer(it))
                         },
                         selectData = state.date,
+                        isFastBooking = state.isFastBooking,
                         selectDuration = state.duration,
                         selectOrganizer = state.selectOrganizer,
                         organizers = state.selectOrganizers,
@@ -145,6 +146,7 @@ fun UpdateEventView(
     onSelectOrganizer: (Organizer) -> Unit,
     selectData: Calendar,
     selectDuration: Int,
+    isFastBooking: Boolean,
     selectOrganizer: Organizer,
     organizers: List<Organizer>,
     expended: Boolean,
@@ -195,18 +197,20 @@ fun UpdateEventView(
                 decrement = decrementDuration
             )
             Spacer(modifier = Modifier.height(15.dp))
-            EventOrganizerView(
-                modifier = Modifier.fillMaxWidth().height(100.dp),
-                selectOrganizers = organizers,
-                expanded = expended,
-                selectedItem = selectOrganizer,
-                onExpandedChange = onExpandedChange,
-                onSelectItem = onSelectOrganizer,
-                onInput = onInput,
-                isInputError = isInputError,
-                onDoneInput = onDoneInput,
-                inputText = inputText
-            )
+            if(!isFastBooking) {
+                EventOrganizerView(
+                    modifier = Modifier.fillMaxWidth().height(100.dp),
+                    selectOrganizers = organizers,
+                    expanded = expended,
+                    selectedItem = selectOrganizer,
+                    onExpandedChange = onExpandedChange,
+                    onSelectItem = onSelectOrganizer,
+                    onInput = onInput,
+                    isInputError = isInputError,
+                    onDoneInput = onDoneInput,
+                    inputText = inputText
+                )
+            }
             Spacer(modifier = Modifier.height(25.dp))
             if (isNewEvent) {
                 SuccessButton(
