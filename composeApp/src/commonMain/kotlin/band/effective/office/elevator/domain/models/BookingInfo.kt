@@ -6,7 +6,8 @@ import band.effective.office.elevator.utils.MonthLocalizations
 import band.effective.office.elevator.utils.capitalizeFirstLetter
 import band.effective.office.elevator.utils.localDateTimeToUnix
 import band.effective.office.elevator.utils.unixToLocalDateTime
-import band.effective.office.network.dto.BookingDTO
+import band.effective.office.network.dto.BookingRequestDTO
+import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.RecurrenceDTO
 import band.effective.office.network.dto.UserDTO
 import band.effective.office.network.dto.WorkspaceDTO
@@ -23,17 +24,17 @@ data class BookingInfo(
     val dateOfEnd: LocalDateTime
 )
 
-fun BookingDTO.toDomainModel() =
+fun BookingResponseDTO.toDomainModel() =
     BookingInfo(
-        id = id!!,
-        ownerId = owner.id,
+        id = id,
+        ownerId = owner?.id ?: "",
         workSpaceId = workspace.id,
         seatName = "${workspace.zone?.name.orEmpty()} ${workspace.name}",
         dateOfStart = unixToLocalDateTime(beginBooking),
         dateOfEnd = unixToLocalDateTime(endBooking),
     )
 
-fun List<BookingDTO>.toDomainZone() = map { it.toDomainModel() }
+fun List<BookingResponseDTO>.toDomainZone() = map {it.toDomainModel()}
 fun emptyUserDTO(id: String, email: String, name: String): UserDTO =
     UserDTO(
         id = id,
@@ -55,12 +56,11 @@ fun emptyWorkSpaceDTO(id: String) =
         tag = "regular"
     )
 
-fun BookingInfo.toDTOModel(userDTO: UserDTO, workspaceDTO: WorkspaceDTO, recurrence: RecurrenceDTO?) =
-    BookingDTO(
-        owner = userDTO,
-        participants = listOf(),
-        workspace = workspaceDTO,
-        id = id,
+fun BookingInfo.toRequestDTOModel(userEmail: String, workSpaceId: String, recurrence: RecurrenceDTO?) =
+    BookingRequestDTO(
+        ownerEmail = userEmail,
+        participantEmails = listOf(userEmail),
+        workspaceId = workSpaceId,
         beginBooking = localDateTimeToUnix(dateOfStart)!!,
         endBooking = localDateTimeToUnix(dateOfEnd)!!,
         recurrence = recurrence

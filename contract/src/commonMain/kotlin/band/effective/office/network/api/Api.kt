@@ -1,6 +1,7 @@
 package band.effective.office.network.api
 
-import band.effective.office.network.dto.BookingDTO
+import band.effective.office.network.dto.BookingRequestDTO
+import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.SuccessResponse
 import band.effective.office.network.dto.UserDTO
 import band.effective.office.network.dto.WorkspaceDTO
@@ -46,7 +47,7 @@ interface Api {
     /**Get booking's by id
      * @param id booking's id
      * @return Information about booking*/
-    suspend fun getBooking(id: String): Either<ErrorResponse, BookingDTO>
+    suspend fun getBooking(id: String): Either<ErrorResponse, BookingResponseDTO>
 
     /**Get user's bookings
      * @param userId user id whose booking need get
@@ -55,7 +56,7 @@ interface Api {
         userId: String,
         beginDate: Long,
         endDate: Long
-    ): Either<ErrorResponse, List<BookingDTO>>
+    ): Either<ErrorResponse, List<BookingResponseDTO>>
 
     /**Get bookings in workspace
      * @param workspaceId workspace id to be reserved
@@ -64,21 +65,21 @@ interface Api {
         workspaceId: String,
         from: Long? = null,
         to: Long? = null
-    ): Either<ErrorResponse, List<BookingDTO>>
+    ): Either<ErrorResponse, List<BookingResponseDTO>>
 
     /**Booking workspace
      * @param bookingInfo information for booking workspace
      * @return Created entry from database*/
     suspend fun createBooking(
-        bookingInfo: BookingDTO
-    ): Either<ErrorResponse, BookingDTO>
+        bookingInfo: BookingRequestDTO
+    ): Either<ErrorResponse, BookingResponseDTO>
 
     /**Update booking info
      * @param bookingInfo new information about booking
      * @return new entry from database*/
     suspend fun updateBooking(
-        bookingInfo: BookingDTO
-    ): Either<ErrorResponse, BookingDTO>
+        bookingInfo: BookingRequestDTO
+    ): Either<ErrorResponse, BookingResponseDTO>
 
     /**Delete booking
      * @param bookingId id of booking to be deleted
@@ -108,12 +109,12 @@ interface Api {
     fun subscribeOnBookingsList(
         workspaceId: String,
         scope: CoroutineScope
-    ): Flow<Either<ErrorResponse, List<BookingDTO>>>
+    ): Flow<Either<ErrorResponse, List<BookingResponseDTO>>>
 
     suspend fun getUserByEmail(email: String): Either<ErrorResponse, UserDTO>
 
     suspend fun getBookings(
         rangeFrom: Long? = null,
         rangeTo: Long? = null
-    ): Either<ErrorResponse, List<BookingDTO>>
+    ): Either<ErrorResponse, List<BookingResponseDTO>>
 }
