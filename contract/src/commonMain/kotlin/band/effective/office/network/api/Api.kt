@@ -5,6 +5,7 @@ import band.effective.office.network.dto.SuccessResponse
 import band.effective.office.network.dto.UserDTO
 import band.effective.office.network.dto.WorkspaceDTO
 import band.effective.office.network.dto.WorkspaceZoneDTO
+import band.effective.office.network.dto.fcm.FcmWorkspaceWithBookingsDTO
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import kotlinx.coroutines.CoroutineScope
@@ -87,28 +88,13 @@ interface Api {
         bookingId: String
     ): Either<ErrorResponse, SuccessResponse>
 
-    /**Subscribe on workspace info updates
-     * @param id workspace name
-     * @param scope CoroutineScope for collect updates
-     * @return Flow with updates*/
-    fun subscribeOnWorkspaceUpdates(
-        id: String,
-        scope: CoroutineScope
-    ): Flow<Either<ErrorResponse, WorkspaceDTO>>
-
-    /**Subscribe on organizers list updates
-     * @param scope CoroutineScope for collect updates
-     * @return Flow with updates*/
-    fun subscribeOnOrganizersList(scope: CoroutineScope): Flow<Either<ErrorResponse, List<UserDTO>>>
 
     /**Subscribe on bookings list updates
-     * @param workspaceId workspace name
      * @param scope CoroutineScope for collect updates
      * @return Flow with updates*/
     fun subscribeOnBookingsList(
-        workspaceId: String,
         scope: CoroutineScope
-    ): Flow<Either<ErrorResponse, List<BookingDTO>>>
+    ): Flow<FcmWorkspaceWithBookingsDTO>
 
     suspend fun getUserByEmail(email: String): Either<ErrorResponse, UserDTO>
 

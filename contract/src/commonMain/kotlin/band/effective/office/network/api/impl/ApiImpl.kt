@@ -7,6 +7,7 @@ import band.effective.office.network.dto.SuccessResponse
 import band.effective.office.network.dto.UserDTO
 import band.effective.office.network.dto.WorkspaceDTO
 import band.effective.office.network.dto.WorkspaceZoneDTO
+import band.effective.office.network.dto.fcm.FcmWorkspaceWithBookingsDTO
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.utils.KtorEtherClient
@@ -17,14 +18,13 @@ import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class ApiImpl : Api {
     /**Update collector*/
-    val collector = Collector("")
+    val collector = Collector<FcmWorkspaceWithBookingsDTO?>(null)
 
     /**KtorEitherClient for safe request*/
     private val client = KtorEtherClient
@@ -165,23 +165,6 @@ class ApiImpl : Api {
             }
         }
 
-    override fun subscribeOnWorkspaceUpdates(
-        id: String,
-        scope: CoroutineScope
-    ): Flow<Either<ErrorResponse, WorkspaceDTO>> =
-        collector.flow(scope).filter { it == "workspace" }.map {
-            Either.Success(
-                WorkspaceDTO(
-                    id = "", name = "",
-                    utilities = listOf(), zone = null, tag = ""
-                )
-            )
-        }
-
-    override fun subscribeOnOrganizersList(scope: CoroutineScope): Flow<Either<ErrorResponse, List<UserDTO>>> =
-        collector.flow(scope).filter { it == "organizer" }.map { Either.Success(listOf()) }
-
-
     override suspend fun getUserByEmail(email: String): Either<ErrorResponse, UserDTO> =
         client.securityResponse("$baseUrl/users") {
             url {
@@ -207,9 +190,7 @@ class ApiImpl : Api {
         }
 
     override fun subscribeOnBookingsList(
-        workspaceId: String,
         scope: CoroutineScope
-    ): Flow<Either<ErrorResponse, List<BookingDTO>>> =
-        collector.flow(scope).filter { it == "booking" }
-            .map { Either.Success(listOf()) }
+    ): Flow<FcmWorkspaceWithBookingsDTO> =
+        collector.flow(scope).mapNotNull { it }
 }
