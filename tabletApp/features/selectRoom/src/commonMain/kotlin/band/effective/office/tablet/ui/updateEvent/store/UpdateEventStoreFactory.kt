@@ -279,10 +279,12 @@ class UpdateEventStoreFactory(
                     )
                 )
                 dispatch(Message.BusyEvent(busyEvent.isNotEmpty()))
-                checkEnableButton(
-                    inputError = !state.organizers.contains(newOrganizer),
-                    busyEvent = busyEvent.isNotEmpty()
-                )
+                if(!state.isFastBooking) {
+                    checkEnableButton(
+                        inputError = !state.organizers.contains(newOrganizer),
+                        busyEvent = busyEvent.isNotEmpty()
+                    )
+                }
             }
         }
 

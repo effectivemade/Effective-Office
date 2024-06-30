@@ -1,7 +1,6 @@
 package band.effective.office.tablet.ui.updateEvent
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -187,7 +186,8 @@ fun UpdateEventView(
                 increment = incrementData,
                 decrement = decrementData,
                 onOpenDateTimePickerModal = onOpenDateTimePickerModal,
-                showTitle = true
+                showTitle = true,
+                regularBooking = !isFastBooking
             )
             Spacer(modifier = Modifier.height(15.dp))
             EventDurationView(

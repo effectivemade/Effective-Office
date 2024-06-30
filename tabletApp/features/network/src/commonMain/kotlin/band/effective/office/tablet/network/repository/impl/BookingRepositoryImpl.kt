@@ -30,7 +30,7 @@ class BookingRepositoryImpl(private val api: Api) :
             beginBooking = this.startTime.timeInMillis,
             endBooking = this.finishTime.timeInMillis,
             ownerEmail = this.organizer.email,
-            participantEmails = listOf(this.organizer.email),
+            participantEmails = this.organizer.email?.let { listOf(it) } ?: listOf(),
             workspaceId = room.id
         )
 

@@ -39,7 +39,8 @@ fun DateTimeView(
     increment: () -> Unit,
     decrement: () -> Unit,
     onOpenDateTimePickerModal: () -> Unit,
-    showTitle: Boolean = false
+    showTitle: Boolean = false,
+    regularBooking: Boolean = true
 ) {
     val backButtonWeight = when {
         currentDate == null -> 0f
@@ -56,24 +57,26 @@ fun DateTimeView(
             Spacer(modifier = Modifier.height(10.dp))
         }
         Row() {
-            Button(
-                modifier = Modifier.fillMaxHeight().weight(1f).clip(RoundedCornerShape(15.dp)),
-                onClick = { decrement() },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = LocalCustomColorsPalette.current.elevationBackground
-                )
-            ) {
-                Image(
-                    modifier = Modifier,
-                    painter = painterResource(MainRes.image.arrow_left),
-                    contentDescription = null
-                )
+            if(regularBooking) {
+                Button(
+                    modifier = Modifier.fillMaxHeight().weight(1f).clip(RoundedCornerShape(15.dp)),
+                    onClick = { decrement() },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = LocalCustomColorsPalette.current.elevationBackground
+                    )
+                ) {
+                    Image(
+                        modifier = Modifier,
+                        painter = painterResource(MainRes.image.arrow_left),
+                        contentDescription = null
+                    )
+                }
+                Spacer(modifier = Modifier.width(10.dp))
             }
-            Spacer(modifier = Modifier.width(10.dp))
             Button(
                 modifier = Modifier.fillMaxHeight().weight(4f - backButtonWeight)
                     .clip(RoundedCornerShape(15.dp)),
-                onClick = { onOpenDateTimePickerModal() },
+                onClick = { if(regularBooking) onOpenDateTimePickerModal() },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = LocalCustomColorsPalette.current.elevationBackground
                 )
@@ -102,18 +105,20 @@ fun DateTimeView(
                 }
                 Spacer(modifier = Modifier.width(10.dp))
             }
-            Button(
-                modifier = Modifier.fillMaxHeight().weight(1f).clip(RoundedCornerShape(15.dp)),
-                onClick = { increment() },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = LocalCustomColorsPalette.current.elevationBackground
-                )
-            ) {
-                Image(
-                    modifier = Modifier,
-                    painter = painterResource(MainRes.image.arrow_right),
-                    contentDescription = null
-                )
+            if(regularBooking) {
+                Button(
+                    modifier = Modifier.fillMaxHeight().weight(1f).clip(RoundedCornerShape(15.dp)),
+                    onClick = { increment() },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = LocalCustomColorsPalette.current.elevationBackground
+                    )
+                ) {
+                    Image(
+                        modifier = Modifier,
+                        painter = painterResource(MainRes.image.arrow_right),
+                        contentDescription = null
+                    )
+                }
             }
         }
     }
