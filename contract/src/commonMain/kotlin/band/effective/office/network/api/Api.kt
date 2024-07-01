@@ -27,6 +27,16 @@ interface Api {
         freeUntil: Long? = null
     ): Either<ErrorResponse, List<WorkspaceDTO>>
 
+    /**Get all workspace with bookings current type
+     * @param tag workspace type. Meeting or regular
+     * @return List of workspaces*/
+    suspend fun getWorkspacesWithBookings(
+        tag: String,
+        withBookings: Boolean = true,
+        freeFrom: Long? = null,
+        freeUntil: Long? = null
+    ): Either<ErrorResponse, List<WorkspaceDTO>>
+
     suspend fun getZones(): Either<ErrorResponse, List<WorkspaceZoneDTO>>
 
     /**Get user by id

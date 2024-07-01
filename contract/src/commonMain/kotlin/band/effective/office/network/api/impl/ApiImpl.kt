@@ -61,6 +61,26 @@ class ApiImpl : Api {
             }
         }
 
+    override suspend fun getWorkspacesWithBookings(
+        tag: String,
+        withBookings: Boolean,
+        freeFrom: Long?,
+        freeUntil: Long?
+    ): Either<ErrorResponse, List<WorkspaceDTO>> =
+        client.securityResponse("$baseUrl/api/v1/workspaces") {
+            url {
+                parameters.append("workspace_tag", tag)
+                parameters.append("with_bookings", withBookings.toString())
+                if (freeFrom != null) {
+                    parameters.append("with_bookings_from", freeFrom.toString())
+                }
+                if (freeUntil != null) {
+                    parameters.append("with_bookings_until", freeUntil.toString())
+                }
+            }
+        }
+
+
     override suspend fun getZones(): Either<ErrorResponse, List<WorkspaceZoneDTO>> =
         client.securityResponse("$baseUrl/api/v1/workspaces/zones")
 

@@ -34,7 +34,7 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
                 saveData = null
             )
         )
-    ) { getFreshRoomInfo() }
+    ) { getRoomInfoWithBookings() }
 
     val mutex = Mutex()
     override suspend fun getRoomsInfo(): Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>> {
@@ -98,6 +98,34 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
         }
     }
 
+    suspend fun getRoomInfoWithBookings(): Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>> {
+        val start = GregorianCalendar()
+        val finish = GregorianCalendar().apply { add(Calendar.MONTH, 1) }
+        val roomResponse = api.getWorkspacesWithBookings(
+            tag = "meeting",
+            freeFrom = start.timeInMillis,
+            freeUntil = finish.timeInMillis
+        )
+        val save = roomsBuffer.bufferFlow.replayCache.firstOrNull()?.unbox(
+            errorHandler = { it.saveData?.map { it.updateCurrentEvent() } }
+        )
+        return try {
+            when (roomResponse) {
+                is Either.Error -> Either.Error(ErrorWithData(roomResponse.error, save))
+                is Either.Success -> roomResponse.asyncMap(
+                    errorMapper = { it },
+                    successMapper = { list ->
+                            list.map {
+                                it.toRoomWithEvents()
+                            }
+                    }
+                )
+            }
+        } catch (e: DownloadException) {
+            Either.Error(ErrorWithData(e.error, save))
+        }
+    }
+
     private suspend fun RoomInfo.addEvents(): RoomInfo {
         val start = GregorianCalendar()
         val finish = GregorianCalendar().apply { add(Calendar.MONTH, 1) }
@@ -141,7 +169,16 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
             currentEvent = null,
             id = id
         )
-
+    private fun WorkspaceDTO.toRoomWithEvents() =
+        RoomInfo(
+            name = name,
+            capacity = utilities.firstOrNull { it.name == "place" }?.count ?: 0,
+            isHaveTv = utilities.firstOrNull { it.name == "tv" } != null,
+            socketCount = utilities.firstOrNull { it.name == "lan" }?.count ?: 0,
+            eventList = bookings.let { it?.map{booking -> booking.toEvent()} } ?: listOf(),
+            currentEvent = null,
+            id = id
+        )
     private data class DownloadException(val error: ErrorResponse) : Exception(error.description)
 }
 
