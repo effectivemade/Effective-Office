@@ -164,7 +164,9 @@ class GoogleCalendarConverter(
             beginBooking = toLocalInstant(event.start),
             endBooking = toLocalInstant(event.end),
             recurrence = recurrence?.let { RecurrenceConverter.recurrenceToModel(it) },
-            isDeclinedByOwner = participantModels.none { model -> model.email == organizerEmail }
+            isDeclinedByOwner = organizerEmail?.let { email ->
+                participantModels.none { model -> model.email == email }
+            } ?: false
         )
         logger.trace("[toMeetingWorkspaceBooking] {}", booking.toString())
         return booking
