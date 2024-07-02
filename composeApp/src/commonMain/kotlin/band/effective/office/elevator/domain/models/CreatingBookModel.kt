@@ -1,14 +1,10 @@
 package band.effective.office.elevator.domain.models
 
 import band.effective.office.elevator.utils.localDateTimeToUnix
-import band.effective.office.network.dto.BookingDTO
+import band.effective.office.network.dto.BookingRequestDTO
 import band.effective.office.network.dto.RecurrenceDTO
-import band.effective.office.network.dto.UserDTO
-import band.effective.office.network.dto.WorkspaceDTO
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 
 data class CreatingBookModel(
     val workSpaceId: String,
@@ -74,17 +70,15 @@ fun List<DayOfWeek>.listToString() : String {
     return str
 }
 
-
-fun CreatingBookModel.toDTO(
-    user: UserDTO,
-    workspaceDTO: WorkspaceDTO,
+fun CreatingBookModel.toRequestDTO(
+    userEmail: String?,
+    workspaceId: String,
     recurrence: RecurrenceDTO?
 ) =
-    BookingDTO(
-        owner = user,
-        participants = listOf(user),
-        workspace = workspaceDTO,
-        id = "",
+    BookingRequestDTO(
+        ownerEmail = userEmail,
+        participantEmails = listOf(userEmail!!),
+        workspaceId = workspaceId,
         beginBooking = localDateTimeToUnix(dateOfStart)!!,
         endBooking = localDateTimeToUnix(dateOfEnd)!!,
         recurrence = recurrence

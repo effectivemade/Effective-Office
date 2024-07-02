@@ -2,7 +2,8 @@ package band.effective.office.network.api.impl
 
 import band.effective.office.network.api.Api
 import band.effective.office.network.api.Collector
-import band.effective.office.network.dto.BookingDTO
+import band.effective.office.network.dto.BookingRequestDTO
+import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.SuccessResponse
 import band.effective.office.network.dto.UserDTO
 import band.effective.office.network.dto.WorkspaceDTO
@@ -48,7 +49,7 @@ class ApiImpl : Api {
         freeFrom: Long?,
         freeUntil: Long?
     ): Either<ErrorResponse, List<WorkspaceDTO>> =
-        client.securityResponse("$baseUrl/workspaces") {
+        client.securityResponse("$baseUrl/api/v1/workspaces") {
             url {
                 parameters.append("workspace_tag", tag)
                 if (freeFrom != null) {
@@ -60,18 +61,38 @@ class ApiImpl : Api {
             }
         }
 
+    override suspend fun getWorkspacesWithBookings(
+        tag: String,
+        withBookings: Boolean,
+        freeFrom: Long?,
+        freeUntil: Long?
+    ): Either<ErrorResponse, List<WorkspaceDTO>> =
+        client.securityResponse("$baseUrl/api/v1/workspaces") {
+            url {
+                parameters.append("workspace_tag", tag)
+                parameters.append("with_bookings", withBookings.toString())
+                if (freeFrom != null) {
+                    parameters.append("with_bookings_from", freeFrom.toString())
+                }
+                if (freeUntil != null) {
+                    parameters.append("with_bookings_until", freeUntil.toString())
+                }
+            }
+        }
+
+
     override suspend fun getZones(): Either<ErrorResponse, List<WorkspaceZoneDTO>> =
-        client.securityResponse("$baseUrl/workspaces/zones")
+        client.securityResponse("$baseUrl/api/v1/workspaces/zones")
 
     override suspend fun getUser(id: String): Either<ErrorResponse, UserDTO> =
-        client.securityResponse("$baseUrl/users") {
+        client.securityResponse("$baseUrl/api/v1/users") {
             url {
                 appendPathSegments(id)
             }
         }
 
     override suspend fun getUsers(tag: String): Either<ErrorResponse, List<UserDTO>> =
-        client.securityResponse("$baseUrl/users") {
+        client.securityResponse("$baseUrl/api/v1/users") {
             url {
                 parameters.append("user_tag", tag)
             }
@@ -79,7 +100,7 @@ class ApiImpl : Api {
 
     override suspend fun updateUser(user: UserDTO): Either<ErrorResponse, UserDTO> =
         client.securityResponse(
-            urlString = "$baseUrl/users",
+            urlString = "$baseUrl/api/v1/users",
             method = KtorEtherClient.RestMethod.Put
         ) {
             println("user = $user")
@@ -90,9 +111,9 @@ class ApiImpl : Api {
             }
         }
 
-    override suspend fun getBooking(id: String): Either<ErrorResponse, BookingDTO> =
+    override suspend fun getBooking(id: String): Either<ErrorResponse, BookingResponseDTO> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
         ) {
             url {
                 appendPathSegments(id)
@@ -103,9 +124,9 @@ class ApiImpl : Api {
         userId: String,
         beginDate: Long,
         endDate: Long
-    ): Either<ErrorResponse, List<BookingDTO>> =
+    ): Either<ErrorResponse, List<BookingResponseDTO>> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
         ) {
             url {
                 parameters.append("user_id", userId)
@@ -118,9 +139,9 @@ class ApiImpl : Api {
         workspaceId: String,
         from: Long?,
         to: Long?
-    ): Either<ErrorResponse, List<BookingDTO>> =
+    ): Either<ErrorResponse, List<BookingResponseDTO>> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
         ) {
             url {
                 parameters.append("workspace_id", workspaceId)
@@ -133,9 +154,9 @@ class ApiImpl : Api {
             }
         }
 
-    override suspend fun createBooking(bookingInfo: BookingDTO): Either<ErrorResponse, BookingDTO> =
+    override suspend fun createBooking(bookingInfo: BookingRequestDTO): Either<ErrorResponse, BookingResponseDTO> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
             method = KtorEtherClient.RestMethod.Post
         ) {
             contentType(ContentType.Application.Json)
@@ -143,10 +164,10 @@ class ApiImpl : Api {
         }
 
     override suspend fun updateBooking(
-        bookingInfo: BookingDTO
-    ): Either<ErrorResponse, BookingDTO> =
+        bookingInfo: BookingRequestDTO
+    ): Either<ErrorResponse, BookingResponseDTO> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
             method = KtorEtherClient.RestMethod.Put
         ) {
             contentType(ContentType.Application.Json)
@@ -157,7 +178,7 @@ class ApiImpl : Api {
 
     override suspend fun deleteBooking(bookingId: String): Either<ErrorResponse, SuccessResponse> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
             method = KtorEtherClient.RestMethod.Delete
         ) {
             url {
@@ -183,7 +204,7 @@ class ApiImpl : Api {
 
 
     override suspend fun getUserByEmail(email: String): Either<ErrorResponse, UserDTO> =
-        client.securityResponse("$baseUrl/users") {
+        client.securityResponse("$baseUrl/api/v1/users") {
             url {
                 parameters.append(name = "email", value = email)
             }
@@ -192,9 +213,9 @@ class ApiImpl : Api {
     override suspend fun getBookings(
         rangeFrom: Long?,
         rangeTo: Long?
-    ): Either<ErrorResponse, List<BookingDTO>> =
+    ): Either<ErrorResponse, List<BookingResponseDTO>> =
         client.securityResponse(
-            urlString = "$baseUrl/bookings",
+            urlString = "$baseUrl/api/v1/bookings",
         ) {
             url {
                 if (rangeFrom != null) {
@@ -209,7 +230,7 @@ class ApiImpl : Api {
     override fun subscribeOnBookingsList(
         workspaceId: String,
         scope: CoroutineScope
-    ): Flow<Either<ErrorResponse, List<BookingDTO>>> =
+    ): Flow<Either<ErrorResponse, List<BookingResponseDTO>>> =
         collector.flow(scope).filter { it == "booking" }
             .map { Either.Success(listOf()) }
 }

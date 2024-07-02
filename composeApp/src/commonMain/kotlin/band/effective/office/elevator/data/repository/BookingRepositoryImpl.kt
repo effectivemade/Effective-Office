@@ -6,19 +6,17 @@ import band.effective.office.elevator.domain.models.CreatingBookModel
 import band.effective.office.elevator.domain.models.ErrorWithData
 import band.effective.office.elevator.domain.models.TypeEndPeriodBooking
 import band.effective.office.elevator.domain.models.User
-import band.effective.office.elevator.domain.models.emptyUserDTO
-import band.effective.office.elevator.domain.models.emptyWorkSpaceDTO
-import band.effective.office.elevator.domain.models.toDTO
-import band.effective.office.elevator.domain.models.toDTOModel
 import band.effective.office.elevator.domain.models.toDomainModel
 import band.effective.office.elevator.domain.models.toDomainZone
+import band.effective.office.elevator.domain.models.toRequestDTO
+import band.effective.office.elevator.domain.models.toRequestDTOModel
 import band.effective.office.elevator.domain.repository.BookingRepository
 import band.effective.office.elevator.domain.repository.ProfileRepository
 import band.effective.office.elevator.ui.employee.aboutEmployee.models.BookingsFilter
 import band.effective.office.elevator.utils.localDateTimeToUnix
 import band.effective.office.elevator.utils.map
 import band.effective.office.network.api.Api
-import band.effective.office.network.dto.BookingDTO
+import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.RecurrenceDTO
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
@@ -75,16 +73,12 @@ class BookingRepositoryImpl(
             typeEndPeriod = typeEndPeriod
         )
 
-        val bookingDTO = bookingInfo.toDTOModel(
-            userDTO = emptyUserDTO(
-                id = bookingInfo.ownerId,
-                email = user?.email ?: "",
-                name = user?.userName.orEmpty()
-            ),
-            workspaceDTO = emptyWorkSpaceDTO(bookingInfo.workSpaceId),
+        val bookingRequestDTO = bookingInfo.toRequestDTOModel(
+            userEmail = user?.email ?: "",
+            workSpaceId = bookingInfo.workSpaceId,
             recurrence = recurrence
         )
-        api.updateBooking(bookingInfo = bookingDTO)
+        api.updateBooking(bookingInfo = bookingRequestDTO)
     }
 
     override suspend fun deleteBooking(bookingInfo: BookingInfo) {
@@ -128,16 +122,12 @@ class BookingRepositoryImpl(
             "Creaing booking is: $recurrence"
         }
 
-        val bookingDTO = creatingBookModel.toDTO(
-            user = emptyUserDTO(
-                id = user.id,
-                email = user.email,
-                name = user.userName
-            ),
-            workspaceDTO = emptyWorkSpaceDTO(creatingBookModel.workSpaceId),
+        val bookingRequestDTO = creatingBookModel.toRequestDTO(
+            userEmail = user.email,
+            workspaceId = creatingBookModel.workSpaceId,
             recurrence = recurrence
         )
-        return when (val creating = api.createBooking(bookingDTO)) {
+        return when (val creating = api.createBooking(bookingRequestDTO)) {
             is Either.Error -> creating
 
             is Either.Success -> Either.Success(creating.data.toDomainModel())
@@ -191,7 +181,7 @@ class BookingRepositoryImpl(
     }
 
 
-    private fun Either<ErrorResponse, List<BookingDTO>>.convert(
+    private fun Either<ErrorResponse, List<BookingResponseDTO>>.convert(
         filter: BookingsFilter,
         oldValue: Either<ErrorWithData<List<BookingInfo>>,
                 List<BookingInfo>>
@@ -213,7 +203,7 @@ class BookingRepositoryImpl(
             }
         )
 
-    private fun placeFilter(filter: BookingsFilter, list: List<BookingDTO>) =
+    private fun placeFilter(filter: BookingsFilter, list: List<BookingResponseDTO>) =
         list.filter { booking ->
             when {
                 filter.workPlace && filter.meetRoom -> true
@@ -225,7 +215,7 @@ class BookingRepositoryImpl(
             }
         }
 
-    private fun Either<ErrorResponse, List<BookingDTO>>.convertWithDateFilter(
+    private fun Either<ErrorResponse, List<BookingResponseDTO>>.convertWithDateFilter(
         filter: BookingsFilter,
         oldValue: Either<ErrorWithData<List<BookingInfo>>, List<BookingInfo>>,
         dateFilter: LocalDate
