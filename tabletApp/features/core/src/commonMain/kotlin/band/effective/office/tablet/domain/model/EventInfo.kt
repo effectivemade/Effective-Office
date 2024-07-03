@@ -10,7 +10,8 @@ data class EventInfo(
     val startTime: Calendar,
     val finishTime: Calendar,
     val organizer: Organizer,
-    val id: String
+    val id: String,
+    var loadState: EventLoadState = EventLoadState.LOADED
 ) : Parcelable {
     companion object {
         const val defaultId: String = ""
@@ -24,4 +25,11 @@ data class EventInfo(
     }
 
     fun isNotCreated() = id == defaultId
+}
+
+enum class EventLoadState {
+    LOADED,
+    CREATING,
+    UPDATING,
+    DELETING
 }

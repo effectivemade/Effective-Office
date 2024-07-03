@@ -2,9 +2,7 @@ package band.effective.office.tablet.ui.mainScreen.slotComponent.store
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.OfficeTime
-import band.effective.office.tablet.domain.model.ErrorWithData
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
 import band.effective.office.tablet.domain.model.RoomInfo
@@ -14,7 +12,6 @@ import band.effective.office.tablet.domain.useCase.SlotUseCase
 import band.effective.office.tablet.domain.useCase.TimerUseCase
 import band.effective.office.tablet.ui.mainScreen.slotComponent.model.SlotUi
 import band.effective.office.tablet.utils.BootstrapperTimer
-import band.effective.office.tablet.utils.map
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -35,13 +32,11 @@ class SlotStoreFactory(
     private val storeFactory: StoreFactory,
     private val roomName: () -> String,
     private val openBookingDialog: (event: EventInfo, room: String) -> Unit,
-) :
-    KoinComponent {
+) : KoinComponent {
     private val slotUseCase: SlotUseCase by inject()
     private val roomInfoUseCase: RoomInfoUseCase by inject()
     private val timerUseCase: TimerUseCase by inject()
     private val updateTimer = BootstrapperTimer<Action>(timerUseCase)
-
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun create(): SlotStore = object : SlotStore,
@@ -53,43 +48,44 @@ class SlotStoreFactory(
             initialState = SlotStore.State.initValue
         ) {}
 
-
     @RequiresApi(Build.VERSION_CODES.N)
     @OptIn(ExperimentalMviKotlinApi::class)
-    private fun bootstrapper() = coroutineBootstrapper<Action> {
+    private fun bootstrapper() = coroutineBootstrapper {
         updateTimer.init(this, 15.minutes) {
             withContext(Dispatchers.Main) {
-                dispatch(Action.UpdateSlots(getUiSlots(roomInfoUseCase.getRoom(roomName()))))
+                roomInfoUseCase.getRoom(roomName())?.let {
+                    dispatch(Action.UpdateSlots(getUiSlots(it)))
+                }
             }
         }
         launch {
-            dispatch(Action.UpdateSlots(getUiSlots(roomInfoUseCase.getRoom(roomName()))))
+            val room = roomInfoUseCase.getRoom(roomName())
+            room?.let {
+                dispatch(
+                    Action.UpdateSlots(
+                        getUiSlots(it)
+                    )
+                )
+            }
         }
         launch(Dispatchers.IO) {
-            roomInfoUseCase.subscribe(this).collect {
-                it.map(
-                    errorMapper = {
-                        val save = it.saveData
-                        val eventInfo: RoomInfo =
-                            save?.firstOrNull { it.name == roomName() } ?: RoomInfo.defaultValue
-                        ErrorWithData(it.error, eventInfo)
-                    },
-                    successMapper = {
-                        it.firstOrNull() { it.name == roomName() } ?: RoomInfo.defaultValue
+            roomInfoUseCase.subscribe(this).collect { roomInfos ->
+                if (roomInfos.isNotEmpty()) {
+                    val roomInfo = roomInfos.firstOrNull{ it.name == roomName() } ?: return@collect
+                    withContext(Dispatchers.Main) {
+                        dispatch(Action.UpdateSlots(getUiSlots(roomInfo)))
                     }
-                )
-                    .let { withContext(Dispatchers.Main) { dispatch(Action.UpdateSlots(getUiSlots(it))) } }
+                }
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun getUiSlots(
-        either: Either<ErrorWithData<RoomInfo>, RoomInfo>,
+        either: RoomInfo,
         start: Calendar = GregorianCalendar(),
         finish: Calendar = OfficeTime.finishWorkTime(start.clone() as Calendar),
-        loadingSlots: List<Slot.LoadingEventSlot> = listOf()
-    ) = getSlots(either, start, finish, loadingSlots).map {
+    ) = getSlots(either, start, finish).map {
         when (it) {
             is Slot.EmptySlot -> SlotUi.SimpleSlot(it)
             is Slot.EventSlot -> SlotUi.SimpleSlot(it)
@@ -105,57 +101,24 @@ class SlotStoreFactory(
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun getSlots(
-        either: Either<ErrorWithData<RoomInfo>, RoomInfo>,
+        roomInfo: RoomInfo,
         start: Calendar = GregorianCalendar(),
         finish: Calendar = OfficeTime.finishWorkTime(start.clone() as Calendar),
-        loadingSlots: List<Slot.LoadingEventSlot>
     ): List<Slot> {
-        return when (either) {
-            is Either.Error -> slotUseCase.getSlots(
-                currentEvent = null,
-                events = listOf(),
-                start = start.apply {
-                    val round = get(Calendar.MINUTE) % 15
-                    val adding = if (round != 0) (15 - round) else 0
-                    add(Calendar.MINUTE, adding)
-                },
-                finish = finish,
-                loadingSlots = loadingSlots
-            )
-
-            is Either.Success -> {
-                val roomInfo = either.data
-                var updatedLoadingSlots = loadingSlots
-                if (loadingSlots.isNotEmpty()) {
-                    val loadingSlot = loadingSlots.find { loadingSlot ->
-                        roomInfo.eventList.any {
-                            loadingSlot.start == it.startTime
-                                    && loadingSlot.finish == it.finishTime
-                        }
-                    }
-
-                    loadingSlot?.let { slot ->
-                        val newLoadingSlots = loadingSlots.filter {
-                            it != slot
-                        }
-                        updatedLoadingSlots = newLoadingSlots
-                        Message.UpdateLoadingSlots(updatedLoadingSlots)
-                    }
-                }
-
-                slotUseCase.getSlots(
-                    currentEvent = roomInfo.currentEvent,
-                    events = roomInfo.eventList,
-                    start = start.apply {
-                        val round = get(Calendar.MINUTE) % 15
-                        val adding = if (round != 0) (15 - round) else 0
-                        add(Calendar.MINUTE, adding)
-                    },
-                    finish = finish,
-                    loadingSlots = updatedLoadingSlots
-                )
-            }
-        }
+         return slotUseCase.getSlots(
+            currentEvent = roomInfo.currentEvent,
+            events = roomInfo.eventList,
+            start = start.apply {
+                val round = get(Calendar.MINUTE) % 15
+                val adding = if (round != 0) (15 - round) else 0
+                add(Calendar.MINUTE, adding)
+                // This will probably fix the issue
+                // with undisplayed bookings
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            },
+            finish = finish
+        )
     }
 
     private inner class ExecutorImpl() :
@@ -182,18 +145,19 @@ class SlotStoreFactory(
                 }
 
                 is SlotStore.Intent.UpdateDate -> scope.launch {
-                    dispatch(
-                        message = Message.UpdateSlots(
-                            slots = getUiSlots(
-                                either = roomInfoUseCase.getRoom(room = roomName()),
-                                start = maxOf(
-                                    OfficeTime.startWorkTime(intent.newDate),
-                                    GregorianCalendar()
+                    roomInfoUseCase.getRoom(room = roomName())?.let {
+                        dispatch(
+                            message = Message.UpdateSlots(
+                                slots = getUiSlots(
+                                    either = it,
+                                    start = maxOf(
+                                        OfficeTime.startWorkTime(intent.newDate),
+                                        GregorianCalendar()
+                                    )
                                 ),
-                                loadingSlots = getState().loadingSlots
-                            ),
+                            )
                         )
-                    )
+                    }
                 }
 
                 is SlotStore.Intent.Delete -> {
@@ -265,26 +229,6 @@ class SlotStoreFactory(
                     }
                     dispatch(Message.UpdateSlots(newSlots))
                 }
-
-                is SlotStore.Intent.Loading -> {
-                    val allSlots = getState().slots
-                    val slot = intent.slot
-                    val loadingSlots = getState().loadingSlots.toMutableList()
-                    loadingSlots.add(slot)
-                    val newSlot = SlotUi.LoadingSlot(slot)
-                    val list = allSlots.toMutableList()
-                    list.add(newSlot)
-                    list.sortBy { it.slot.start }
-                    dispatch(Message.UpdateLoadingSlots(loadingSlots))
-                    dispatch(Message.UpdateSlots(list))
-                }
-
-                is SlotStore.Intent.CancelLoading -> {
-                    val newLoadingSlots = getState().loadingSlots.filter {
-                        it.eventInfo != intent.eventInfo
-                    }
-                    dispatch(Message.UpdateLoadingSlots(newLoadingSlots))
-                }
             }
         }
 
@@ -296,13 +240,13 @@ class SlotStoreFactory(
                         roomInfoUseCase.updateCache()
                     }
                 }
-                dispatch(
-                    Message.UpdateSlots(
-                        getUiSlots(
-                            roomInfoUseCase.getRoom(roomName)
+                roomInfoUseCase.getRoom(roomName)?.let {
+                    dispatch(
+                        Message.UpdateSlots(
+                            getUiSlots(it)
                         )
                     )
-                )
+                }
             }
         }
 
@@ -360,7 +304,6 @@ class SlotStoreFactory(
         override fun SlotStore.State.reduce(msg: Message): SlotStore.State =
             when (msg) {
                 is Message.UpdateSlots -> copy(slots = msg.slots)
-                is Message.UpdateLoadingSlots -> copy(loadingSlots = msg.loadingSlots)
             }
     }
 
@@ -370,7 +313,6 @@ class SlotStoreFactory(
 
     private sealed interface Message {
         data class UpdateSlots(val slots: List<SlotUi>) : Message
-        data class UpdateLoadingSlots(val loadingSlots: List<Slot.LoadingEventSlot>) : Message
     }
 }
 

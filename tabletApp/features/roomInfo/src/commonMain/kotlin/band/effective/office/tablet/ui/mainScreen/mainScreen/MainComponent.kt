@@ -2,14 +2,10 @@ package band.effective.office.tablet.ui.mainScreen.mainScreen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.model.Slot
-import band.effective.office.tablet.domain.useCase.AddCachedEventUseCase
 import band.effective.office.tablet.domain.useCase.BookingUseCase
-import band.effective.office.tablet.domain.useCase.CancelUseCase
-import band.effective.office.tablet.domain.useCase.DeleteCachedEventUseCase
 import band.effective.office.tablet.ui.freeSelectRoom.FreeSelectRoomComponent
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainFactory
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainStore
@@ -42,18 +38,19 @@ class MainComponent(
     private val storeFactory: StoreFactory,
     val onSettings: () -> Unit
 ) : ComponentContext by componentContext, KoinComponent {
-
-    val cancelUseCase by inject<CancelUseCase>()
-    val deleteCachedEventUseCase: DeleteCachedEventUseCase by inject()
     private val bookingUseCase: BookingUseCase by inject()
-    private val addEventUseCase: AddCachedEventUseCase by inject()
 
     val slotComponent = SlotComponent(
         componentContext = componentContext,
         storeFactory = storeFactory,
         roomName = {
-            state.value.run {
-                with(if (roomList.isNotEmpty()) roomList[indexSelectRoom] else RoomInfo.defaultValue) { name }
+            // NOTE: for some reason state's value will be null
+            // on first startup after room selection
+            if (state.value == null) RoomInfo.defaultValue.name
+            else {
+                state.value.run {
+                    with(if (roomList.isNotEmpty()) roomList[indexSelectRoom] else RoomInfo.defaultValue) { name }
+                }
             }
         },
         openBookingDialog = { event, room ->
@@ -92,8 +89,8 @@ class MainComponent(
                 eventInfo = modalWindows.event,
                 onRemoveEvent = { event ->
                     CoroutineScope(Dispatchers.IO).launch {
-                        deleteCachedEventUseCase(
-                            roomName = state.value.run { roomList[indexSelectRoom].name },
+                        bookingUseCase.delete(
+                            room = state.value.run { roomList[indexSelectRoom].name },
                             eventInfo = event
                         )
                     }
@@ -109,79 +106,31 @@ class MainComponent(
                     slotComponent.sendIntent(SlotStore.Intent.Delete(slot) {
                         CoroutineScope(Dispatchers.IO).launch {
                             (slot as? Slot.EventSlot)?.eventInfo?.apply {
-                                deleteCachedEventUseCase(
-                                    roomName = state.value.run { roomList[indexSelectRoom].name },
-                                    eventInfo = this
+                                bookingUseCase.delete(
+                                    eventInfo = this,
+                                    room = state.value.run { roomList[indexSelectRoom].name }
                                 )
-                                cancelUseCase(this)
                             }
                         }
                     })
                 },
                 onCloseRequest = { closeModalWindow() },
                 onEventCreation = { eventInfo ->
-                    slotComponent.sendIntent(
-                        SlotStore.Intent.Loading(
-                            Slot.LoadingEventSlot(
-                                start = eventInfo.startTime,
-                                finish = eventInfo.finishTime,
-                                eventInfo
-                            )
-                        )
-                    )
-
                     CoroutineScope(Dispatchers.Main).launch {
                         val roomName = modalWindows.room
                         val result = bookingUseCase.invoke(
                             eventInfo = eventInfo,
                             room = roomName
                         )
-                        when (result) {
-                            is Either.Error -> {
-                                slotComponent.sendIntent(
-                                    SlotStore.Intent.CancelLoading(eventInfo)
-                                )
-                            }
-                            is Either.Success -> {
-                                slotComponent.sendIntent(
-                                    SlotStore.Intent.CancelLoading(eventInfo)
-                                )
-                                addEventUseCase(roomName, result.data)
-                            }
-                        }
                     }
                 },
                 onEventUpdate = { eventInfo ->
                     val roomName = modalWindows.room
-                    slotComponent.sendIntent(
-                        SlotStore.Intent.Loading(
-                            Slot.LoadingEventSlot(
-                                start = eventInfo.startTime,
-                                finish = eventInfo.finishTime,
-                                eventInfo
-                            )
-                        )
-                    )
-
                     CoroutineScope(Dispatchers.Main).launch {
                         val result = bookingUseCase.update(
                             eventInfo = eventInfo,
                             room = roomName
                         )
-                        when (result) {
-                            is Either.Error -> {
-                                slotComponent.sendIntent(
-                                    SlotStore.Intent.CancelLoading(eventInfo)
-                                )
-                            }
-                            is Either.Success -> {
-                                deleteCachedEventUseCase(roomName, eventInfo)
-                                slotComponent.sendIntent(
-                                    SlotStore.Intent.CancelLoading(eventInfo)
-                                )
-                                addEventUseCase(roomName, eventInfo)
-                            }
-                        }
                     }
                 }
             )

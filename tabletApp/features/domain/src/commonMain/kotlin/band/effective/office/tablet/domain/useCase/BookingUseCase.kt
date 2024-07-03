@@ -3,25 +3,12 @@ package band.effective.office.tablet.domain.useCase
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
-import band.effective.office.tablet.network.repository.BookingRepository
-import band.effective.office.tablet.network.repository.RoomRepository
-import band.effective.office.tablet.utils.map
+import band.effective.office.tablet.network.repository.impl.StateManager
 
 /**Use case for booking room*/
 class BookingUseCase(
-    private val repository: BookingRepository,
-    private val roomRepository: RoomRepository
+    private val repository: StateManager
 ) {
-    /**Get info about room
-     * @param room room name*/
-    suspend fun getRoom(room: String) = try {
-        roomRepository.getRoomsInfo().map(
-            errorMapper = { it.error },
-            successMapper = { it.first { roomInfo -> roomInfo.name == room } }
-        )
-    } catch (e: NoSuchElementException) {
-        Either.Error(ErrorResponse.getResponse(404))
-    }
     /**Booking room
      * @param eventInfo info about event
      * @param room room name
@@ -30,24 +17,20 @@ class BookingUseCase(
         eventInfo: EventInfo,
         room: String
     ): Either<ErrorResponse, EventInfo> =
-        with(getRoom(room)) {
-            when (this) {
-                is Either.Error -> this
-                is Either.Success -> repository.bookingRoom(eventInfo, data)
-            }
-        }
+        repository.createBooking(room, eventInfo)
+
     /**Update exist booking
      * @param eventInfo info about event
      * @param room room name
      * @return if booking confirm then Either.Success else Either.Error with error code */
     suspend fun update(eventInfo: EventInfo, room: String) =
-        with(getRoom(room)) {
-            when (this) {
-                is Either.Error -> this
-                is Either.Success -> repository.updateBooking(
-                    eventInfo = eventInfo,
-                    room = data
-                )
-            }
-        }
+        repository.updateBooking(room, eventInfo)
+
+    /**Delete exist booking
+     * @param eventInfo info about event
+     * @param room room name
+     * @return f */
+    suspend fun delete(eventInfo: EventInfo, room: String) =
+        repository.deleteBooking(room, eventInfo)
 }
+

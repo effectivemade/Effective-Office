@@ -230,7 +230,7 @@ class UpdateEventStoreFactory(
                     selectOrganizer = newOrganizer
                 ).toEvent(),
                 room = room
-            ).filter { it.startTime != state.date } ?: listOf()
+            ).filter { it.startTime != state.date }
             if (newDuration > 0 && newDate > today()) {
                 dispatch(
                     Message.UpdateInformation(

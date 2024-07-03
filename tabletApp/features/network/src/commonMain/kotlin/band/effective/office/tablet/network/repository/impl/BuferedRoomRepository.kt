@@ -26,6 +26,11 @@ import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
 
+
+@Deprecated(
+    message = "This repository is deprecated due to its complexity which shouldn't appear in repository",
+    replaceWith = ReplaceWith("StateManager")
+)
 class BufferedRoomRepository(private val api: Api) : RoomRepository {
     private val roomsBuffer = Buffer(
         Either.Error(

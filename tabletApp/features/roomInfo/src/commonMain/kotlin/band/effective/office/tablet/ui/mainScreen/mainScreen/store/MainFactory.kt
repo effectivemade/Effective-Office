@@ -2,8 +2,6 @@ package band.effective.office.tablet.ui.mainScreen.mainScreen.store
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import band.effective.office.network.model.Either
-import band.effective.office.tablet.domain.model.ErrorWithData
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.useCase.CheckSettingsUseCase
@@ -57,16 +55,20 @@ class MainFactory(
                     launch {
                         if (checkSettingsUseCase().isEmpty()) {
                             dispatch(Action.OnSettings)
-                        } else {
-                            dispatch(Action.OnLoad(RoomInfoEither = roomInfoUseCase()))
                         }
                     }
+
+                    // initial load
+                    launch {
+                        dispatch(Action.OnLoad(roomInfos = roomInfoUseCase()))
+                    }
+
                     // update events when start/finish event in room
                     launch(Dispatchers.IO) {
                         updateUseCase.updateFlow().collect {
                             delay(1.seconds)
                             withContext(Dispatchers.Main) {
-                                dispatch(Action.OnLoad(RoomInfoEither = roomInfoUseCase()))
+                                dispatch(Action.OnLoad(roomInfos = roomInfoUseCase()))
                             }
                         }
                     }
@@ -78,21 +80,23 @@ class MainFactory(
                     }
                     // update events list
                     launch(Dispatchers.Main) {
-                        roomInfoUseCase.subscribe(this).collect {
-                            dispatch(Action.OnUpdateRoomInfo)
+                        roomInfoUseCase.subscribe(this).collect { roomInfos ->
+                            if (roomInfos.isNotEmpty()) {
+                                dispatch(Action.OnUpdateRoomInfo)
+                            }
                         }
                     }
                     // reset selected room
                     currentRoomTimer.start(bootstrapperScope = this, delay = 1.minutes) {
                         withContext(Dispatchers.Main) {
-                            dispatch(Action.OnLoad(RoomInfoEither = roomInfoUseCase()))
+                            dispatch(Action.OnLoad(roomInfos = roomInfoUseCase()))
                         }
                     }
                     // update cache when get error
                     errorTimer.init(this, 15.minutes) {
                         roomInfoUseCase.updateCache()
                         withContext(Dispatchers.Main) {
-                            dispatch(Action.OnLoad(RoomInfoEither = roomInfoUseCase()))
+                            dispatch(Action.OnLoad(roomInfos = roomInfoUseCase()))
                         }
                     }
                     // reset select date
@@ -122,7 +126,7 @@ class MainFactory(
     }
 
     private sealed interface Action {
-        data class OnLoad(val RoomInfoEither: Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>) :
+        data class OnLoad(val roomInfos: List<RoomInfo>) :
             Action
 
         data object OnSettings : Action
@@ -214,64 +218,34 @@ class MainFactory(
                     roomInfoUseCase.updateCache()
                 }
             }
-            when (val either = roomInfoUseCase()) {
-                is Either.Error -> {
-                    val save = either.error.saveData
-                    if (!state.isData) {
-                        dispatch(
-                            Message.Load(
-                                isSuccess = false,
-                                roomList = save ?: listOf(RoomInfo.defaultValue),
-                                indexSelectRoom = 0
-                            )
-                        )
-                    } else {
-                        dispatch(Message.UpdateDisconnect(true))
-                    }
-                }
-
-                is Either.Success -> {
-                    dispatch(Message.UpdateDisconnect(false))
-                    dispatch(
-                        Message.Load(
-                            isSuccess = true,
-                            roomList = either.data,
-                            indexSelectRoom = roomIndex
-                        )
+            val roomInfos = roomInfoUseCase()
+            if (roomInfos.isNotEmpty()) {
+                dispatch(Message.UpdateDisconnect(false))
+                dispatch(
+                    Message.Load(
+                        isSuccess = true,
+                        roomList = roomInfos,
+                        indexSelectRoom = roomIndex
                     )
-                    updateRoomInfo(either.data[roomIndex], state.selectDate)
-                }
+                )
+                updateRoomInfo(roomInfos[roomIndex], state.selectDate)
+            } else {
+                Message.UpdateDisconnect(true)
             }
         }
 
         override fun executeAction(action: Action, getState: () -> MainStore.State) {
             when (action) {
                 is Action.OnLoad -> {
-                    when (val either = action.RoomInfoEither) {
-                        is Either.Error -> {
-                            val save = either.error.saveData
-                            dispatch(
-                                Message.Load(
-                                    isSuccess = false,
-                                    roomList = save ?: listOf(RoomInfo.defaultValue),
-                                    indexSelectRoom = 0
-                                )
-                            )
-                        }
-
-                        is Either.Success -> {
-                            either.data.apply {
-                                dispatch(
-                                    Message.Load(
-                                        isSuccess = true,
-                                        roomList = this,
-                                        indexSelectRoom = getState().indexRoom()
-                                    )
-                                )
-                                reboot(getState())
-                            }
-                        }
-                    }
+                    val roomInfos = action.roomInfos
+                    dispatch(
+                        Message.Load(
+                            isSuccess = roomInfos.isNotEmpty(),
+                            roomList = roomInfos,
+                            indexSelectRoom = getState().indexRoom()
+                        )
+                    )
+                    reboot(getState())
                 }
 
                 is Action.OnSettings -> dispatch(Message.OnSettings)
