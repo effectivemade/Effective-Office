@@ -160,7 +160,7 @@ class UpdateEventStoreFactory(
                     date = newDate
                 ).toEvent(),
                 room = room
-            ).unbox({ it.saveData })?.filter { it.startTime != state.date } ?: listOf()
+            ).filter { it.startTime != state.date }
             dispatch(
                 Message.UpdateInformation(
                     newDate = newDate,
@@ -169,6 +169,12 @@ class UpdateEventStoreFactory(
                 )
             )
             dispatch(Message.BusyEvent(isBusy = busyEvent.isNotEmpty()))
+            if (state.selectOrganizer != Organizer.default) {
+                checkEnableButton(
+                    inputError = state.isInputError,
+                    busyEvent = busyEvent.isNotEmpty()
+                )
+            }
         }
 
         fun cancel(state: UpdateEventStore.State) {
@@ -182,14 +188,14 @@ class UpdateEventStoreFactory(
 
         fun onDone(state: UpdateEventStore.State) {
             val input = state.inputText.lowercase()
-            val defaultOrganizerId = ""
             val organizer =
                 state.selectOrganizers.firstOrNull { it.fullName.lowercase().contains(input) }
                     ?: state.event.organizer
+            val wrongOrganizer = !state.organizers.contains(organizer)
             dispatch(Message.UpdateOrganizer(organizer))
-            dispatch(Message.InputError(organizer.id == defaultOrganizerId))
+            dispatch(Message.InputError(wrongOrganizer))
             checkEnableButton(
-                inputError = organizer.id == defaultOrganizerId,
+                inputError = wrongOrganizer,
                 busyEvent = state.isBusyEvent
             )
         }
@@ -224,7 +230,7 @@ class UpdateEventStoreFactory(
                     selectOrganizer = newOrganizer
                 ).toEvent(),
                 room = room
-            ).unbox({ it.saveData })?.filter { it.startTime != state.date } ?: listOf()
+            ).filter { it.startTime != state.date } ?: listOf()
             if (newDuration > 0 && newDate > today()) {
                 dispatch(
                     Message.UpdateInformation(
@@ -234,15 +240,24 @@ class UpdateEventStoreFactory(
                     )
                 )
                 dispatch(Message.BusyEvent(busyEvent.isNotEmpty()))
-                checkEnableButton(state.isInputError, busyEvent.isNotEmpty())
+                checkEnableButton(
+                    inputError = !state.organizers.contains(newOrganizer),
+                    busyEvent = busyEvent.isNotEmpty()
+                )
             }
         }
 
         private fun checkEnableButton(
             inputError: Boolean,
             busyEvent: Boolean
-        ) {
-            dispatch(Message.EnableButton(isEnable = !inputError && !busyEvent))
+        ){
+            if(!inputError && !busyEvent) {
+                dispatch(Message.EnableButton(isEnable = true))
+            }
+            else {
+                dispatch(Message.EnableButton(isEnable = false))
+            }
+
         }
 
         private fun today() = GregorianCalendar().apply {
