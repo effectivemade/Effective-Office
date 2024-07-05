@@ -10,12 +10,12 @@ import java.util.GregorianCalendar
 
 class LocalStoreRepository {
     private val buffer = MutableStateFlow<List<RoomInfo>>(
-        listOf()
+        emptyList()
     )
     val flow = buffer.asStateFlow()
 
-    fun getRoomInfo(roomName: String): RoomInfo {
-        return buffer.value.first { it.name == roomName }
+    fun getRoomByName(roomName: String): RoomInfo? {
+        return buffer.value.firstOrNull { it.name == roomName }
     }
 
     fun updateCurrentEvents() {
@@ -25,49 +25,41 @@ class LocalStoreRepository {
     }
 
     fun updateRoomInfos(roomInfos: List<RoomInfo>) {
-        buffer.update {
-            roomInfos.toMutableList()
-        }
+        buffer.update { roomInfos }
     }
 
     fun addEvent(roomName: String, eventInfo: EventInfo) {
-        buffer.update { rooms ->
-            val roomIndex = rooms.indexOfFirst { room -> room.name == roomName }
-            if (roomIndex == -1) return
-            val mutableRooms = rooms.toMutableList()
-            val room = mutableRooms[roomIndex]
-            val events = room.eventList + eventInfo
-            mutableRooms[roomIndex] = room.copy(eventList = events)
-            mutableRooms
+        updateRoomInBuffer(roomName) { events ->
+            events + eventInfo
         }
     }
 
     fun removeEvent(roomName: String, eventInfo: EventInfo) {
-        buffer.update { rooms ->
-            val roomIndex = rooms.indexOfFirst { room -> room.name == roomName }
-            if (roomIndex == -1) return
-            val mutableRooms = rooms.toMutableList()
-            val room = mutableRooms[roomIndex]
-            val events = room.eventList - eventInfo
-            mutableRooms[roomIndex] = room.copy(eventList = events)
-            mutableRooms
+        updateRoomInBuffer(roomName) { events ->
+            events - eventInfo
         }
     }
 
     fun updateEvent(roomName: String, eventInfo: EventInfo) {
+        updateRoomInBuffer(roomName) { events ->
+            val oldEvent = events.firstOrNull {
+                it.id == eventInfo.id
+                        || (it.startTime == eventInfo.startTime
+                        && it.finishTime == eventInfo.finishTime)
+            } ?: return@updateRoomInBuffer events
+
+            events - oldEvent + eventInfo
+        }
+    }
+
+    private fun updateRoomInBuffer(roomName: String, action: (List<EventInfo>) -> List<EventInfo>) {
         buffer.update { rooms ->
             val roomIndex = rooms.indexOfFirst { room -> room.name == roomName }
             if (roomIndex == -1) return
             val mutableRooms = rooms.toMutableList()
             val room = mutableRooms[roomIndex]
-            val oldEvent = room.eventList.firstOrNull {
-                it.id == eventInfo.id
-                        || (it.startTime == eventInfo.startTime
-                        && it.finishTime == eventInfo.finishTime)
-            } ?: return
-
-            val events = room.eventList - oldEvent + eventInfo
-            mutableRooms[roomIndex] = room.copy(eventList = events)
+            val newEvents = action(room.eventList)
+            mutableRooms[roomIndex] = room.copy(eventList = newEvents)
             mutableRooms
         }
     }
@@ -80,12 +72,9 @@ class LocalStoreRepository {
     }
 
     fun getEventById(roomName: String, eventId: String): EventInfo? {
-        val room = buffer.value.firstOrNull { room -> room.name == roomName }
+        val room = getRoomByName(roomName)
         return room?.eventList?.firstOrNull { it.id == eventId }
     }
-
-    fun getRoomByName(roomName: String): RoomInfo? =
-        buffer.value.firstOrNull { it.name == roomName }
 
     private fun RoomInfo.removePastEvents(): RoomInfo {
         val now = GregorianCalendar()
@@ -99,6 +88,7 @@ class LocalStoreRepository {
         val now = GregorianCalendar().removeSeconds()
         val currentEvent = eventList.firstOrNull {
             it.startTime <= now && it.finishTime > now
+                    && !it.isLoading
         } ?: return this
 
         return copy(

@@ -52,7 +52,7 @@ class NetworkRepository(
         eventInfo: EventInfo,
         room: RoomInfo
     ): Either<ErrorResponse, EventInfo> =
-        api.updateBooking(eventInfo.toBookingRequestDTO(room))
+        api.updateBooking(eventInfo.toBookingRequestDTO(room), eventInfo.id)
             .map(errorMapper = { it }, successMapper = { it.toEventInfo() })
 
     suspend fun deleteBooking(

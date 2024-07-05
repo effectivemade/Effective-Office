@@ -7,7 +7,7 @@ import band.effective.office.tablet.network.repository.impl.StateManager
 
 /**Use case for booking room*/
 class BookingUseCase(
-    private val repository: StateManager
+    private val state: StateManager
 ) {
     /**Booking room
      * @param eventInfo info about event
@@ -17,20 +17,20 @@ class BookingUseCase(
         eventInfo: EventInfo,
         room: String
     ): Either<ErrorResponse, EventInfo> =
-        repository.createBooking(room, eventInfo)
+        state.createBooking(room, eventInfo)
 
     /**Update exist booking
      * @param eventInfo info about event
      * @param room room name
      * @return if booking confirm then Either.Success else Either.Error with error code */
     suspend fun update(eventInfo: EventInfo, room: String) =
-        repository.updateBooking(room, eventInfo)
+        state.updateBooking(room, eventInfo)
 
     /**Delete exist booking
      * @param eventInfo info about event
      * @param room room name
      * @return f */
     suspend fun delete(eventInfo: EventInfo, room: String) =
-        repository.deleteBooking(room, eventInfo)
+        state.deleteBooking(room, eventInfo)
 }
 

@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import band.effective.office.tablet.domain.OfficeTime
 import band.effective.office.tablet.domain.model.EventInfo
-import band.effective.office.tablet.domain.model.EventLoadState
 import band.effective.office.tablet.domain.model.Slot
 import java.util.Calendar
 
@@ -119,7 +118,7 @@ class SlotUseCase {
     }
 
     private fun EventInfo.toSlot(): Slot {
-        return if (loadState == EventLoadState.LOADED)
+        return if (!isLoading)
             Slot.EventSlot(start = startTime, finish = finishTime, eventInfo = this)
         else Slot.LoadingEventSlot(start = startTime, finish = finishTime, eventInfo = this)
 

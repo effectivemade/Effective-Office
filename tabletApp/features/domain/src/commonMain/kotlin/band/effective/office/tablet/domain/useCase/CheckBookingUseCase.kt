@@ -18,7 +18,7 @@ class CheckBookingUseCase(
     /** get events blocking room for booking
      * @param event info about event
      * @param room room name
-     * @return List events busy with room booking, if room free, return null*/
+     * @return List events busy with room booking, if room's free then empty list will be returned*/
     fun busyEvents(event: EventInfo, room: String): List<EventInfo> {
         val eventList = eventList(room)
         return eventList.getBusy(event)

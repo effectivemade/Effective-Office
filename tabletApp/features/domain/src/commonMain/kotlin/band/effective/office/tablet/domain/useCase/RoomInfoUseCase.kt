@@ -7,25 +7,25 @@ import kotlinx.coroutines.flow.map
 import java.util.GregorianCalendar
 
 /**Use case for get info about room*/
-class RoomInfoUseCase(private val repository: StateManager) {
+class RoomInfoUseCase(private val state: StateManager) {
     /**Get all rooms names*/
     fun getRoomsNames(): List<String> {
-        return repository.getRoomNames()
+        return state.getRoomNames()
     }
     /**Update repository cache*/
-    suspend fun updateCache() = repository.refreshData()
+    suspend fun updateCache() = state.refreshData()
     /**get info about all rooms*/
-    suspend operator fun invoke() = repository.getRoomInfos().mapRoomsInfo()
+    suspend operator fun invoke() = state.getRoomInfos().mapRoomsInfo()
     /**get update room flow
      * @param scope scope for collect updates from server*/
     fun subscribe(scope: CoroutineScope) =
-        repository.getEventsFlow().map { it.mapRoomsInfo() }
+        state.getEventsFlow().map { it.mapRoomsInfo() }
 
     /**Get info about room
      * @param room room name*/
-    fun getRoom(room: String) = repository.getRoomByName(room)
+    fun getRoom(room: String) = state.getRoomByName(room)
 
-    fun getCurrentRooms() = repository.getCurrentRoomInfos()
+    fun getCurrentRooms() = state.getCurrentRoomInfos()
 
     private fun List<RoomInfo>.mapRoomsInfo() =
         map {

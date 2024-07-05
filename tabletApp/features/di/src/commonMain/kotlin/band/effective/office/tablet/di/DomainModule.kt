@@ -19,9 +19,9 @@ val domainModule = module {
     singleOf(::LocalStoreRepository)
     singleOf(::StateManager)
 
-    single<RoomInfoUseCase> { RoomInfoUseCase(repository = get()) }
+    single<RoomInfoUseCase> { RoomInfoUseCase(state = get()) }
     single<OrganizersInfoUseCase> { OrganizersInfoUseCase(repository = get()) }
-    single<BookingUseCase> { BookingUseCase(repository = get()) }
+    single<BookingUseCase> { BookingUseCase(state = get()) }
     single<TimerUseCase> { TimerUseCase() }
     single<SelectRoomUseCase> { SelectRoomUseCase() }
 }

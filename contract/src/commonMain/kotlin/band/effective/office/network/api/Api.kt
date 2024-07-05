@@ -88,7 +88,8 @@ interface Api {
      * @param bookingInfo new information about booking
      * @return new entry from database*/
     suspend fun updateBooking(
-        bookingInfo: BookingRequestDTO
+        bookingInfo: BookingRequestDTO,
+        bookingId: String,
     ): Either<ErrorResponse, BookingResponseDTO>
 
     /**Delete booking

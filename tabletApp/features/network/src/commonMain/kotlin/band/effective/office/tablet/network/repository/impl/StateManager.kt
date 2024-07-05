@@ -3,7 +3,6 @@ package band.effective.office.tablet.network.repository.impl
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
-import band.effective.office.tablet.domain.model.EventLoadState
 import band.effective.office.tablet.domain.model.RoomInfo
 
 class StateManager(
@@ -23,16 +22,18 @@ class StateManager(
     }
 
     suspend fun createBooking(roomName: String, eventInfo: EventInfo): Either<ErrorResponse, EventInfo> {
-        eventInfo.loadState = EventLoadState.CREATING
-        localStoreRepository.addEvent(roomName, eventInfo)
-        val roomInfo = localStoreRepository.getRoomInfo(roomName)
-        val response = networkRepository.createBooking(eventInfo, roomInfo)
+        val loadingEvent = eventInfo.copy(isLoading = true)
+        val roomInfo = localStoreRepository.getRoomByName(roomName)
+            ?: return Either.Error(ErrorResponse(404, "Couldn't find a room with name $roomName"))
+
+        localStoreRepository.addEvent(roomName, loadingEvent)
+        val response = networkRepository.createBooking(loadingEvent, roomInfo)
         when (response) {
             is Either.Error -> {
-                localStoreRepository.removeEvent(roomName, eventInfo)
+                localStoreRepository.removeEvent(roomName, loadingEvent)
             }
             is Either.Success -> {
-                val event = response.data.apply { loadState = EventLoadState.LOADED }
+                val event = response.data
                 localStoreRepository.updateEvent(roomName, event)
             }
         }
@@ -40,18 +41,20 @@ class StateManager(
     }
 
     suspend fun updateBooking(roomName: String, eventInfo: EventInfo): Either<ErrorResponse, EventInfo> {
-        eventInfo.loadState = EventLoadState.UPDATING
+        val loadingEvent = eventInfo.copy(isLoading = true)
         val oldEvent = localStoreRepository.getEventById(roomName, eventInfo.id)
             ?: return Either.Error(ErrorResponse(404, "Old event with id ${eventInfo.id} wasn't found"))
-        localStoreRepository.updateEvent(roomName, eventInfo)
-        val roomInfo = localStoreRepository.getRoomInfo(roomName)
-        val response = networkRepository.updateBooking(eventInfo, roomInfo)
+        val roomInfo = localStoreRepository.getRoomByName(roomName)
+            ?: return Either.Error(ErrorResponse(404, "Couldn't find a room with name $roomName"))
+
+        localStoreRepository.updateEvent(roomName, loadingEvent)
+        val response = networkRepository.updateBooking(loadingEvent, roomInfo)
         when (response) {
             is Either.Error -> {
-                localStoreRepository.addEvent(roomName, oldEvent)
+                localStoreRepository.updateEvent(roomName, oldEvent)
             }
             is Either.Success -> {
-                val event = response.data.apply { loadState = EventLoadState.LOADED }
+                val event = response.data
                 localStoreRepository.updateEvent(roomName, event)
             }
         }
@@ -59,14 +62,16 @@ class StateManager(
     }
 
     suspend fun deleteBooking(roomName: String, eventInfo: EventInfo): Either<ErrorResponse, String> {
-        eventInfo.loadState = EventLoadState.DELETING
-        localStoreRepository.removeEvent(roomName, eventInfo)
-        val response = networkRepository.deleteBooking(eventInfo)
+        val loadingEvent = eventInfo.copy(isLoading = true)
+        localStoreRepository.updateEvent(roomName, loadingEvent)
+        val response = networkRepository.deleteBooking(loadingEvent)
         when (response) {
             is Either.Error -> {
                 localStoreRepository.addEvent(roomName, eventInfo)
             }
-            is Either.Success -> {}
+            is Either.Success -> {
+                localStoreRepository.removeEvent(roomName, loadingEvent)
+            }
         }
         return response
     }

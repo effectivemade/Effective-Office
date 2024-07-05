@@ -21,7 +21,7 @@ class BookingRepositoryImpl(private val api: Api) :
         eventInfo: EventInfo,
         room: RoomInfo
     ): Either<ErrorResponse, String> =
-        api.updateBooking(eventInfo.toBookingRequestDTO(room))
+        api.updateBooking(eventInfo.toBookingRequestDTO(room), eventInfo.id)
             .map(errorMapper = { it }, successMapper = { "ok" })
 
     /**Map domain model to DTO*/
