@@ -7,7 +7,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +35,7 @@ fun BorderIndicator(
     stokeWidth: Dp,
     onDispose: () -> Unit
 ) {
-    var hasRun = false
+    var hasRun by remember { mutableStateOf(false) }
 
     var targetValue by remember {
         mutableStateOf(100f)
@@ -91,13 +90,5 @@ fun BorderIndicator(
         delay(startDurationInSeconds * 1000L)
         onDispose()
         hasRun = true
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            if (!hasRun) {
-                onDispose()
-            }
-        }
     }
 }
