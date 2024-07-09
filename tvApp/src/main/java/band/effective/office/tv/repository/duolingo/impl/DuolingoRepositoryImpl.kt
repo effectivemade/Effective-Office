@@ -16,7 +16,7 @@ class DuolingoRepositoryImpl @Inject constructor(
 ) : DuolingoRepository {
     override suspend fun getUsers(): Flow<Either<String, List<DuolingoUser>>> =
         flow {
-            val users = workTogether.getAll().filter { it.duolingo != null && it.employment in setOf("Band", "Intern") && it.status == "Active" }
+            val users = workTogether.getAll().filter { it.duolingo != null && it.employment == "Band" && it.status == "Active" }
             var error = false
             val data = users.mapNotNull {
                 when (val response = duolingoApi.getUserInfo(it.duolingo!!)) {

@@ -2,6 +2,8 @@ package band.effective.office.tv.domain.model.notion
 
 import band.effective.office.tv.screen.eventStory.models.*
 import band.effective.office.tv.utils.DateUtlils
+import band.effective.office.tv.utils.atDayStart
+import band.effective.office.tv.utils.isSameDay
 import java.util.Calendar
 
 class EmployeeInfoEntity(
@@ -58,10 +60,18 @@ fun isFirstOrThirdMonthCelebrationToday(date: String): Boolean {
     val dayOfMonth = dateInfo[2].toInt()
     val monthNumber = dateInfo[1].toInt()
     val year = dateInfo[0].toInt()
+
     val calendar = Calendar.getInstance()
-    return (calendar.get(Calendar.DAY_OF_MONTH) == dayOfMonth
-            && (calendar.get(Calendar.MONTH)  == monthNumber ||
-            calendar.get(Calendar.MONTH) - 2 == monthNumber) && year == calendar.get(Calendar.YEAR))
+    val employeeStartDate = Calendar.getInstance()
+    employeeStartDate.set(year, monthNumber - 1, dayOfMonth)
+
+    val oneMonthCheck = (calendar.clone() as Calendar)
+        .apply { add(Calendar.MONTH, -1) }
+    val threeMonthsCheck = (calendar.clone() as Calendar)
+        .apply { add(Calendar.MONTH, -3) }
+
+    return oneMonthCheck.isSameDay(employeeStartDate)
+            || threeMonthsCheck.isSameDay(employeeStartDate)
 }
 
 fun isNewEmployeeToday(date: String): Boolean {
@@ -69,13 +79,12 @@ fun isNewEmployeeToday(date: String): Boolean {
     val dayOfMonth = dateInfo[2].toInt()
     val monthNumber = dateInfo[1].toInt()
     val year = dateInfo[0].toInt()
-    val employeeStartWorkingDay = Calendar.getInstance()
+
+    val employeeStartWorkingDay = Calendar.getInstance().atDayStart()
     employeeStartWorkingDay.set(year, monthNumber - 1, dayOfMonth)
-    val startDate = Calendar.getInstance()
-    startDate.add(Calendar.DAY_OF_MONTH, -7)
-    val endDate = Calendar.getInstance()
-    endDate.add(Calendar.DAY_OF_MONTH, 7)
-    val dateToCheck: Calendar = Calendar.getInstance()
-    dateToCheck.set(year, monthNumber, dayOfMonth)
-    return (employeeStartWorkingDay.after(startDate) && employeeStartWorkingDay.before(endDate))
+
+    val endCheckDate = (employeeStartWorkingDay.clone() as Calendar)
+    endCheckDate.add(Calendar.DAY_OF_MONTH, 7)
+
+    return Calendar.getInstance() in employeeStartWorkingDay..<endCheckDate
 }

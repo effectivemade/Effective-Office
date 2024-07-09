@@ -38,9 +38,9 @@ class EventStoryDataCombinerUseCase @Inject constructor(
 
     private fun getNotionDataForStories() = flow {
         val response = try {
-            Either.Success(
-                workTogether.getAll()
-                    .filter { it.employment in setOf("Band", "Intern") && it.status == "Active" })
+            val activeEmployees = workTogether.getAll()
+                .filter { it.employment == "Band" && it.status == "Active" }
+            Either.Success(activeEmployees)
         } catch (t: Throwable) {
             Either.Failure(
                 t.message ?: "Error in EventStoryDataCombinerUseCase.getNotionDataForStories"

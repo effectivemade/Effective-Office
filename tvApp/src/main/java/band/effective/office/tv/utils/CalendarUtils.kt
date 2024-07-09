@@ -19,3 +19,14 @@ fun GregorianCalendar.fullDay(): GregorianCalendar {
     result.set(Calendar.MINUTE, 59)
     return result
 }
+
+fun Calendar.atDayStart(): Calendar = apply {
+    set(Calendar.HOUR, 0)
+    set(Calendar.MINUTE, 0)
+    set(Calendar.SECOND, 0)
+}
+
+fun Calendar.isSameDay(other: Calendar): Boolean =
+    get(Calendar.YEAR) == other.get(Calendar.YEAR)
+            && get(Calendar.MONTH) == other.get(Calendar.MONTH)
+            && get(Calendar.DAY_OF_MONTH) == other.get(Calendar.DAY_OF_MONTH)
