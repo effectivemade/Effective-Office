@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.GregorianCalendar
 
-class LocalStoreRepository {
+class LocalEventStoreRepository {
     private val buffer = MutableStateFlow<List<RoomInfo>>(
         emptyList()
     )
@@ -64,7 +64,7 @@ class LocalStoreRepository {
         }
     }
 
-    fun getRooms(): List<RoomInfo> =
+    fun getRoomsInfo(): List<RoomInfo> =
         buffer.value.map { it.updateCurrentEvent() }
 
     fun getRoomNames(): List<String> {

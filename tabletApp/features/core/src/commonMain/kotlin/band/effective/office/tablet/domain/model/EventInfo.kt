@@ -11,7 +11,7 @@ data class EventInfo(
     val finishTime: Calendar,
     val organizer: Organizer,
     val id: String,
-    var isLoading: Boolean = false,
+    var isLoading: Boolean,
 ) : Parcelable {
     companion object {
         const val defaultId: String = ""
@@ -20,7 +20,8 @@ data class EventInfo(
             startTime = GregorianCalendar(),
             finishTime = GregorianCalendar(),
             organizer = Organizer.default,
-            id = defaultId
+            id = defaultId,
+            isLoading = true,
         )
     }
 

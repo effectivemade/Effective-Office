@@ -5,7 +5,7 @@ import androidx.annotation.RequiresApi
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.model.Slot
-import band.effective.office.tablet.domain.useCase.BookingUseCase
+import band.effective.office.tablet.network.repository.impl.EventManager
 import band.effective.office.tablet.ui.freeSelectRoom.FreeSelectRoomComponent
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainFactory
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainStore
@@ -13,6 +13,7 @@ import band.effective.office.tablet.ui.mainScreen.slotComponent.SlotComponent
 import band.effective.office.tablet.ui.mainScreen.slotComponent.store.SlotStore
 import band.effective.office.tablet.ui.modal.ModalWindow
 import band.effective.office.tablet.ui.updateEvent.UpdateEventComponent
+import band.effective.office.tablet.utils.componentCoroutineScope
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
@@ -24,8 +25,6 @@ import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -38,7 +37,7 @@ class MainComponent(
     private val storeFactory: StoreFactory,
     val onSettings: () -> Unit
 ) : ComponentContext by componentContext, KoinComponent {
-    private val bookingUseCase: BookingUseCase by inject()
+    private val eventManager: EventManager by inject()
 
     val slotComponent = SlotComponent(
         componentContext = componentContext,
@@ -88,9 +87,9 @@ class MainComponent(
                 storeFactory = storeFactory,
                 eventInfo = modalWindows.event,
                 onRemoveEvent = { event ->
-                    CoroutineScope(Dispatchers.IO).launch {
-                        bookingUseCase.delete(
-                            room = state.value.run { roomList[indexSelectRoom].name },
+                    this.componentContext.componentCoroutineScope().launch {
+                        eventManager.deleteBooking(
+                            roomName = state.value.run { roomList[indexSelectRoom].name },
                             eventInfo = event
                         )
                     }
@@ -104,11 +103,11 @@ class MainComponent(
                 room = modalWindows.room,
                 onDelete = { slot ->
                     slotComponent.sendIntent(SlotStore.Intent.Delete(slot) {
-                        CoroutineScope(Dispatchers.IO).launch {
+                        this.componentContext.componentCoroutineScope().launch {
                             (slot as? Slot.EventSlot)?.eventInfo?.apply {
-                                bookingUseCase.delete(
+                                eventManager.deleteBooking(
                                     eventInfo = this,
-                                    room = state.value.run { roomList[indexSelectRoom].name }
+                                    roomName = state.value.run { roomList[indexSelectRoom].name }
                                 )
                             }
                         }
@@ -116,20 +115,20 @@ class MainComponent(
                 },
                 onCloseRequest = { closeModalWindow() },
                 onEventCreation = { eventInfo ->
-                    CoroutineScope(Dispatchers.Main).launch {
+                    this.componentContext.componentCoroutineScope().launch {
                         val roomName = modalWindows.room
-                        val result = bookingUseCase.invoke(
+                        val result = eventManager.createBooking(
                             eventInfo = eventInfo,
-                            room = roomName
+                            roomName = roomName
                         )
                     }
                 },
                 onEventUpdate = { eventInfo ->
                     val roomName = modalWindows.room
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val result = bookingUseCase.update(
+                    this.componentContext.componentCoroutineScope().launch {
+                        val result = eventManager.updateBooking(
                             eventInfo = eventInfo,
-                            room = roomName
+                            roomName = roomName
                         )
                     }
                 }

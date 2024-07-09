@@ -35,8 +35,6 @@ fun BorderIndicator(
     stokeWidth: Dp,
     onDispose: () -> Unit
 ) {
-    var hasRun by remember { mutableStateOf(false) }
-
     var targetValue by remember {
         mutableStateOf(100f)
     }
@@ -89,6 +87,5 @@ fun BorderIndicator(
         targetValue = 0f
         delay(startDurationInSeconds * 1000L)
         onDispose()
-        hasRun = true
     }
 }

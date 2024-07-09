@@ -9,6 +9,7 @@ import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
 import band.effective.office.tablet.domain.model.RoomInfo
+import band.effective.office.tablet.network.repository.BookingRepository
 import band.effective.office.tablet.utils.Converter.toOrganizer
 import band.effective.office.tablet.utils.map
 import kotlinx.coroutines.CoroutineScope
@@ -18,12 +19,12 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.GregorianCalendar
 
-class NetworkRepository(
+class NetworkEventRepository(
     private val api: Api,
-) {
+) : BookingRepository {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    suspend fun getFreshRoomInfos(): List<RoomInfo>? {
+    suspend fun getFreshRoomsInfo(): List<RoomInfo>? {
         val start = GregorianCalendar().apply {
             val minutes = get(Calendar.MINUTE)
             val excess = minutes % 15 + 1
@@ -42,20 +43,20 @@ class NetworkRepository(
         return rooms
     }
 
-    suspend fun createBooking(
+    override suspend fun createBooking(
         eventInfo: EventInfo,
         room: RoomInfo
     ): Either<ErrorResponse, EventInfo> = api.createBooking(eventInfo.toBookingRequestDTO(room))
         .map(errorMapper = { it }, successMapper = { it.toEventInfo() })
 
-    suspend fun updateBooking(
+    override suspend fun updateBooking(
         eventInfo: EventInfo,
         room: RoomInfo
     ): Either<ErrorResponse, EventInfo> =
         api.updateBooking(eventInfo.toBookingRequestDTO(room), eventInfo.id)
             .map(errorMapper = { it }, successMapper = { it.toEventInfo() })
 
-    suspend fun deleteBooking(
+    override suspend fun deleteBooking(
         eventInfo: EventInfo
     ): Either<ErrorResponse, String> =
         api.deleteBooking(eventInfo.id)
@@ -84,7 +85,8 @@ class NetworkRepository(
         id = id,
         startTime = GregorianCalendar().apply { timeInMillis = beginBooking },
         finishTime = GregorianCalendar().apply { timeInMillis = endBooking },
-        organizer = owner?.toOrganizer() ?: Organizer.default
+        organizer = owner?.toOrganizer() ?: Organizer.default,
+        isLoading = false,
     )
 
     private fun WorkspaceDTO.toRoom() =
@@ -97,5 +99,4 @@ class NetworkRepository(
             currentEvent = null,
             id = id
         )
-
 }

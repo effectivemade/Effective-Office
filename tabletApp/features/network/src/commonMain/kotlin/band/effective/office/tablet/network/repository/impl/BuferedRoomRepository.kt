@@ -29,7 +29,7 @@ import java.util.GregorianCalendar
 
 @Deprecated(
     message = "This repository is deprecated due to its complexity which shouldn't appear in repository",
-    replaceWith = ReplaceWith("StateManager")
+    replaceWith = ReplaceWith("EventManager")
 )
 class BufferedRoomRepository(private val api: Api) : RoomRepository {
     private val roomsBuffer = Buffer(
@@ -182,7 +182,8 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
         startTime = GregorianCalendar().apply { time = Date(beginBooking) },
         finishTime = GregorianCalendar().apply { time = Date(endBooking) },
         organizer = this.owner?.toOrganizer() ?: Organizer.default ,
-        id = id
+        id = id,
+        isLoading = false,
     )
 
     private fun WorkspaceDTO.toRoom() =

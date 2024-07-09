@@ -80,7 +80,7 @@ class MainFactory(
                     }
                     // update events list
                     launch(Dispatchers.Main) {
-                        roomInfoUseCase.subscribe(this).collect { roomInfos ->
+                        roomInfoUseCase.subscribe().collect { roomInfos ->
                             if (roomInfos.isNotEmpty()) {
                                 dispatch(Action.OnUpdateRoomInfo)
                             }

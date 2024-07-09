@@ -274,7 +274,8 @@ class UpdateEventStoreFactory(
                     .apply { add(Calendar.MINUTE, duration) }
                     .removeSeconds(),
                 organizer = selectOrganizer,
-                id = event.id
+                id = event.id,
+                isLoading = false,
             )
 
 
@@ -320,7 +321,8 @@ class UpdateEventStoreFactory(
                     )
                 },
                 organizer = newOrganizer,
-                id = id
+                id = id,
+                isLoading = false,
             )
         }
     }
@@ -330,5 +332,6 @@ private fun UpdateEventStore.State.toEvent(): EventInfo = EventInfo(
     startTime = date,
     finishTime = (date.clone() as Calendar).apply { add(Calendar.MINUTE, duration) },
     organizer = selectOrganizer,
-    id = ""
+    id = "",
+    isLoading = false,
 )

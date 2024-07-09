@@ -69,7 +69,7 @@ class SlotStoreFactory(
             }
         }
         launch(Dispatchers.IO) {
-            roomInfoUseCase.subscribe(this).collect { roomInfos ->
+            roomInfoUseCase.subscribe().collect { roomInfos ->
                 if (roomInfos.isNotEmpty()) {
                     val roomInfo = roomInfos.firstOrNull{ it.name == roomName() } ?: return@collect
                     withContext(Dispatchers.Main) {
@@ -271,9 +271,7 @@ class SlotStoreFactory(
             is Slot.EmptySlot -> executeFreeSlot(this)
             is Slot.EventSlot -> executeEventSlot(this)
             is Slot.MultiEventSlot -> {}
-            is Slot.LoadingEventSlot -> {
-
-            }
+            is Slot.LoadingEventSlot -> {}
         }
 
         private fun executeFreeSlot(slot: Slot.EmptySlot) {
@@ -295,7 +293,8 @@ class SlotStoreFactory(
                     }
                 },
                 organizer = Organizer.default,
-                id = EventInfo.defaultId
+                id = EventInfo.defaultId,
+                isLoading = false,
             )
 
     }
