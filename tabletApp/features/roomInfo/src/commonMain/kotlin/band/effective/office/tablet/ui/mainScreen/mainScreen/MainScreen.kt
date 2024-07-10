@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import band.effective.office.tablet.ui.common.ErrorMainScreen
+import band.effective.office.tablet.ui.fastEvent.FastEventComponent
+import band.effective.office.tablet.ui.fastEvent.FastEventView
 import band.effective.office.tablet.ui.freeSelectRoom.FreeSelectRoomComponent
 import band.effective.office.tablet.ui.freeSelectRoom.FreeSelectRoomView
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainStore
@@ -84,6 +86,7 @@ fun MainScreen(component: MainComponent) {
         when (val activeComponent = activeWindowSlot.child?.instance) {
             is FreeSelectRoomComponent -> FreeSelectRoomView(freeSelectRoomComponent = activeComponent)
             is UpdateEventComponent -> UpdateEventView(component = activeComponent)
+            is FastEventComponent -> FastEventView(component = activeComponent)
         }
     }
 }

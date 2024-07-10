@@ -22,4 +22,8 @@
     <string name="update_button">Изменить</string>
     <string name="delete_button">Удалить бронь</string>
     <string name="time_booked">Это время уже занято</string>
+    <string name="booked_until">Забронирована до ${finishTime}</string>
+    <string name="cancel_book">Отменить бронь</string>
+    <string name="no_free">Свободных нет</string>
+    <string name="find_quiet_place">Через ${minutes} мин освободится ${room}. Пока что попробуйте найти тихое место в офисе</string>
 </resources>

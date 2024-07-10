@@ -1,7 +1,6 @@
 package band.effective.office.tablet.ui.mainScreen.mainScreen.store
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.ErrorWithData
@@ -9,7 +8,6 @@ import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.useCase.CheckSettingsUseCase
 import band.effective.office.tablet.domain.useCase.RoomInfoUseCase
-import band.effective.office.tablet.domain.useCase.SelectRoomUseCase
 import band.effective.office.tablet.domain.useCase.TimerUseCase
 import band.effective.office.tablet.domain.useCase.UpdateUseCase
 import band.effective.office.tablet.ui.mainScreen.mainScreen.MainComponent
@@ -42,7 +40,6 @@ class MainFactory(
     private val checkSettingsUseCase: CheckSettingsUseCase by inject()
     private val updateUseCase: UpdateUseCase by inject()
     private val timerUseCase: TimerUseCase by inject()
-    private val selectRoomUseCase: SelectRoomUseCase by inject()
     private val currentTimeTimer = BootstrapperTimer<Action>(timerUseCase)
     private val currentRoomTimer = BootstrapperTimer<Action>(timerUseCase)
     private val errorTimer = BootstrapperTimer<Action>(timerUseCase)
@@ -155,32 +152,21 @@ class MainFactory(
 
                 MainStore.Intent.OnUpdate -> reboot(getState())
                 is MainStore.Intent.OnFastBooking -> {
-                    val state = getState()
-                    val currentRoom = state.run { roomList[indexSelectRoom] }
-                    val selectRoom =
-                        selectRoomUseCase.getRoom(
-                            currentRoom = currentRoom,
-                            rooms = state.roomList,
-                            minEventDuration = intent.minDuration
+                    navigate(
+                        MainComponent.ModalWindowsConfig.FastEvent(
+                            event = EventInfo.emptyEvent.copy(
+                                startTime = GregorianCalendar(),
+                                finishTime = GregorianCalendar().apply {
+                                    add(
+                                        Calendar.MINUTE,
+                                        intent.minDuration
+                                    )
+                                }
+                            ),
+                            room = getState().run { roomList[indexSelectRoom].name }
                         )
-                    val event = EventInfo.emptyEvent.copy(
-                        startTime = GregorianCalendar(),
-                        finishTime = GregorianCalendar().apply {
-                            add(
-                                Calendar.MINUTE,
-                                intent.minDuration
-                            )
-                        })
-                    if (selectRoom != null) {
-                        navigate(
-                            MainComponent.ModalWindowsConfig.UpdateEvent(
-                                event = event,
-                                room = selectRoom.name
-                            )
-                        )
-                    }
+                    )
                 }
-
                 is MainStore.Intent.OnUpdateSelectDate -> {
                     currentTimeTimer.restart()
                     currentRoomTimer.restart()

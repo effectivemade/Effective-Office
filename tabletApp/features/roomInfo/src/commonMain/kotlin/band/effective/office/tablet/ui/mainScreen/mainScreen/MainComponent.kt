@@ -7,6 +7,7 @@ import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.model.Slot
 import band.effective.office.tablet.domain.useCase.CancelUseCase
 import band.effective.office.tablet.domain.useCase.DeleteCachedEventUseCase
+import band.effective.office.tablet.ui.fastEvent.FastEventComponent
 import band.effective.office.tablet.ui.freeSelectRoom.FreeSelectRoomComponent
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainFactory
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainStore
@@ -112,6 +113,13 @@ class MainComponent(
                     slotComponent.sendIntent(SlotStore.Intent.Loading(Slot.LoadingEventSlot(start = it.startTime, finish = it.finishTime, it)))
                 }
             )
+            is ModalWindowsConfig.FastEvent -> FastEventComponent(
+                componentContext = componentContext,
+                storeFactory = storeFactory,
+                eventInfo = modalWindows.event,
+                room = modalWindows.room,
+                onCloseRequest = { closeModalWindow() }
+            )
         }
     }
 
@@ -163,5 +171,11 @@ class MainComponent(
 
         @Parcelize
         data class FreeRoom(val event: EventInfo) : ModalWindowsConfig
+
+        @Parcelize
+        data class FastEvent(
+            val event: EventInfo,
+            val room: String
+        ) : ModalWindowsConfig
     }
 }

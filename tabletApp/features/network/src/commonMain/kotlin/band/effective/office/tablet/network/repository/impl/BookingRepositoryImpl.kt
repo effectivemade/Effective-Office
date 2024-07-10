@@ -15,7 +15,7 @@ class BookingRepositoryImpl(private val api: Api) :
         eventInfo: EventInfo,
         room: RoomInfo
     ): Either<ErrorResponse, String> = api.createBooking(eventInfo.toBookingRequestDTO(room))
-        .map(errorMapper = { it }, successMapper = { "ok" })
+        .map(errorMapper = { it }, successMapper = { it.id })
 
     override suspend fun updateBooking(
         eventInfo: EventInfo,
@@ -30,7 +30,7 @@ class BookingRepositoryImpl(private val api: Api) :
             beginBooking = this.startTime.timeInMillis,
             endBooking = this.finishTime.timeInMillis,
             ownerEmail = this.organizer.email,
-            participantEmails = listOf(this.organizer.email),
+            participantEmails = this.organizer.email?.let { listOf(it) } ?: listOf(),
             workspaceId = room.id
         )
 
