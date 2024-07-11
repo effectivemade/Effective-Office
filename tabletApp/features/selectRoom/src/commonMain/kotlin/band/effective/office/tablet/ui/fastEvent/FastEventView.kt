@@ -37,6 +37,7 @@ fun FastEventView(
     component: FastEventComponent
 ) {
     val state by component.state.collectAsState()
+    val currentTime = SimpleDateFormat("HH:mm").format(state.currentTime)
     Children(stack = component.childStack, modifier = Modifier.padding(35.dp)) {
         Dialog(
             onDismissRequest = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest)},
@@ -50,7 +51,7 @@ fun FastEventView(
             ){
                 Spacer(modifier = Modifier.height(50.dp))
                 Text(
-                    text = SimpleDateFormat("HH:mm").format(state.currentTime),
+                    text = currentTime,
                     style = MaterialTheme.typography.h2,
                     color = LocalCustomColorsPalette.current.primaryTextAndIcon
                 )
