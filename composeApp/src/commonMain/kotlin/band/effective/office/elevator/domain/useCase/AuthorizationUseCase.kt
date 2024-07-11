@@ -26,7 +26,7 @@ class AuthorizationUseCase(
             scope.launch(Dispatchers.IO) {
                 googleAccount.idToken?.let { token ->
                     authorizationRepository
-                        .authorizeUser(idToken = token, email = googleAccount.email)
+                        .authorizeUser(idToken = token, email = googleAccount.email, imageUrl = googleAccount.photoUrl)
                         .collect { response ->
                             when (response) {
                                 is Either.Success -> {

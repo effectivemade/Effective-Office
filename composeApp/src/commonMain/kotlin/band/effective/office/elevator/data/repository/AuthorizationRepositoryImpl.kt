@@ -22,7 +22,8 @@ class AuthorizationRepositoryImpl(
 
     override suspend fun authorizeUser(
         idToken: String,
-        email: String
+        email: String,
+        imageUrl: String?,
     ): Flow<Either<ErrorResponse, User>> = flow {
         KtorEtherClient.token.add(idToken)
         Napier.d {
@@ -30,8 +31,12 @@ class AuthorizationRepositoryImpl(
         }
         val apiResponse = api.getUserByEmail(email = email)
         val userResponse = apiResponse.map(
-            errorMapper = {it},
-            successMapper = {it.toUser()}
+            errorMapper = { it },
+            successMapper = {
+                val user = it.toUser()
+                if (imageUrl != null) user.copy(imageUrl = imageUrl)
+                else user
+            }
         )
         when(userResponse) {
             is Either.Success -> {

@@ -21,8 +21,8 @@ class SignInUseCase(
             }
             is ApiResponse.Success -> {
                 authorizationRepository
-                    .authorizeUser(idToken = user.body.idToken!!, email = user.body.email)
-                    .collect{ response ->
+                    .authorizeUser(idToken = user.body.idToken!!, email = user.body.email, imageUrl = user.body.photoUrl)
+                    .collect { response ->
                         emit(
                             when (response) {
                                 is Either.Error -> Either.Error(Unit)
