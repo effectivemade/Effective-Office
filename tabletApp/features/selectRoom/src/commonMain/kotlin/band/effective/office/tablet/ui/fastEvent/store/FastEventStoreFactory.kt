@@ -44,10 +44,16 @@ class FastEventStoreFactory(
                 initialState = FastEventStore.State.defaultState,
                 bootstrapper = coroutineBootstrapper {
                     launch {
-                        val busyEvents = (checkBookingUseCase.busyEvents(
+                        val checkBookings = checkBookingUseCase.busyEvents(
                             event = eventInfo,
                             room = room
-                        ) as? Either.Success?)?.data!!
+                        )
+                        if (checkBookings is Either.Error ) {
+                            dispatch(Action.FastBooking(isSuccess = false))
+                            navigate(FastEventComponent.ModalConfig.FailureModal)
+                        }
+
+                        val busyEvents = (checkBookings as Either.Success).data
 
                         if(busyEvents.isEmpty())
                         {
@@ -57,20 +63,20 @@ class FastEventStoreFactory(
                             )
                             when (result) {
                                 is Either.Success -> {
-                                    dispatch(Action.UpdateEvent(eventInfo.copy(id = result.data)))
-                                    dispatch(Action.FastBooking(true))
+                                    dispatch(Action.UpdateEvent(event = eventInfo.copy(id = result.data)))
+                                    dispatch(Action.FastBooking(isSuccess = true))
                                     navigate(FastEventComponent.ModalConfig.SuccessModal)
                                 }
                                 is Either.Error -> {
-                                    dispatch(Action.FastBooking(false))
+                                    dispatch(Action.FastBooking(isSuccess = false))
                                     navigate(FastEventComponent.ModalConfig.FailureModal)
                                 }
                             }
                         }
                         else {
-                            dispatch(Action.FastBooking(false))
+                            dispatch(Action.FastBooking(isSuccess = false))
                             dispatch(Action.GetDifferenceInTime(
-                                endTime = busyEvents[0].finishTime.timeInMillis ,
+                                endTime = busyEvents[0].finishTime.timeInMillis,
                                 startTime = GregorianCalendar().timeInMillis
                             ))
                             navigate(FastEventComponent.ModalConfig.FailureModal)
@@ -111,7 +117,7 @@ class FastEventStoreFactory(
             getState: () -> FastEventStore.State
         ) {
             when (intent) {
-                is FastEventStore.Intent.OnFreeSelectRequest -> freeRoom(getState())
+                is FastEventStore.Intent.OnFreeSelectRequest -> freeRoom(state = getState())
                 is FastEventStore.Intent.OnCloseWindowRequest -> onCloseRequest()
 
             }
@@ -132,7 +138,7 @@ class FastEventStoreFactory(
                     } else dispatch(Message.Fail)
                 }
                 is Action.UpdateEvent -> {
-                    dispatch(Message.UpdateEvent(action.event))
+                    dispatch(Message.UpdateEvent(event = action.event))
                 }
                 is Action.RefreshTime -> dispatch(Message.UpdateTime(GregorianCalendar().time))
                 is Action.GetDifferenceInTime -> {

@@ -46,7 +46,7 @@ fun SuccessSelectRoomView(
         IconSuccess()
         Spacer(modifier = Modifier.height(24.dp))
         SuccessText(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp),
             nameRoom = roomName
         )
         Spacer(modifier = Modifier.height(50.dp))

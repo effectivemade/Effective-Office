@@ -85,7 +85,7 @@ fun FastEventView(
 }
 
 @Composable
-fun FastEventView(
+private fun FastEventView(
     onDismissRequest:() -> Unit
 ) {
     Box(contentAlignment = Alignment.Center) {
