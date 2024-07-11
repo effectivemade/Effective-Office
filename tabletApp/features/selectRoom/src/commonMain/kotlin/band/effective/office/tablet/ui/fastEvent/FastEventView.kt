@@ -17,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +38,8 @@ fun FastEventView(
     component: FastEventComponent
 ) {
     val state by component.state.collectAsState()
-    val currentTime = SimpleDateFormat("HH:mm").format(state.currentTime)
+    val timeFormat = remember { SimpleDateFormat("HH:mm") }
+
     Children(stack = component.childStack, modifier = Modifier.padding(35.dp)) {
         Dialog(
             onDismissRequest = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest)},
@@ -51,7 +53,7 @@ fun FastEventView(
             ){
                 Spacer(modifier = Modifier.height(50.dp))
                 Text(
-                    text = currentTime,
+                    text = timeFormat.format(state.currentTime),
                     style = MaterialTheme.typography.h2,
                     color = LocalCustomColorsPalette.current.primaryTextAndIcon
                 )
