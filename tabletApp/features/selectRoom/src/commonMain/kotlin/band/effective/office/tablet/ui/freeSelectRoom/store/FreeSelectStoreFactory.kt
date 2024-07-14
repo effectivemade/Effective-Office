@@ -1,8 +1,6 @@
 package band.effective.office.tablet.ui.freeSelectRoom.store
 
-import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
-import band.effective.office.tablet.domain.useCase.CancelUseCase
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -11,14 +9,12 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class FreeSelectStoreFactory(
     private val storeFactory: StoreFactory,
-    private val eventInfo: EventInfo
+    private val eventInfo: EventInfo,
+    private val onRemoveEvent: (EventInfo) -> Unit
 ) : KoinComponent {
-    val cancelUseCase: CancelUseCase by inject()
-
     @OptIn(ExperimentalMviKotlinApi::class)
     fun create(): FreeSelectStore =
         object : FreeSelectStore,
@@ -31,10 +27,10 @@ class FreeSelectStoreFactory(
             ) {}
 
     private sealed interface Message {
-        object Success : Message
-        object Load : Message
-        object Fail : Message
-        object Reset : Message
+        data object Success : Message
+        data object Load : Message
+        data object Fail : Message
+        data object Reset : Message
     }
 
     private inner class ExecutorImpl() :
@@ -54,12 +50,9 @@ class FreeSelectStoreFactory(
         }
 
         private fun freeRoom() = scope.launch() {
-            dispatch(Message.Load)
-            if (cancelUseCase(eventInfo) is Either.Success) {
-                publish(FreeSelectStore.Label.Close)
-                dispatch(Message.Success)
-                dispatch(Message.Reset)
-            } else dispatch(Message.Fail)
+            onRemoveEvent(eventInfo)
+            publish(FreeSelectStore.Label.Close)
+            dispatch(Message.Reset)
         }
     }
 

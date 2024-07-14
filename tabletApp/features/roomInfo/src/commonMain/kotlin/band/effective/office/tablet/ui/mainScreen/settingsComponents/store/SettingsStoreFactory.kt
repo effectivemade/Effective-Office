@@ -1,5 +1,6 @@
 package band.effective.office.tablet.ui.mainScreen.settingsComponents.store
 
+import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.useCase.CheckSettingsUseCase
 import band.effective.office.tablet.domain.useCase.RoomInfoUseCase
 import band.effective.office.tablet.domain.useCase.SetRoomUseCase
@@ -30,9 +31,9 @@ class SettingsStoreFactory(private val storeFactory: StoreFactory) : KoinCompone
 
                     launch {
                         roomUseCase.updateCache()
-                        val rooms = roomUseCase.getRoomsNames()
-                        println("rooms = ${rooms}")
-                        dispatch(Action.Loaded(rooms))
+                        val rooms = roomUseCase.getRoomsNames() as? Either.Success
+                            ?: return@launch
+                        dispatch(Action.Loaded(rooms.data))
                     }
                 },
                 executorFactory = ::ExecutorImpl,

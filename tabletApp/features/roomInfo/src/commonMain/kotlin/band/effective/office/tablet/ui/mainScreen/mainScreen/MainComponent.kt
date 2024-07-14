@@ -5,8 +5,7 @@ import androidx.annotation.RequiresApi
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.model.Slot
-import band.effective.office.tablet.domain.useCase.CancelUseCase
-import band.effective.office.tablet.domain.useCase.DeleteCachedEventUseCase
+import band.effective.office.tablet.network.repository.impl.EventManager
 import band.effective.office.tablet.ui.freeSelectRoom.FreeSelectRoomComponent
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainFactory
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainStore
@@ -14,6 +13,7 @@ import band.effective.office.tablet.ui.mainScreen.slotComponent.SlotComponent
 import band.effective.office.tablet.ui.mainScreen.slotComponent.store.SlotStore
 import band.effective.office.tablet.ui.modal.ModalWindow
 import band.effective.office.tablet.ui.updateEvent.UpdateEventComponent
+import band.effective.office.tablet.utils.componentCoroutineScope
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
@@ -25,8 +25,6 @@ import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -39,16 +37,19 @@ class MainComponent(
     private val storeFactory: StoreFactory,
     val onSettings: () -> Unit
 ) : ComponentContext by componentContext, KoinComponent {
-
-    val cancelUseCase by inject<CancelUseCase>()
-    val deleteCachedEventUseCase: DeleteCachedEventUseCase by inject()
+    private val eventManager: EventManager by inject()
 
     val slotComponent = SlotComponent(
         componentContext = componentContext,
         storeFactory = storeFactory,
         roomName = {
-            state.value.run {
-                with(if (roomList.isNotEmpty()) roomList[indexSelectRoom] else RoomInfo.defaultValue) { name }
+            // NOTE: for some reason state's value will be null
+            // on first startup after room selection
+            if (state.value == null) RoomInfo.defaultValue.name
+            else {
+                state.value.run {
+                    with(if (roomList.isNotEmpty()) roomList[indexSelectRoom] else RoomInfo.defaultValue) { name }
+                }
             }
         },
         openBookingDialog = { event, room ->
@@ -69,8 +70,7 @@ class MainComponent(
     )
 
     fun openModalWindow(dist: ModalWindowsConfig) {
-        navigation.activate(dist)
-    }
+        navigation.activate(dist) }
 
     fun closeModalWindow() {
         navigation.dismiss()
@@ -86,6 +86,14 @@ class MainComponent(
                 componentContext = componentContext,
                 storeFactory = storeFactory,
                 eventInfo = modalWindows.event,
+                onRemoveEvent = { event ->
+                    this.componentContext.componentCoroutineScope().launch {
+                        eventManager.deleteBooking(
+                            roomName = state.value.run { roomList[indexSelectRoom].name },
+                            eventInfo = event
+                        )
+                    }
+                },
                 onCloseRequest = { closeModalWindow() })
 
             is ModalWindowsConfig.UpdateEvent -> UpdateEventComponent(
@@ -94,22 +102,35 @@ class MainComponent(
                 event = modalWindows.event,
                 room = modalWindows.room,
                 onDelete = { slot ->
-                    slotComponent.sendIntent(SlotStore.Intent.Delete(slot, {
-                        CoroutineScope(Dispatchers.IO).launch {
+                    slotComponent.sendIntent(SlotStore.Intent.Delete(slot) {
+                        this.componentContext.componentCoroutineScope().launch {
                             (slot as? Slot.EventSlot)?.eventInfo?.apply {
-                                deleteCachedEventUseCase(
-                                    roomName = state.value.run { roomList[indexSelectRoom].name },
-                                    eventInfo = this
+                                eventManager.deleteBooking(
+                                    eventInfo = this,
+                                    roomName = state.value.run { roomList[indexSelectRoom].name }
                                 )
-                                cancelUseCase(this)
                             }
                         }
-                    }))
-
+                    })
                 },
                 onCloseRequest = { closeModalWindow() },
-                onTempLoading = {
-                    slotComponent.sendIntent(SlotStore.Intent.Loading(Slot.LoadingEventSlot(start = it.startTime, finish = it.finishTime, it)))
+                onEventCreation = { eventInfo ->
+                    this.componentContext.componentCoroutineScope().launch {
+                        val roomName = modalWindows.room
+                        val result = eventManager.createBooking(
+                            eventInfo = eventInfo,
+                            roomName = roomName
+                        )
+                    }
+                },
+                onEventUpdate = { eventInfo ->
+                    this.componentContext.componentCoroutineScope().launch {
+                        val roomName = modalWindows.room
+                        val result = eventManager.updateBooking(
+                            eventInfo = eventInfo,
+                            roomName = roomName
+                        )
+                    }
                 }
             )
         }

@@ -26,7 +26,8 @@ class UpdateEventComponent(
     val room: String,
     onDelete: (Slot) -> Unit,
     onCloseRequest: () -> Unit,
-    onTempLoading: (EventInfo) -> Unit
+    onEventCreation: (EventInfo) -> Unit,
+    onEventUpdate: (EventInfo) -> Unit
 ) : ComponentContext by componentContext, ModalWindow {
 
     private val navigation = StackNavigation<ModalConfig>()
@@ -44,7 +45,8 @@ class UpdateEventComponent(
             navigate = { navigation.push(it) },
             room = room,
             onDelete = onDelete,
-            onTempLoading = onTempLoading
+            onEventCreation = onEventCreation,
+            onEventUpdate = onEventUpdate
         ).create(defaultValue = event.toState())
     }
 

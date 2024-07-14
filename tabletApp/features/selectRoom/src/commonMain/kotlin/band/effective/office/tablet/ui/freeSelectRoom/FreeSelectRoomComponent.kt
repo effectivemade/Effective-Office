@@ -18,11 +18,16 @@ class FreeSelectRoomComponent(
     private val componentContext: ComponentContext,
     storeFactory: StoreFactory,
     eventInfo: EventInfo,
-    private val onCloseRequest: () -> Unit
+    private val onCloseRequest: () -> Unit,
+    private val onRemoveEvent: (EventInfo) -> Unit
 ) : ComponentContext by componentContext, KoinComponent, ModalWindow {
 
     private val store: FreeSelectStore = instanceKeeper.getStore {
-        FreeSelectStoreFactory(storeFactory = storeFactory, eventInfo = eventInfo).create()
+        FreeSelectStoreFactory(
+            storeFactory = storeFactory,
+            eventInfo = eventInfo,
+            onRemoveEvent = onRemoveEvent
+        ).create()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

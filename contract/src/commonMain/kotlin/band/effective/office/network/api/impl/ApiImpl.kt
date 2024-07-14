@@ -164,12 +164,16 @@ class ApiImpl : Api {
         }
 
     override suspend fun updateBooking(
-        bookingInfo: BookingRequestDTO
+        bookingInfo: BookingRequestDTO,
+        bookingId: String
     ): Either<ErrorResponse, BookingResponseDTO> =
         client.securityResponse(
             urlString = "$baseUrl/api/v1/bookings",
             method = KtorEtherClient.RestMethod.Put
         ) {
+            url {
+                appendPathSegments(bookingId)
+            }
             contentType(ContentType.Application.Json)
             val body = Json.encodeToString(bookingInfo)
             println(bookingInfo)

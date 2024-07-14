@@ -11,7 +11,6 @@ interface SlotStore : Store<SlotStore.Intent, SlotStore.State, Nothing> {
         data class UpdateRequest(val room: String, val refresh: Boolean = true) : Intent
         data class UpdateDate(val newDate: Calendar) : Intent
         data class Delete(val slot: Slot, val onDelete: () -> Unit) : Intent
-        data class Loading(val slot: Slot) : Intent
         data class OnCancelDelete(val slot: SlotUi.DeleteSlot) : Intent
     }
 
@@ -20,7 +19,9 @@ interface SlotStore : Store<SlotStore.Intent, SlotStore.State, Nothing> {
     ) {
         companion object {
             val initValue =
-                State(slots = listOf())
+                State(
+                    slots = listOf()
+                )
         }
 
     }

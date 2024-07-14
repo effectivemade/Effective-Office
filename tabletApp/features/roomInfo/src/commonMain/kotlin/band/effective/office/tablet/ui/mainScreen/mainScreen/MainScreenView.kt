@@ -75,9 +75,11 @@ fun MainScreenView(
         * where infoViewFrame, mainScreenFrame is frames from figma and all width I get from figma*/
         val infoViewWidth = 627f / 1133f
         Row(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(infoViewWidth)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(infoViewWidth)
+            ) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -99,7 +101,7 @@ fun MainScreenView(
                             back = onResetDate,
                         )
                     }
-                    stickyHeader{
+                    stickyHeader {
                             RoomInfoComponent(
                                 modifier = Modifier
                                     .background(color = MaterialTheme.colors.background),

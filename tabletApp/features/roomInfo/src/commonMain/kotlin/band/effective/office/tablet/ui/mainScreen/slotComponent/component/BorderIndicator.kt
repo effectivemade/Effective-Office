@@ -35,8 +35,6 @@ fun BorderIndicator(
     stokeWidth: Dp,
     onDispose: () -> Unit
 ) {
-
-
     var targetValue by remember {
         mutableStateOf(100f)
     }
