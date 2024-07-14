@@ -1,5 +1,6 @@
 package band.effective.office.tablet.domain.useCase
 
+import band.effective.office.network.model.Either
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import java.util.GregorianCalendar
@@ -15,7 +16,8 @@ class UpdateUseCase(
     /**flow for update when start/finish event in room*/
     fun updateFlow() = flow {
         while (true) {
-            val roomInfo = roomInfoUseCase.getCurrentRooms()
+            val roomInfo = (roomInfoUseCase.getCurrentRooms() as? Either.Success)?.data
+                ?: emptyList()
             if (roomInfo.isNotEmpty()) {
                 val timeToStartNextEvent = roomInfo
                     .map { roomInfo -> roomInfo.eventList }

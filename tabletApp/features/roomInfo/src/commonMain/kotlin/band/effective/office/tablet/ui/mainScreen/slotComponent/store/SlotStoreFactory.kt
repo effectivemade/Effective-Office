@@ -2,6 +2,7 @@ package band.effective.office.tablet.ui.mainScreen.slotComponent.store
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.OfficeTime
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
@@ -53,17 +54,17 @@ class SlotStoreFactory(
     private fun bootstrapper() = coroutineBootstrapper {
         updateTimer.init(this, 15.minutes) {
             withContext(Dispatchers.Main) {
-                roomInfoUseCase.getRoom(roomName())?.let {
-                    dispatch(Action.UpdateSlots(getUiSlots(it)))
+                (roomInfoUseCase.getRoom(roomName()) as? Either.Success)?.let {
+                    dispatch(Action.UpdateSlots(getUiSlots(it.data)))
                 }
             }
         }
         launch {
-            val room = roomInfoUseCase.getRoom(roomName())
+            val room = roomInfoUseCase.getRoom(roomName()) as? Either.Success
             room?.let {
                 dispatch(
                     Action.UpdateSlots(
-                        getUiSlots(it)
+                        getUiSlots(it.data)
                     )
                 )
             }
@@ -145,11 +146,11 @@ class SlotStoreFactory(
                 }
 
                 is SlotStore.Intent.UpdateDate -> scope.launch {
-                    roomInfoUseCase.getRoom(room = roomName())?.let {
+                    (roomInfoUseCase.getRoom(room = roomName()) as? Either.Success)?.let {
                         dispatch(
                             message = Message.UpdateSlots(
                                 slots = getUiSlots(
-                                    either = it,
+                                    either = it.data,
                                     start = maxOf(
                                         OfficeTime.startWorkTime(intent.newDate),
                                         GregorianCalendar()
@@ -240,10 +241,10 @@ class SlotStoreFactory(
                         roomInfoUseCase.updateCache()
                     }
                 }
-                roomInfoUseCase.getRoom(roomName)?.let {
+                (roomInfoUseCase.getRoom(roomName) as? Either.Success)?.let {
                     dispatch(
                         Message.UpdateSlots(
-                            getUiSlots(it)
+                            getUiSlots(it.data)
                         )
                     )
                 }

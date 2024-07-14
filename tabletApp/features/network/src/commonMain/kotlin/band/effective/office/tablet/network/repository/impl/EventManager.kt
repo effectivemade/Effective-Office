@@ -4,37 +4,51 @@ import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
+import band.effective.office.tablet.network.repository.BookingRepository
+import band.effective.office.tablet.network.repository.LocalBookingRepository
+import band.effective.office.tablet.utils.map
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class EventManager(
-    private val networkEventRepository: NetworkEventRepository,
-    private val localEventStoreRepository: LocalEventStoreRepository
+    private val networkEventRepository: BookingRepository,
+    private val localEventStoreRepository: LocalBookingRepository
 ) {
+    private val scope = CoroutineScope(Dispatchers.IO)
     init {
-        networkEventRepository.subscribeOnUpdates { refreshData() }
+        scope.launch {
+            networkEventRepository.subscribeOnUpdates().collect {
+                refreshData()
+            }
+        }
     }
 
-    fun getEventsFlow() = localEventStoreRepository.flow
+    fun getEventsFlow() = localEventStoreRepository.subscribeOnUpdates()
 
-    suspend fun refreshData() {
-        val roomInfos = networkEventRepository.getFreshRoomsInfo()
-        roomInfos?.let { localEventStoreRepository.updateRoomInfos(it) }
-            ?: localEventStoreRepository.updateCurrentEvents()
+    suspend fun refreshData(): Either<ErrorResponse, List<RoomInfo>> {
+        val roomInfos = networkEventRepository.getRoomsInfo()
+        when (roomInfos) {
+            is Either.Success -> localEventStoreRepository.updateRoomsInfo(roomInfos.data)
+            else -> {}
+        }
+        return roomInfos
     }
 
     suspend fun createBooking(roomName: String, eventInfo: EventInfo): Either<ErrorResponse, EventInfo> {
         val loadingEvent = eventInfo.copy(isLoading = true)
-        val roomInfo = localEventStoreRepository.getRoomByName(roomName)
+        val roomInfo = getRoomByName(roomName) as? Either.Success
             ?: return Either.Error(ErrorResponse(404, "Couldn't find a room with name $roomName"))
 
-        localEventStoreRepository.addEvent(roomName, loadingEvent)
-        val response = networkEventRepository.createBooking(loadingEvent, roomInfo)
+        localEventStoreRepository.createBooking(loadingEvent, roomInfo.data)
+        val response = networkEventRepository.createBooking(loadingEvent, roomInfo.data)
         when (response) {
             is Either.Error -> {
-                localEventStoreRepository.removeEvent(roomName, loadingEvent)
+                localEventStoreRepository.deleteBooking(loadingEvent, roomInfo.data)
             }
             is Either.Success -> {
                 val event = response.data
-                localEventStoreRepository.updateEvent(roomName, event)
+                localEventStoreRepository.updateBooking(event, roomInfo.data)
             }
         }
         return response
@@ -42,20 +56,20 @@ class EventManager(
 
     suspend fun updateBooking(roomName: String, eventInfo: EventInfo): Either<ErrorResponse, EventInfo> {
         val loadingEvent = eventInfo.copy(isLoading = true)
-        val oldEvent = localEventStoreRepository.getEventById(roomName, eventInfo.id)
+        val oldEvent = localEventStoreRepository.getBooking(eventInfo) as? Either.Success
             ?: return Either.Error(ErrorResponse(404, "Old event with id ${eventInfo.id} wasn't found"))
-        val roomInfo = localEventStoreRepository.getRoomByName(roomName)
+        val roomInfo = getRoomByName(roomName) as? Either.Success
             ?: return Either.Error(ErrorResponse(404, "Couldn't find a room with name $roomName"))
 
-        localEventStoreRepository.updateEvent(roomName, loadingEvent)
-        val response = networkEventRepository.updateBooking(loadingEvent, roomInfo)
+        localEventStoreRepository.updateBooking(loadingEvent, roomInfo.data)
+        val response = networkEventRepository.updateBooking(loadingEvent, roomInfo.data)
         when (response) {
             is Either.Error -> {
-                localEventStoreRepository.updateEvent(roomName, oldEvent)
+                localEventStoreRepository.updateBooking(oldEvent.data, roomInfo.data)
             }
             is Either.Success -> {
                 val event = response.data
-                localEventStoreRepository.updateEvent(roomName, event)
+                localEventStoreRepository.updateBooking(event, roomInfo.data)
             }
         }
         return response
@@ -63,34 +77,41 @@ class EventManager(
 
     suspend fun deleteBooking(roomName: String, eventInfo: EventInfo): Either<ErrorResponse, String> {
         val loadingEvent = eventInfo.copy(isLoading = true)
-        localEventStoreRepository.updateEvent(roomName, loadingEvent)
-        val response = networkEventRepository.deleteBooking(loadingEvent)
+        val roomInfo = getRoomByName(roomName) as? Either.Success
+            ?: return Either.Error(ErrorResponse(404, "Couldn't find a room with name $roomName"))
+        localEventStoreRepository.updateBooking(loadingEvent, roomInfo.data)
+        val response = networkEventRepository.deleteBooking(loadingEvent, roomInfo.data)
         when (response) {
             is Either.Error -> {
-                localEventStoreRepository.addEvent(roomName, eventInfo)
+                localEventStoreRepository.createBooking(eventInfo, roomInfo.data)
             }
             is Either.Success -> {
-                localEventStoreRepository.removeEvent(roomName, loadingEvent)
+                localEventStoreRepository.deleteBooking(loadingEvent, roomInfo.data)
             }
         }
         return response
     }
 
-    suspend fun getRoomsInfo(): List<RoomInfo> {
+    suspend fun getRoomsInfo(): Either<ErrorResponse, List<RoomInfo>> {
         val roomInfos = localEventStoreRepository.getRoomsInfo()
-        if (roomInfos.isEmpty()) {
-            refreshData()
-            return localEventStoreRepository.getRoomsInfo()
+        if (roomInfos as? Either.Success == null) {
+            return refreshData()
         }
         return roomInfos
     }
 
-    fun getCurrentRoomInfos(): List<RoomInfo> {
+    suspend fun getCurrentRoomInfos(): Either<ErrorResponse, List<RoomInfo>> {
         return localEventStoreRepository.getRoomsInfo()
     }
 
-    fun getRoomNames() = localEventStoreRepository.getRoomNames()
+    suspend fun getRoomNames() = getRoomsInfo().map(
+        errorMapper = { it },
+        successMapper = { it.map { room -> room.name } }
+    )
 
-    fun getRoomByName(roomName: String) =
-        localEventStoreRepository.getRoomByName(roomName)
+    suspend fun getRoomByName(roomName: String) =
+        localEventStoreRepository.getRoomsInfo().map(
+            errorMapper = { it },
+            successMapper = { it.firstOrNull { room -> room.name == roomName } ?: RoomInfo.defaultValue }
+        )
 }

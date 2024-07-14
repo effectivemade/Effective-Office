@@ -14,8 +14,8 @@ import band.effective.office.tablet.utils.Converter.toOrganizer
 import band.effective.office.tablet.utils.map
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -24,7 +24,7 @@ class NetworkEventRepository(
 ) : BookingRepository {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    suspend fun getFreshRoomsInfo(): List<RoomInfo>? {
+    override suspend fun getRoomsInfo(): Either<ErrorResponse, List<RoomInfo>> {
         val start = GregorianCalendar().apply {
             val minutes = get(Calendar.MINUTE)
             val excess = minutes % 15 + 1
@@ -33,43 +33,49 @@ class NetworkEventRepository(
             set(Calendar.MILLISECOND, 0)
         }
         val finish = GregorianCalendar().apply { add(Calendar.DAY_OF_MONTH, 14) }
-        val workspaceWithBookings = api.getWorkspacesWithBookings(
+        return api.getWorkspacesWithBookings(
             tag = "meeting",
             freeFrom = start.timeInMillis,
             freeUntil =  finish.timeInMillis
-        ) as? Either.Success
-
-        val rooms = workspaceWithBookings?.data?.map { it.toRoom() }
-        return rooms
+        ).map(
+            errorMapper = { it },
+            successMapper = { it.map { workspace ->  workspace.toRoom() }}
+        )
     }
 
     override suspend fun createBooking(
         eventInfo: EventInfo,
-        room: RoomInfo
+        room: RoomInfo,
     ): Either<ErrorResponse, EventInfo> = api.createBooking(eventInfo.toBookingRequestDTO(room))
         .map(errorMapper = { it }, successMapper = { it.toEventInfo() })
 
     override suspend fun updateBooking(
         eventInfo: EventInfo,
-        room: RoomInfo
+        room: RoomInfo,
     ): Either<ErrorResponse, EventInfo> =
         api.updateBooking(eventInfo.toBookingRequestDTO(room), eventInfo.id)
             .map(errorMapper = { it }, successMapper = { it.toEventInfo() })
 
     override suspend fun deleteBooking(
-        eventInfo: EventInfo
+        eventInfo: EventInfo,
+        room: RoomInfo,
     ): Either<ErrorResponse, String> =
         api.deleteBooking(eventInfo.id)
             .map({ it }, { "ok" })
 
-    fun subscribeOnUpdates(refreshCallback: suspend () -> Unit) {
-        scope.launch(Dispatchers.IO) {
-            api.subscribeOnBookingsList("", this)
-                .collectLatest {
-                    refreshCallback()
-                }
-        }
+    override suspend fun getBooking(
+        eventInfo: EventInfo
+    ): Either<ErrorResponse, EventInfo> {
+        val response = api.getBooking(eventInfo.id)
+        return response.map(
+            errorMapper = { it },
+            successMapper = { it.toEventInfo() }
+        )
     }
+
+    override fun subscribeOnUpdates(): Flow<List<RoomInfo>> =
+        api.subscribeOnBookingsList("", scope)
+            .map { emptyList() }
 
     /**Map domain model to DTO*/
     private fun EventInfo.toBookingRequestDTO(room: RoomInfo): BookingRequestDTO = BookingRequestDTO(

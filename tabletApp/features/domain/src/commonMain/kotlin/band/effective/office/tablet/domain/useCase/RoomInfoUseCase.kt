@@ -1,29 +1,40 @@
 package band.effective.office.tablet.domain.useCase
 
+import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.network.repository.impl.EventManager
+import band.effective.office.tablet.utils.map
 import kotlinx.coroutines.flow.map
 import java.util.GregorianCalendar
 
 /**Use case for get info about room*/
 class RoomInfoUseCase(private val eventManager: EventManager) {
     /**Get all rooms names*/
-    fun getRoomsNames(): List<String> {
+    suspend fun getRoomsNames(): Either<ErrorResponse, List<String>> {
         return eventManager.getRoomNames()
     }
     /**Update repository cache*/
     suspend fun updateCache() = eventManager.refreshData()
     /**get info about all rooms*/
-    suspend operator fun invoke() = eventManager.getRoomsInfo().mapRoomsInfo()
+    suspend operator fun invoke() = eventManager.getRoomsInfo()
+        .map(
+            errorMapper = { it },
+            successMapper = { it.map { room ->
+                room.copy(eventList = room.eventList.filter { event ->
+                    event.startTime > GregorianCalendar()
+                })
+            }}
+        )
     /**get update room flow*/
     fun subscribe() =
         eventManager.getEventsFlow().map { it.mapRoomsInfo() }
 
     /**Get info about room
      * @param room room name*/
-    fun getRoom(room: String) = eventManager.getRoomByName(room)
+    suspend fun getRoom(room: String) = eventManager.getRoomByName(room)
 
-    fun getCurrentRooms() = eventManager.getCurrentRoomInfos()
+    suspend fun getCurrentRooms() = eventManager.getCurrentRoomInfos()
 
     private fun List<RoomInfo>.mapRoomsInfo() =
         map {

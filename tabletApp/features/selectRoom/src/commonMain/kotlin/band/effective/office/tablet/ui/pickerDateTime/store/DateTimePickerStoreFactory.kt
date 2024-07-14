@@ -110,7 +110,7 @@ class DateTimePickerStoreFactory(
             checkEnableDateButton(newDate, finishDate)
         }
 
-        fun checkEnableDateButton(
+        suspend fun checkEnableDateButton(
             startDate: Calendar,
             finishDate: Calendar
         ) {

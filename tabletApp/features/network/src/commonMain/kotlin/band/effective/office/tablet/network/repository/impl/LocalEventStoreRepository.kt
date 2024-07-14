@@ -1,47 +1,63 @@
 package band.effective.office.tablet.network.repository.impl
 
+import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
+import band.effective.office.tablet.network.repository.LocalBookingRepository
 import band.effective.office.tablet.utils.removeSeconds
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.GregorianCalendar
 
-class LocalEventStoreRepository {
+class LocalEventStoreRepository : LocalBookingRepository {
     private val buffer = MutableStateFlow<List<RoomInfo>>(
         emptyList()
     )
     val flow = buffer.asStateFlow()
 
-    fun getRoomByName(roomName: String): RoomInfo? {
-        return buffer.value.firstOrNull { it.name == roomName }
+    override fun subscribeOnUpdates(): Flow<List<RoomInfo>> = flow
+
+    override fun updateRoomsInfo(roomsInfo: List<RoomInfo>) {
+        buffer.update { roomsInfo }
     }
 
-    fun updateCurrentEvents() {
-        buffer.update {
-            it.map { room -> room.removePastEvents() }
-        }
-    }
-
-    fun updateRoomInfos(roomInfos: List<RoomInfo>) {
-        buffer.update { roomInfos }
-    }
-
-    fun addEvent(roomName: String, eventInfo: EventInfo) {
-        updateRoomInBuffer(roomName) { events ->
+    override suspend fun createBooking(
+        eventInfo: EventInfo,
+        room: RoomInfo
+    ): Either<ErrorResponse, EventInfo> {
+        updateRoomInBuffer(room.name) { events ->
             events + eventInfo
         }
+        return Either.Success(eventInfo)
     }
 
-    fun removeEvent(roomName: String, eventInfo: EventInfo) {
-        updateRoomInBuffer(roomName) { events ->
+    override suspend fun deleteBooking(
+        eventInfo: EventInfo,
+        room: RoomInfo
+    ) : Either<ErrorResponse, String> {
+        updateRoomInBuffer(room.name) { events ->
             events - eventInfo
         }
+        return Either.Success("ok")
     }
 
-    fun updateEvent(roomName: String, eventInfo: EventInfo) {
-        updateRoomInBuffer(roomName) { events ->
+    override suspend fun getBooking(eventInfo: EventInfo): Either<ErrorResponse, EventInfo> {
+        return buffer.value.firstNotNullOfOrNull {
+            it.eventList.firstOrNull { event -> event.id == eventInfo.id }
+        }?.let { Either.Success(it) }
+            ?: Either.Error(
+                ErrorResponse(404, "Couldn't find booking with id ${eventInfo.id}")
+            )
+    }
+
+    override suspend fun updateBooking(
+        eventInfo: EventInfo,
+        room: RoomInfo
+    ): Either<ErrorResponse, EventInfo> {
+        updateRoomInBuffer(room.name) { events ->
             val oldEvent = events.firstOrNull {
                 it.id == eventInfo.id
                         || (it.startTime == eventInfo.startTime
@@ -50,6 +66,7 @@ class LocalEventStoreRepository {
 
             events - oldEvent + eventInfo
         }
+        return Either.Success(eventInfo)
     }
 
     private fun updateRoomInBuffer(roomName: String, action: (List<EventInfo>) -> List<EventInfo>) {
@@ -64,16 +81,10 @@ class LocalEventStoreRepository {
         }
     }
 
-    fun getRoomsInfo(): List<RoomInfo> =
-        buffer.value.map { it.updateCurrentEvent() }
-
-    fun getRoomNames(): List<String> {
-        return buffer.value.map { it.name }
-    }
-
-    fun getEventById(roomName: String, eventId: String): EventInfo? {
-        val room = getRoomByName(roomName)
-        return room?.eventList?.firstOrNull { it.id == eventId }
+    override suspend fun getRoomsInfo(): Either<ErrorResponse, List<RoomInfo>> {
+        return if (buffer.value.isEmpty())
+            Either.Error(ErrorResponse(404, "No rooms were loaded"))
+        else Either.Success(buffer.value.map { it.updateCurrentEvent() })
     }
 
     private fun RoomInfo.removePastEvents(): RoomInfo {

@@ -2,6 +2,8 @@ package band.effective.office.tablet.ui.mainScreen.mainScreen.store
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.useCase.CheckSettingsUseCase
@@ -60,7 +62,8 @@ class MainFactory(
 
                     // initial load
                     launch {
-                        dispatch(Action.OnLoad(roomInfos = roomInfoUseCase()))
+                        val roomsInfo = roomInfoUseCase()
+                        dispatch(Action.OnLoad(roomsInfo))
                     }
 
                     // update events when start/finish event in room
@@ -68,7 +71,7 @@ class MainFactory(
                         updateUseCase.updateFlow().collect {
                             delay(1.seconds)
                             withContext(Dispatchers.Main) {
-                                dispatch(Action.OnLoad(roomInfos = roomInfoUseCase()))
+                                dispatch(Action.OnLoad(roomInfoUseCase()))
                             }
                         }
                     }
@@ -89,14 +92,14 @@ class MainFactory(
                     // reset selected room
                     currentRoomTimer.start(bootstrapperScope = this, delay = 1.minutes) {
                         withContext(Dispatchers.Main) {
-                            dispatch(Action.OnLoad(roomInfos = roomInfoUseCase()))
+                            dispatch(Action.OnLoad(roomInfoUseCase()))
                         }
                     }
                     // update cache when get error
                     errorTimer.init(this, 15.minutes) {
                         roomInfoUseCase.updateCache()
                         withContext(Dispatchers.Main) {
-                            dispatch(Action.OnLoad(roomInfos = roomInfoUseCase()))
+                            dispatch(Action.OnLoad(roomInfoUseCase()))
                         }
                     }
                     // reset select date
@@ -126,7 +129,7 @@ class MainFactory(
     }
 
     private sealed interface Action {
-        data class OnLoad(val roomInfos: List<RoomInfo>) :
+        data class OnLoad(val roomInfos: Either<ErrorResponse, List<RoomInfo>>) :
             Action
 
         data object OnSettings : Action
@@ -218,7 +221,8 @@ class MainFactory(
                     roomInfoUseCase.updateCache()
                 }
             }
-            val roomInfos = roomInfoUseCase()
+            val roomInfos = (roomInfoUseCase() as? Either.Success)?.data
+                ?: emptyList()
             if (roomInfos.isNotEmpty()) {
                 dispatch(Message.UpdateDisconnect(false))
                 dispatch(
@@ -237,15 +241,27 @@ class MainFactory(
         override fun executeAction(action: Action, getState: () -> MainStore.State) {
             when (action) {
                 is Action.OnLoad -> {
-                    val roomInfos = action.roomInfos
-                    dispatch(
-                        Message.Load(
-                            isSuccess = roomInfos.isNotEmpty(),
-                            roomList = roomInfos,
-                            indexSelectRoom = getState().indexRoom()
-                        )
-                    )
-                    reboot(getState())
+                    when (val roomInfos = action.roomInfos) {
+                        is Either.Success -> {
+                            dispatch(
+                                Message.Load(
+                                    isSuccess = true,
+                                    roomList = roomInfos.data,
+                                    indexSelectRoom = getState().indexRoom()
+                                )
+                            )
+                            reboot(getState())
+                        }
+                        is Either.Error -> {
+                            dispatch(
+                                Message.Load(
+                                    isSuccess = false,
+                                    roomList = listOf(RoomInfo.defaultValue),
+                                    indexSelectRoom = 0
+                                )
+                            )
+                        }
+                    }
                 }
 
                 is Action.OnSettings -> dispatch(Message.OnSettings)

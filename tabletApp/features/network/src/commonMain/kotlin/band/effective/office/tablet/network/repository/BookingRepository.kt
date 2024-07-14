@@ -4,6 +4,8 @@ import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
+import kotlinx.coroutines.flow.Flow
+
 /**Repository for booking room*/
 interface BookingRepository {
     /**Create booking
@@ -21,5 +23,11 @@ interface BookingRepository {
     /**Update booking
      * @param eventInfo new info about event
      * @return if booking is updated - "ok", else - [ErrorResponse]*/
-    suspend fun deleteBooking(eventInfo: EventInfo): Either<ErrorResponse, String>
+    suspend fun deleteBooking(eventInfo: EventInfo, room: RoomInfo): Either<ErrorResponse, String>
+
+    suspend fun getBooking(eventInfo: EventInfo): Either<ErrorResponse, EventInfo>
+
+    fun subscribeOnUpdates(): Flow<List<RoomInfo>>
+
+    suspend fun getRoomsInfo(): Either<ErrorResponse, List<RoomInfo>>
 }

@@ -1,5 +1,6 @@
 package band.effective.office.tablet.domain.useCase
 
+import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.utils.removeSeconds
@@ -12,21 +13,21 @@ class CheckBookingUseCase(
      * @param event info about event
      * @param room room name
      * @return Event busy with room booking, if room free, return null*/
-    operator fun invoke(event: EventInfo, room: String) =
+    suspend operator fun invoke(event: EventInfo, room: String) =
         busyEvents(event, room)
 
     /** get events blocking room for booking
      * @param event info about event
      * @param room room name
      * @return List events busy with room booking, if room's free then empty list will be returned*/
-    fun busyEvents(event: EventInfo, room: String): List<EventInfo> {
+    suspend fun busyEvents(event: EventInfo, room: String): List<EventInfo> {
         val eventList = eventList(room)
         return eventList.getBusy(event)
     }
 
-    private fun eventList(room: String): List<EventInfo> {
-        val roomInfo = roomInfoUseCase.getRoom(room)
-        return roomInfo?.getAllEvents() ?: emptyList()
+    private suspend fun eventList(room: String): List<EventInfo> {
+        val roomInfo = roomInfoUseCase.getRoom(room) as? Either.Success
+        return roomInfo?.data?.getAllEvents() ?: emptyList()
     }
 
     /**

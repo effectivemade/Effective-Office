@@ -124,8 +124,8 @@ class MainComponent(
                     }
                 },
                 onEventUpdate = { eventInfo ->
-                    val roomName = modalWindows.room
                     this.componentContext.componentCoroutineScope().launch {
+                        val roomName = modalWindows.room
                         val result = eventManager.updateBooking(
                             eventInfo = eventInfo,
                             roomName = roomName
