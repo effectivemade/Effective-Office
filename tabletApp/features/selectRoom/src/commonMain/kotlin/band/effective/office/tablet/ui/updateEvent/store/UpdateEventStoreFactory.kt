@@ -1,5 +1,7 @@
 package band.effective.office.tablet.ui.updateEvent.store
 
+import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
 import band.effective.office.tablet.domain.model.Slot

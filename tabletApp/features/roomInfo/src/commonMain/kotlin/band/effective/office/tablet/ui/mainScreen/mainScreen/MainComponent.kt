@@ -6,6 +6,7 @@ import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.model.Slot
 import band.effective.office.tablet.network.repository.impl.EventManager
+import band.effective.office.tablet.ui.fastEvent.FastEventComponent
 import band.effective.office.tablet.ui.freeSelectRoom.FreeSelectRoomComponent
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainFactory
 import band.effective.office.tablet.ui.mainScreen.mainScreen.store.MainStore
@@ -26,6 +27,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -37,6 +39,7 @@ class MainComponent(
     private val storeFactory: StoreFactory,
     val onSettings: () -> Unit
 ) : ComponentContext by componentContext, KoinComponent {
+
     private val eventManager: EventManager by inject()
 
     val slotComponent = SlotComponent(
@@ -115,7 +118,7 @@ class MainComponent(
                 },
                 onCloseRequest = { closeModalWindow() },
                 onEventCreation = { eventInfo ->
-                    this.componentContext.componentCoroutineScope().launch {
+                    val res = this.componentContext.componentCoroutineScope().launch {
                         val roomName = modalWindows.room
                         val result = eventManager.createBooking(
                             eventInfo = eventInfo,
@@ -132,6 +135,31 @@ class MainComponent(
                         )
                     }
                 }
+            )
+            is ModalWindowsConfig.FastEvent -> FastEventComponent(
+                componentContext = componentContext,
+                storeFactory = storeFactory,
+                eventInfo = modalWindows.event,
+                onEventCreation = { eventInfo ->
+                        val result = this.componentContext.componentCoroutineScope().async {
+                            eventManager.createBooking(
+                                eventInfo = eventInfo,
+                                roomName = modalWindows.room
+                            )
+                        }
+                    return@FastEventComponent result.await()
+                    },
+                onRemoveEvent = { event ->
+                    val result = this.componentContext.componentCoroutineScope().async {
+                        eventManager.deleteBooking(
+                            roomName = state.value.run { roomList[indexSelectRoom].name },
+                            eventInfo = event
+                        )
+                    }
+                    return@FastEventComponent result.await()
+                },
+                room = modalWindows.room,
+                onCloseRequest = { closeModalWindow() }
             )
         }
     }
@@ -184,5 +212,11 @@ class MainComponent(
 
         @Parcelize
         data class FreeRoom(val event: EventInfo) : ModalWindowsConfig
+
+        @Parcelize
+        data class FastEvent(
+            val event: EventInfo,
+            val room: String
+        ) : ModalWindowsConfig
     }
 }

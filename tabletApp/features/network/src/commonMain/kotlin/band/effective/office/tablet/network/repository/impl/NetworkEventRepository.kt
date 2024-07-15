@@ -82,7 +82,7 @@ class NetworkEventRepository(
         beginBooking = this.startTime.timeInMillis,
         endBooking = this.finishTime.timeInMillis,
         ownerEmail = this.organizer.email,
-        participantEmails = listOf(this.organizer.email),
+        participantEmails = listOfNotNull(this.organizer.email),
         workspaceId = room.id
     )
 

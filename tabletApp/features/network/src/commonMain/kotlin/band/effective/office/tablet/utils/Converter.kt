@@ -23,7 +23,7 @@ object Converter {
             role = "",
             avatarUrl = "",
             integrations = null,
-            email = email,
+            email = email!!,
             tag = "employee"
         )
 

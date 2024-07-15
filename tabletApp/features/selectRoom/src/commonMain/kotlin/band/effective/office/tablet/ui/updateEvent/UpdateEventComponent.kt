@@ -2,6 +2,8 @@ package band.effective.office.tablet.ui.updateEvent
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Slot
 import band.effective.office.tablet.ui.pickerDateTime.DateTimePickerComponent

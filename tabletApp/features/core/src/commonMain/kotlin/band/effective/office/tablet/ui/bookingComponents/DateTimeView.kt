@@ -16,6 +16,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -46,6 +47,9 @@ fun DateTimeView(
         currentDate.date() != selectDate.date() -> 1.5f
         else -> 0f
     }
+    val timeDayMonthDateFormat = remember { SimpleDateFormat("HH:mm dd MMMM") }
+    val dayMonthDateFormat = remember { SimpleDateFormat("dd MMMM") }
+
     Column(modifier = modifier) {
         if (showTitle) {
             Text(
@@ -79,7 +83,7 @@ fun DateTimeView(
                 )
             ) {
                 Text(
-                    text = SimpleDateFormat("HH:mm dd MMMM").format(selectDate.time),
+                    text = timeDayMonthDateFormat.format(selectDate.time),
                     style = MaterialTheme.typography.h6
                 )
             }
@@ -95,7 +99,7 @@ fun DateTimeView(
                     )
                 ) {
                     Text(
-                        text = SimpleDateFormat("dd MMMM").format(currentDate!!.time),
+                        text = dayMonthDateFormat.format(currentDate!!.time),
                         style = MaterialTheme.typography.h6,
                         textAlign = TextAlign.Center
                     )
