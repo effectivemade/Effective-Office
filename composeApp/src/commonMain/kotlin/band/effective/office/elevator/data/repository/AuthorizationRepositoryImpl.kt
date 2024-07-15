@@ -32,11 +32,7 @@ class AuthorizationRepositoryImpl(
         val apiResponse = api.getUserByEmail(email = email)
         val userResponse = apiResponse.map(
             errorMapper = { it },
-            successMapper = {
-                val user = it.toUser()
-                if (imageUrl != null) user.copy(imageUrl = imageUrl)
-                else user
-            }
+            successMapper = { it.toUser(imageUrl) }
         )
         when(userResponse) {
             is Either.Success -> {
