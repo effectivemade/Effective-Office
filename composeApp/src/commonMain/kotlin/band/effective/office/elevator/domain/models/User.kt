@@ -45,7 +45,7 @@ fun User.toUserDTO(idPhoneNumber: String, idTelegram: String): UserDTO =
 fun UserDTO.toUser(imageUrl: String? = null) =
     User(
         id = id,
-        imageUrl = imageUrl ?: avatarUrl,
+        imageUrl = avatarUrl.takeIf { it.isNotEmpty() } ?: imageUrl ?: "",
         userName = fullName,
         post = role,
         email = email,
