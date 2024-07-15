@@ -1,10 +1,9 @@
 package band.effective.office.tablet.ui.fastEvent.store
 
 import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
-import band.effective.office.tablet.domain.useCase.BookingUseCase
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
-import band.effective.office.tablet.domain.useCase.CancelUseCase
 import band.effective.office.tablet.domain.useCase.CheckBookingUseCase
 import band.effective.office.tablet.domain.useCase.TimerUseCase
 import band.effective.office.tablet.ui.fastEvent.FastEventComponent
@@ -27,12 +26,12 @@ class FastEventStoreFactory(
     private val storeFactory: StoreFactory,
     private val navigate: (FastEventComponent.ModalConfig) -> Unit,
     private val room: String,
+    private val onEventCreation: suspend (EventInfo) -> Either<ErrorResponse, EventInfo>,
+    private val onRemoveEvent: suspend (EventInfo) -> Either<ErrorResponse, String>,
     private val eventInfo: EventInfo,
     private val onCloseRequest: () -> Unit,
 ) : KoinComponent {
-    val cancelUseCase: CancelUseCase by inject()
     val checkBookingUseCase: CheckBookingUseCase by inject()
-    val bookingUseCase: BookingUseCase by inject()
     private val timerUseCase: TimerUseCase by inject()
     private val currentTimeTimer = BootstrapperTimer<Action>(timerUseCase)
 
@@ -48,22 +47,16 @@ class FastEventStoreFactory(
                             event = eventInfo,
                             room = room
                         )
-                        if (checkBookings is Either.Error ) {
-                            dispatch(Action.FastBooking(isSuccess = false))
-                            navigate(FastEventComponent.ModalConfig.FailureModal)
-                        }
 
-                        val busyEvents = (checkBookings as Either.Success).data
+                        if(checkBookings.isEmpty())
 
-                        if(busyEvents.isEmpty())
                         {
-                            val result = bookingUseCase.invoke(
-                                eventInfo = eventInfo,
-                                room = room
-                            )
+                            val result = onEventCreation(eventInfo)
                             when (result) {
                                 is Either.Success -> {
-                                    dispatch(Action.UpdateEvent(event = eventInfo.copy(id = result.data)))
+                                    dispatch(Action.UpdateEvent(event = eventInfo.copy(
+                                        id = result.data.id
+                                    )))
                                     dispatch(Action.FastBooking(isSuccess = true))
                                     navigate(FastEventComponent.ModalConfig.SuccessModal)
                                 }
@@ -76,7 +69,7 @@ class FastEventStoreFactory(
                         else {
                             dispatch(Action.FastBooking(isSuccess = false))
                             dispatch(Action.GetDifferenceInTime(
-                                endTime = busyEvents[0].finishTime.timeInMillis,
+                                endTime = checkBookings[0].finishTime.timeInMillis,
                                 startTime = GregorianCalendar().timeInMillis
                             ))
                             navigate(FastEventComponent.ModalConfig.FailureModal)
@@ -125,7 +118,7 @@ class FastEventStoreFactory(
 
         private fun freeRoom(state: FastEventStore.State) = scope.launch() {
             dispatch(Message.Load)
-            if (cancelUseCase(state.event) is Either.Success) {
+            if (onRemoveEvent(state.event) is Either.Success) {
                 onCloseRequest()
             } else dispatch(Message.Fail)
         }

@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.useCase.CheckBookingUseCase
-import band.effective.office.tablet.utils.unbox
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -118,7 +117,7 @@ class DateTimePickerStoreFactory(
             val busyEvent: List<EventInfo> = checkBookingUseCase.busyEvents(
                 event = event.copy(startTime = startDate, finishTime = finishDate),
                 room = room
-            ).unbox({ it.saveData })?.filter { it.startTime != startDate } ?: listOf()
+            ).filter { it.startTime != startDate }
             if (busyEvent.isNotEmpty()){
                 dispatch(Message.EnableDateButton(false))
             }

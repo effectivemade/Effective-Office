@@ -2,6 +2,8 @@ package band.effective.office.tablet.ui.updateEvent
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Slot
 import band.effective.office.tablet.ui.pickerDateTime.DateTimePickerComponent
@@ -26,7 +28,8 @@ class UpdateEventComponent(
     val room: String,
     onDelete: (Slot) -> Unit,
     onCloseRequest: () -> Unit,
-    onTempLoading: (EventInfo) -> Unit
+    onEventCreation: (EventInfo) -> Unit,
+    onEventUpdate: (EventInfo) -> Unit
 ) : ComponentContext by componentContext, ModalWindow {
 
     private val navigation = StackNavigation<ModalConfig>()
@@ -44,7 +47,8 @@ class UpdateEventComponent(
             navigate = { navigation.push(it) },
             room = room,
             onDelete = onDelete,
-            onTempLoading = onTempLoading
+            onEventCreation = onEventCreation,
+            onEventUpdate = onEventUpdate
         ).create(defaultValue = event.toState())
     }
 

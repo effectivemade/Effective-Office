@@ -1,7 +1,6 @@
 package band.effective.office.tablet.ui.updateEvent
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -109,8 +108,6 @@ fun UpdateEventView(
                         onInput = { component.sendIntent(UpdateEventStore.Intent.OnInput(it)) },
                         isInputError = state.isInputError,
                         onDoneInput = { component.sendIntent(UpdateEventStore.Intent.OnDoneInput) },
-                        isUpdateError = state.isErrorUpdate,
-                        isUpdateLoad = state.isLoadUpdate,
                         isDeleteError = state.isErrorDelete,
                         isDeleteLoad = state.isLoadDelete,
                         enableUpdateButton = state.enableUpdateButton,
@@ -155,8 +152,6 @@ fun UpdateEventView(
     onInput: (String) -> Unit,
     isInputError: Boolean,
     onDoneInput: (String) -> Unit,
-    isUpdateError: Boolean,
-    isUpdateLoad: Boolean,
     isDeleteError: Boolean,
     isDeleteLoad: Boolean,
     enableUpdateButton: Boolean,
@@ -214,23 +209,13 @@ fun UpdateEventView(
                     onClick = onCreateEvent,
                     enable = enableUpdateButton
                 ) {
-                    when {
-//                        isUpdateLoad -> Loader()
-                        isUpdateError -> Text(
-                            text = MainRes.string.try_again,
-                            style = MaterialTheme.typography.h6
-                        )
-
-                        else -> {
-                            Text(
-                                text = MainRes.string.booking_time_button.format(
-                                    startTime = start,
-                                    finishTime = finish
-                                ),
-                                style = MaterialTheme.typography.h6
-                            )
-                        }
-                    }
+                    Text(
+                        text = MainRes.string.booking_time_button.format(
+                            startTime = start,
+                            finishTime = finish
+                        ),
+                        style = MaterialTheme.typography.h6
+                    )
                 }
             } else {
                 SuccessButton(
@@ -238,19 +223,10 @@ fun UpdateEventView(
                     onClick = onUpdateEvent,
                     enable = enableUpdateButton
                 ) {
-                    when {
-                        isUpdateError -> Text(
-                            text = MainRes.string.try_again,
-                            style = MaterialTheme.typography.h6
-                        )
-
-                        else -> {
-                            Text(
-                                text = MainRes.string.update_button,
-                                style = MaterialTheme.typography.h6
-                            )
-                        }
-                    }
+                    Text(
+                        text = MainRes.string.update_button,
+                        style = MaterialTheme.typography.h6
+                    )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 AlertButton(

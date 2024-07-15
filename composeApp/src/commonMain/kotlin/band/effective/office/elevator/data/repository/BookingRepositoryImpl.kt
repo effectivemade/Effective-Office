@@ -78,7 +78,10 @@ class BookingRepositoryImpl(
             workSpaceId = bookingInfo.workSpaceId,
             recurrence = recurrence
         )
-        api.updateBooking(bookingInfo = bookingRequestDTO)
+        api.updateBooking(
+            bookingInfo = bookingRequestDTO,
+            bookingId = bookingInfo.id
+        )
     }
 
     override suspend fun deleteBooking(bookingInfo: BookingInfo) {

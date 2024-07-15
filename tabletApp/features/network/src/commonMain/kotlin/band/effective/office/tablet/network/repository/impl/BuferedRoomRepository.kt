@@ -26,6 +26,11 @@ import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
 
+
+@Deprecated(
+    message = "This repository is deprecated due to its complexity which shouldn't appear in repository",
+    replaceWith = ReplaceWith("EventManager")
+)
 class BufferedRoomRepository(private val api: Api) : RoomRepository {
     private val roomsBuffer = Buffer(
         Either.Error(
@@ -63,7 +68,13 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
         fun MutableList<RoomInfo>.updList() {
             firstOrNull { it.name == roomName }?.let {
                 val index = indexOf(it)
-                this[index] = this[index].copy(eventList = it.eventList.minus(eventInfo))
+                // this needed for updates because update event
+                // components only stores event with new params
+                val cachedEvent = it.eventList.first { event ->
+                    event == eventInfo
+                            || event.id == eventInfo.id
+                }
+                this[index] = this[index].copy(eventList = it.eventList.minus(cachedEvent))
             }
         }
 
@@ -137,6 +148,21 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
         return copy(eventList = events)
     }
 
+    suspend fun addCachedEvent(roomName: String, eventInfo: EventInfo) {
+        fun MutableList<RoomInfo>.updList() {
+            firstOrNull { it.name == roomName }?.let {
+                val index = indexOf(it)
+                this[index] = this[index].copy(eventList = it.eventList.plus(eventInfo))
+            }
+        }
+
+        val newBufferValue = roomsBuffer.bufferedValue().map(
+            errorMapper = { it.map { rooms -> rooms.toMutableList().apply { updList() } } },
+            successMapper = { it.toMutableList().apply { updList() } }
+        )
+        roomsBuffer.update(newBufferValue)
+    }
+
     private fun RoomInfo.updateCurrentEvent(): RoomInfo {
         val now = GregorianCalendar()
         val currentEvent = eventList.firstOrNull {
@@ -156,7 +182,8 @@ class BufferedRoomRepository(private val api: Api) : RoomRepository {
         startTime = GregorianCalendar().apply { time = Date(beginBooking) },
         finishTime = GregorianCalendar().apply { time = Date(endBooking) },
         organizer = this.owner?.toOrganizer() ?: Organizer.default ,
-        id = id
+        id = id,
+        isLoading = false,
     )
 
     private fun WorkspaceDTO.toRoom() =

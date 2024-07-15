@@ -1,13 +1,14 @@
 package band.effective.office.tablet.ui.updateEvent.store
 
 import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
 import band.effective.office.tablet.domain.model.Slot
-import band.effective.office.tablet.domain.useCase.BookingUseCase
 import band.effective.office.tablet.domain.useCase.CheckBookingUseCase
 import band.effective.office.tablet.domain.useCase.OrganizersInfoUseCase
 import band.effective.office.tablet.ui.updateEvent.UpdateEventComponent
+import band.effective.office.tablet.utils.removeSeconds
 import band.effective.office.tablet.utils.unbox
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
@@ -24,13 +25,13 @@ import java.util.GregorianCalendar
 class UpdateEventStoreFactory(
     private val storeFactory: StoreFactory,
     private val onCloseRequest: () -> Unit,
-    private val onTempLoading: (EventInfo) -> Unit,
+    private val onEventCreation: (EventInfo) -> Unit,
+    private val onEventUpdate: (EventInfo) -> Unit,
     private val navigate: (UpdateEventComponent.ModalConfig) -> Unit,
     private val room: String,
     private val onDelete: (Slot) -> Unit,
 ) : KoinComponent {
 
-    val bookingUseCase: BookingUseCase by inject()
     val organizersInfoUseCase: OrganizersInfoUseCase by inject()
     val checkBookingUseCase: CheckBookingUseCase by inject()
 
@@ -67,8 +68,6 @@ class UpdateEventStoreFactory(
 
         data class EnableButton(val isEnable: Boolean) : Message
         data class BusyEvent(val isBusy: Boolean) : Message
-        object LoadUpdate : Message
-        object FailUpdate : Message
         data class InputError(val isError: Boolean) : Message
         data class Input(val newInput: String, val newList: List<Organizer>) : Message
         data class UpdateOrganizer(val newValue: Organizer) : Message
@@ -99,83 +98,59 @@ class UpdateEventStoreFactory(
                     checkEnableButton(inputError = false, state.isBusyEvent)
                 }
 
-                is UpdateEventStore.Intent.OnUpdateDate -> updateInfo(
-                    state = state,
-                    changeData = intent.updateInDays
-                )
-
-                is UpdateEventStore.Intent.OnUpdateEvent -> updateEvent(state, intent.room)
-                is UpdateEventStore.Intent.OnUpdateLength -> updateInfo(
-                    state = state,
-                    changeDuration = intent.update
-                )
-
-                is UpdateEventStore.Intent.OnDoneInput -> onDone(state)
-                is UpdateEventStore.Intent.OnInput -> onInput(intent.input, state)
-                is UpdateEventStore.Intent.OnCloseSelectDateDialog -> dispatch(
-                    Message.ChangeShowSelectDateModal(false)
-                )
-
-                is UpdateEventStore.Intent.OnOpenSelectDateDialog -> dispatch(
-                    Message.ChangeShowSelectDateModal(
-                        true
+                is UpdateEventStore.Intent.OnUpdateDate -> {
+                    updateInfo(
+                        state = state,
+                        changeData = intent.updateInDays
                     )
-                )
+                }
 
-                is UpdateEventStore.Intent.OnSetDate -> setDay(
-                    state = state,
-                    newDate = intent.calendar
-                )
+                is UpdateEventStore.Intent.OnUpdateEvent -> {
+                    updateEvent(state)
+                }
+                is UpdateEventStore.Intent.OnUpdateLength -> {
+                    updateInfo(
+                        state = state,
+                        changeDuration = intent.update
+                    )
+                }
+
+                is UpdateEventStore.Intent.OnDoneInput -> {
+                    onDone(state)
+                }
+                is UpdateEventStore.Intent.OnInput -> {
+                    onInput(intent.input, state)
+                }
+                is UpdateEventStore.Intent.OnCloseSelectDateDialog -> {
+                    dispatch(
+                        Message.ChangeShowSelectDateModal(false)
+                    )
+                }
+
+                is UpdateEventStore.Intent.OnOpenSelectDateDialog -> {
+                    dispatch(
+                        Message.ChangeShowSelectDateModal(true)
+                    )
+                }
+
+                is UpdateEventStore.Intent.OnSetDate -> {
+                    setDay(
+                        state = state,
+                        newDate = intent.calendar
+                    )
+                }
 
                 UpdateEventStore.Intent.OnClose -> onCloseRequest()
-                UpdateEventStore.Intent.OnBooking -> createEvent(state)
+                UpdateEventStore.Intent.OnBooking -> {
+                    createEvent(state)
+                }
             }
         }
 
         fun createEvent(state: UpdateEventStore.State) {
-
-            val event = EventInfo(
-                startTime = state.date,
-                organizer = state.selectOrganizer,
-                finishTime = (state.date.clone() as Calendar).apply {
-                    add(
-                        Calendar.MINUTE,
-                        state.duration
-                    )
-                },
-                id = ""
-            )
-            scope.launch {
-
-                if ((checkBookingUseCase.busyEvents(
-                        event = event,
-                        room = room
-                    ) as? Either.Success)?.data?.isEmpty() == true
-                ) {
-//                    Temp comments
-//                    dispatch(Message.LoadUpdate)
-                    val result = bookingUseCase.invoke(
-                        eventInfo = event,
-                        room = room
-                    )
-                    when (result) {
-                        is Either.Error -> {
-                            dispatch(Message.FailUpdate)
-                            navigate(UpdateEventComponent.ModalConfig.FailureModal)
-                        }
-
-                        is Either.Success -> {
-                            dispatch(Message.FailUpdate)
-//                            navigate(UpdateEventComponent.ModalConfig.SuccessModal)
-                        }
-                    }
-                }
-
-            }
-
-//            onCloseRequest()
-            onTempLoading(event)
-            navigate(UpdateEventComponent.ModalConfig.SuccessModal)
+            val event = state.toEventInfo()
+            onEventCreation(event)
+            onCloseRequest()
         }
 
         fun setDay(
@@ -187,7 +162,7 @@ class UpdateEventStoreFactory(
                     date = newDate
                 ).toEvent(),
                 room = room
-            ).unbox({ it.saveData })?.filter { it.startTime != state.date } ?: listOf()
+            ).filter { it.startTime != state.date }
             dispatch(
                 Message.UpdateInformation(
                     newDate = newDate,
@@ -234,13 +209,9 @@ class UpdateEventStoreFactory(
             dispatch(Message.Input(input, newList))
         }
 
-        fun updateEvent(state: UpdateEventStore.State, room: String) = scope.launch {
-            dispatch(Message.LoadUpdate)
-            if (bookingUseCase.update(state.toEventInfo(), room) is Either.Success) {
-                onCloseRequest()
-            } else {
-                dispatch(Message.FailUpdate)
-            }
+        fun updateEvent(state: UpdateEventStore.State) {
+            onEventUpdate(state.toEventInfo())
+            onCloseRequest()
         }
 
         fun updateInfo(
@@ -261,7 +232,7 @@ class UpdateEventStoreFactory(
                     selectOrganizer = newOrganizer
                 ).toEvent(),
                 room = room
-            ).unbox({ it.saveData })?.filter { it.startTime != state.date } ?: listOf()
+            ).filter { it.startTime != state.date }
             if (newDuration > 0 && newDate > today()) {
                 dispatch(
                     Message.UpdateInformation(
@@ -300,10 +271,13 @@ class UpdateEventStoreFactory(
 
         private fun UpdateEventStore.State.toEventInfo(): EventInfo =
             EventInfo(
-                startTime = date,
-                finishTime = (date.clone() as Calendar).apply { add(Calendar.MINUTE, duration) },
+                startTime = date.removeSeconds(),
+                finishTime = (date.clone() as Calendar)
+                    .apply { add(Calendar.MINUTE, duration) }
+                    .removeSeconds(),
                 organizer = selectOrganizer,
-                id = event.id
+                id = event.id,
+                isLoading = false,
             )
 
 
@@ -328,8 +302,6 @@ class UpdateEventStoreFactory(
                     selectOrganizer = msg.newOrganizer,
                     event = msg.event(event.id)
                 )
-                is Message.FailUpdate -> copy(isErrorUpdate = true, isLoadUpdate = false)
-                is Message.LoadUpdate -> copy(isErrorUpdate = false, isLoadUpdate = true)
                 is Message.InputError -> copy(isInputError = msg.isError)
                 is Message.Input -> copy(inputText = msg.newInput, selectOrganizers = msg.newList)
                 is Message.UpdateOrganizer -> copy(
@@ -351,7 +323,8 @@ class UpdateEventStoreFactory(
                     )
                 },
                 organizer = newOrganizer,
-                id = id
+                id = id,
+                isLoading = false,
             )
         }
     }
@@ -361,5 +334,6 @@ private fun UpdateEventStore.State.toEvent(): EventInfo = EventInfo(
     startTime = date,
     finishTime = (date.clone() as Calendar).apply { add(Calendar.MINUTE, duration) },
     organizer = selectOrganizer,
-    id = ""
+    id = "",
+    isLoading = false,
 )

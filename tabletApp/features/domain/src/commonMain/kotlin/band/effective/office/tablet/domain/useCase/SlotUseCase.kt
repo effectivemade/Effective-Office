@@ -6,6 +6,7 @@ import band.effective.office.tablet.domain.OfficeTime
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Slot
 import java.util.Calendar
+
 /**use case for generate slots*/
 class SlotUseCase {
     /**generate slots
@@ -20,7 +21,7 @@ class SlotUseCase {
         finish: Calendar = OfficeTime.finishWorkTime(),
         minSlotDur: Int = 15,
         events: List<EventInfo>,
-        currentEvent: EventInfo?
+        currentEvent: EventInfo?,
     ): List<Slot> {
         return events
             .filter { it.startTime in start..finish }
@@ -69,9 +70,11 @@ class SlotUseCase {
     private fun MutableList<Slot>.removeEmptySlot(eventInfo: EventInfo?) {
         if (eventInfo != null) {
             removeIf { slot ->
-                slot.start >= eventInfo.startTime && slot.start <= eventInfo.finishTime
-                        ||
-                        eventInfo.startTime >= slot.start && eventInfo.startTime < slot.finish
+                val eventInfoWithoutSeconds = (eventInfo.finishTime.clone() as Calendar).apply { set(Calendar.SECOND, 0) }
+                val firstCondition = slot.start >= eventInfo.startTime && slot.start < eventInfoWithoutSeconds
+                val secondCondition = eventInfo.startTime >= slot.start && eventInfo.startTime < slot.finish
+                firstCondition || secondCondition
+
             }
         }
     }
@@ -114,6 +117,10 @@ class SlotUseCase {
         }
     }
 
-    private fun EventInfo.toSlot(): Slot =
-        Slot.EventSlot(start = startTime, finish = finishTime, eventInfo = this)
+    private fun EventInfo.toSlot(): Slot {
+        return if (!isLoading)
+            Slot.EventSlot(start = startTime, finish = finishTime, eventInfo = this)
+        else Slot.LoadingEventSlot(start = startTime, finish = finishTime, eventInfo = this)
+
+    }
 }

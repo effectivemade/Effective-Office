@@ -1,5 +1,7 @@
 package band.effective.office.tablet.ui.fastEvent
 
+import band.effective.office.network.model.Either
+import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.ui.fastEvent.store.FastEventStore
 import band.effective.office.tablet.ui.fastEvent.store.FastEventStoreFactory
@@ -21,6 +23,8 @@ class FastEventComponent(
     storeFactory: StoreFactory,
     val eventInfo: EventInfo,
     val room: String,
+    private val onEventCreation : suspend (EventInfo) -> Either<ErrorResponse, EventInfo>,
+    private val onRemoveEvent : suspend (EventInfo) -> Either<ErrorResponse, String>,
     private val onCloseRequest: () -> Unit
 ) : ComponentContext by componentContext, KoinComponent, ModalWindow {
 
@@ -38,6 +42,8 @@ class FastEventComponent(
             navigate = { navigation.push(it) },
             room = room,
             eventInfo = eventInfo,
+            onEventCreation = onEventCreation,
+            onRemoveEvent = onRemoveEvent,
             onCloseRequest = onCloseRequest
         ).create()
     }
