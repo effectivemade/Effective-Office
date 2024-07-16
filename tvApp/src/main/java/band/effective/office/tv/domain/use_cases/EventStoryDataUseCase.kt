@@ -32,14 +32,15 @@ class EventStoryDataCombinerUseCase @Inject constructor(
                 firstName = name,
                 startDate = formater.format(startDate.time),
                 nextBirthdayDate = formater.format(nextBDay.time),
-                photoUrl = photo
+                photoUrl = photo,
+                employment = employment,
             )
         }
 
     private fun getNotionDataForStories() = flow {
         val response = try {
             val activeEmployees = workTogether.getAll()
-                .filter { it.employment == "Band" && it.status == "Active" }
+                .filter { it.employment in setOf("Band", "Intern") && it.status == "Active" }
             Either.Success(activeEmployees)
         } catch (t: Throwable) {
             Either.Failure(

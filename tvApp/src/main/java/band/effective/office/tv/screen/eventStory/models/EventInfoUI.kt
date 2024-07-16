@@ -8,32 +8,36 @@ import band.effective.office.tv.screen.eventStory.KeySortDuolingoUser
 sealed class EmployeeInfoUI(
     val name: String,
     val photoUrl: String,
+    val employment: String,
     val eventType: EventType
     ) : StoryModel(StoryType.Employee)
 
 data class BirthdayUI(
     val employeeName: String,
     val employeePhotoUrl: String,
-) : EmployeeInfoUI(employeeName, employeePhotoUrl, EventType.Birthday)
+    private val employmentType: String,
+    ) : EmployeeInfoUI(employeeName, employeePhotoUrl, employmentType, EventType.Birthday)
 
 data class AnnualAnniversaryUI(
     private val employeeName: String,
     private val employeePhotoUrl: String,
+    private val employmentType : String,
     val yearsInCompany: Int
-) : EmployeeInfoUI(employeeName, employeePhotoUrl, EventType.AnnualAnniversary)
+) : EmployeeInfoUI(employeeName, employeePhotoUrl, employmentType, EventType.AnnualAnniversary)
 
 data class MonthAnniversaryUI(
     private val employeeName: String,
     private val employeePhotoUrl: String,
+    private val employmentType: String,
     val yearsInCompany: Int,
     val monthsInCompany: Int
-) : EmployeeInfoUI(employeeName, employeePhotoUrl, EventType.MonthAnniversary)
+) : EmployeeInfoUI(employeeName, employeePhotoUrl, employmentType, EventType.MonthAnniversary)
 
 
 data class NewEmployeeUI(
     private val employeeName: String,
     private val employeePhotoUrl: String,
-) : EmployeeInfoUI(employeeName, employeePhotoUrl, EventType.NewEmployee)
+) : EmployeeInfoUI(employeeName, employeePhotoUrl, "Band", EventType.NewEmployee)
 
 data class DuolingoUserInfo(
     val keySort: KeySortDuolingoUser,

@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.sp
 import band.effective.office.tv.R
 import band.effective.office.tv.domain.model.notion.EventType
 import band.effective.office.tv.screen.eventStory.models.AnnualAnniversaryUI
+import band.effective.office.tv.screen.eventStory.models.BirthdayUI
 import band.effective.office.tv.screen.eventStory.models.EmployeeInfoUI
 import band.effective.office.tv.screen.eventStory.models.MonthAnniversaryUI
-import band.effective.office.tv.screen.eventStory.models.NewEmployeeUI
 import band.effective.office.tv.ui.theme.drukLCGWideMedium
 import band.effective.office.tv.ui.theme.museoCyrl
 import band.effective.office.tv.utils.getCorrectDeclension
@@ -51,7 +51,6 @@ fun StoryContent(
             .data(employeeInfo.photoUrl).size(Size.ORIGINAL).build()
     )
     if (painter.state is AsyncImagePainter.State.Loading) {
-        //onImageLoading()
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,7 +65,6 @@ fun StoryContent(
             )
         }
     } else {
-        //onImageLoaded()
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -81,12 +79,20 @@ fun StoryContent(
                     .width(500.dp)
                     .fillMaxSize()
             ) {
+                if (employeeInfo.employment == "Intern") {
+                    Text(
+                        text = stringResource(id = R.string.intern),
+                        fontSize = 46.sp,
+                        color = Color.Black,
+                        fontFamily = drukLCGWideMedium,
+                    )
+                }
                 Text(
                     text = employeeInfo.name,
-                    fontSize = 64.sp,
+                    fontSize = 52.sp,
                     fontFamily = museoCyrl,
                     color = Color.Black,
-                    fontStyle = FontStyle.Italic
+                    fontStyle = FontStyle.Italic,
                 )
                 if (isAnnualAnnualAnniversary) {
                     val story = employeeInfo as AnnualAnniversaryUI
@@ -98,14 +104,14 @@ fun StoryContent(
                             "года",
                             "лет"
                         ),
-                        fontSize = 54.sp,
+                        fontSize = 46.sp,
                         color = Color.Black,
                         fontFamily = drukLCGWideMedium,
                     )
                 } else if (isBirthday) {
                     Text(
                         text = stringResource(id = R.string.congratulations_birthday),
-                        fontSize = 54.sp,
+                        fontSize = 46.sp,
                         color = Color.Black,
                         fontFamily = drukLCGWideMedium,
                     )
@@ -119,7 +125,7 @@ fun StoryContent(
                             "месяца",
                             "месяцев"
                         ),
-                        fontSize = 54.sp,
+                        fontSize = 46.sp,
                         color = Color.Black,
                         fontFamily = drukLCGWideMedium,
                     )
@@ -127,7 +133,7 @@ fun StoryContent(
                 else {
                     Text(
                         text = stringResource(id = R.string.welcome_to_the_team),
-                        fontSize = 54.sp,
+                        fontSize = 46.sp,
                         color = Color.Black,
                         fontFamily = drukLCGWideMedium,
                     )
@@ -147,10 +153,10 @@ fun StoryContent(
 }
 
 @Composable
-@Preview
+@Preview(widthDp = 960, heightDp = 540)
 fun PreviewStoryContent() {
     StoryContent(
-        employeeInfo = NewEmployeeUI("John Doe", "testUrl"),
+        employeeInfo = BirthdayUI("John Doe", "testUrl", "Intern"),
         Modifier
             .fillMaxSize()
             .padding(vertical = 64.dp)

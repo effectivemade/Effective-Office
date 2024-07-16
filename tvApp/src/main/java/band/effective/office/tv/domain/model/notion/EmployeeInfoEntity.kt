@@ -11,6 +11,7 @@ class EmployeeInfoEntity(
     val startDate: String,
     val nextBirthdayDate: String,
     val photoUrl: String,
+    val employment: String,
 )
 
 fun List<EmployeeInfoEntity>.processEmployeeInfo(): List<EmployeeInfoUI> =
@@ -20,12 +21,17 @@ fun List<EmployeeInfoEntity>.processEmployeeInfo(): List<EmployeeInfoUI> =
                 BirthdayUI(
                     employee.firstName,
                     employee.photoUrl,
+                    employee.employment,
                 )
             } else null,
-            if (employee.startDate.isNotBlank() && isFirstOrThirdMonthCelebrationToday(employee.startDate)) {
+            if (employee.startDate.isNotBlank()
+                && isFirstOrThirdMonthCelebrationToday(
+                    employee.startDate, employee.employment
+                )) {
                 MonthAnniversaryUI(
                     employee.firstName,
                     employee.photoUrl,
+                    employee.employment,
                     DateUtlils.getYearsFromStartDate(employee.startDate),
                     DateUtlils.getMonthsFromStartDate(employee.startDate),
                 ).run { if (yearsInCompany == 0) this else null }
@@ -34,10 +40,13 @@ fun List<EmployeeInfoEntity>.processEmployeeInfo(): List<EmployeeInfoUI> =
                 AnnualAnniversaryUI(
                     employee.firstName,
                     employee.photoUrl,
+                    employee.employment,
                     DateUtlils.getYearsFromStartDate(employee.startDate)
                 ).run { if (yearsInCompany == 0) null else this }
             } else null,
-            if (employee.startDate.isNotBlank() && isNewEmployeeToday(employee.startDate)) {
+            if (employee.startDate.isNotBlank()
+                && isNewEmployeeToday(employee.startDate, employee.employment)
+                ) {
                 NewEmployeeUI(
                     employee.firstName,
                     employee.photoUrl,
@@ -55,7 +64,7 @@ fun isYearCelebrationToday(date: String): Boolean {
             && calendar.get(Calendar.MONTH) + 1 == monthNumber)
 }
 
-fun isFirstOrThirdMonthCelebrationToday(date: String): Boolean {
+fun isFirstOrThirdMonthCelebrationToday(date: String, employment: String): Boolean {
     val dateInfo = date.split('-')
     val dayOfMonth = dateInfo[2].toInt()
     val monthNumber = dateInfo[1].toInt()
@@ -70,11 +79,13 @@ fun isFirstOrThirdMonthCelebrationToday(date: String): Boolean {
     val threeMonthsCheck = (calendar.clone() as Calendar)
         .apply { add(Calendar.MONTH, -3) }
 
-    return oneMonthCheck.isSameDay(employeeStartDate)
+    return oneMonthCheck.isSameDay(employeeStartDate) && employment == "Band"
             || threeMonthsCheck.isSameDay(employeeStartDate)
 }
 
-fun isNewEmployeeToday(date: String): Boolean {
+fun isNewEmployeeToday(date: String, employment: String): Boolean {
+    if (employment != "Band") return false
+
     val dateInfo = date.split('-')
     val dayOfMonth = dateInfo[2].toInt()
     val monthNumber = dateInfo[1].toInt()
