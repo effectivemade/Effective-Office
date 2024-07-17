@@ -23,7 +23,7 @@ class EmployeeInfoRepositoryImpl @Inject constructor(private val employeeInfoRem
                             employee.startDate.orEmpty(),
                             employee.nextBirthdayDate.orEmpty(),
                             employee.photoUrl.orEmpty(),
-                            "Band",
+                            isIntern = false,
                         )
                     }))
                 }

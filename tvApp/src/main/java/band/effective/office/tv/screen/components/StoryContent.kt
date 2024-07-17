@@ -19,18 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import band.effective.office.tv.R
-import band.effective.office.tv.domain.model.notion.EventType
 import band.effective.office.tv.screen.eventStory.models.AnnualAnniversaryUI
 import band.effective.office.tv.screen.eventStory.models.BirthdayUI
 import band.effective.office.tv.screen.eventStory.models.EmployeeInfoUI
 import band.effective.office.tv.screen.eventStory.models.MonthAnniversaryUI
-import band.effective.office.tv.ui.theme.drukLCGWideMedium
-import band.effective.office.tv.ui.theme.museoCyrl
+import band.effective.office.tv.screen.eventStory.models.NewEmployeeUI
+import band.effective.office.tv.ui.theme.storyBodyStyle
+import band.effective.office.tv.ui.theme.storyEmployeeNameStyle
 import band.effective.office.tv.utils.getCorrectDeclension
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -42,10 +40,6 @@ fun StoryContent(
     employeeInfo: EmployeeInfoUI,
     modifier: Modifier
 ) {
-    val isAnnualAnnualAnniversary = employeeInfo.eventType == EventType.AnnualAnniversary
-    val isBirthday = employeeInfo.eventType == EventType.Birthday
-    val isMonthAnniversary  = employeeInfo.eventType == EventType.MonthAnniversary
-
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .data(employeeInfo.photoUrl).size(Size.ORIGINAL).build()
@@ -79,67 +73,58 @@ fun StoryContent(
                     .width(500.dp)
                     .fillMaxSize()
             ) {
-                if (employeeInfo.employment == "Intern") {
+                if (employeeInfo.isIntern) {
                     Text(
                         text = stringResource(id = R.string.intern),
-                        fontSize = 46.sp,
-                        color = Color.Black,
-                        fontFamily = drukLCGWideMedium,
+                        style = storyBodyStyle,
                     )
                 }
                 Text(
                     text = employeeInfo.name,
-                    fontSize = 52.sp,
-                    fontFamily = museoCyrl,
-                    color = Color.Black,
-                    fontStyle = FontStyle.Italic,
+                    style = storyEmployeeNameStyle,
                 )
-                if (isAnnualAnnualAnniversary) {
-                    val story = employeeInfo as AnnualAnniversaryUI
-                    Text(
-                        text =
-                        stringResource(id = R.string.with_us) + " " + story.yearsInCompany + " " + getCorrectDeclension(
-                            story.yearsInCompany,
-                            "год",
-                            "года",
-                            "лет"
-                        ),
-                        fontSize = 46.sp,
-                        color = Color.Black,
-                        fontFamily = drukLCGWideMedium,
-                    )
-                } else if (isBirthday) {
-                    Text(
-                        text = stringResource(id = R.string.congratulations_birthday),
-                        fontSize = 46.sp,
-                        color = Color.Black,
-                        fontFamily = drukLCGWideMedium,
-                    )
-                } else if (isMonthAnniversary) {
-                    val story = employeeInfo as MonthAnniversaryUI
-                    Text(
-                        text =
-                        stringResource(id = R.string.with_us) + " " + story.monthsInCompany + " " + getCorrectDeclension(
-                            story.monthsInCompany,
-                            "месяц",
-                            "месяца",
-                            "месяцев"
-                        ),
-                        fontSize = 46.sp,
-                        color = Color.Black,
-                        fontFamily = drukLCGWideMedium,
-                    )
-                }
-                else {
-                    Text(
-                        text = stringResource(id = R.string.welcome_to_the_team),
-                        fontSize = 46.sp,
-                        color = Color.Black,
-                        fontFamily = drukLCGWideMedium,
-                    )
+                when (employeeInfo) {
+                    is AnnualAnniversaryUI -> {
+                        Text(
+                            text =
+                            stringResource(id = R.string.with_us) + " " + employeeInfo.yearsInCompany + " " + getCorrectDeclension(
+                                employeeInfo.yearsInCompany,
+                                "год",
+                                "года",
+                                "лет"
+                            ),
+                            style = storyBodyStyle,
+                        )
+                    }
+
+                    is BirthdayUI -> {
+                        Text(
+                            text = stringResource(id = R.string.congratulations_birthday),
+                            style = storyBodyStyle,
+                        )
+                    }
+
+                    is MonthAnniversaryUI -> {
+                        Text(
+                            text =
+                            stringResource(id = R.string.with_us) + " " + employeeInfo.monthsInCompany + " " + getCorrectDeclension(
+                                employeeInfo.monthsInCompany,
+                                "месяц",
+                                "месяца",
+                                "месяцев"
+                            ),
+                            style = storyBodyStyle,
+                        )
+                    }
+                    is NewEmployeeUI -> {
+                        Text(
+                            text = stringResource(id = R.string.welcome_to_the_team),
+                            style = storyBodyStyle,
+                        )
+                    }
                 }
             }
-            Image(
+            Image     (
                 painter = painter,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -156,7 +141,7 @@ fun StoryContent(
 @Preview(widthDp = 960, heightDp = 540)
 fun PreviewStoryContent() {
     StoryContent(
-        employeeInfo = BirthdayUI("John Doe", "testUrl", "Intern"),
+        employeeInfo = BirthdayUI("John Doe", "testUrl", true),
         Modifier
             .fillMaxSize()
             .padding(vertical = 64.dp)
