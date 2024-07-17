@@ -79,6 +79,7 @@ fun StoryContent(
                         style = storyBodyStyle,
                     )
                 }
+
                 Text(
                     text = employeeInfo.name,
                     style = storyEmployeeNameStyle,
@@ -116,6 +117,7 @@ fun StoryContent(
                             style = storyBodyStyle,
                         )
                     }
+
                     is NewEmployeeUI -> {
                         Text(
                             text = stringResource(id = R.string.welcome_to_the_team),
@@ -124,7 +126,8 @@ fun StoryContent(
                     }
                 }
             }
-            Image     (
+            
+            Image(
                 painter = painter,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
