@@ -42,10 +42,10 @@ fun User.toUserDTO(idPhoneNumber: String, idTelegram: String): UserDTO =
         tag = "employee"
     )
 
-fun UserDTO.toUser() =
+fun UserDTO.toUser(imageUrl: String? = null) =
     User(
         id = id,
-        imageUrl = avatarUrl,
+        imageUrl = avatarUrl.takeIf { it.isNotEmpty() } ?: imageUrl ?: "",
         userName = fullName,
         post = role,
         email = email,
