@@ -217,8 +217,8 @@ class GoogleCalendarConverter(
      */
     private fun getParticipantsModels(event: Event): List<UserModel> {
         val attendees = event.attendees
-            .filter { attendee -> !attendee.isResource && attendee.responseStatus != "declined" }
-            .map { attendee -> attendee.email }
+            ?.filter { attendee -> !attendee.isResource && attendee.responseStatus != "declined" }
+            ?.map { attendee -> attendee.email } ?: return emptyList()
         return userRepository.findAllByEmails(attendees)
     }
 
