@@ -3,7 +3,6 @@ package office.effective.features.booking.repository
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.Event
-import kotlinx.coroutines.delay
 import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
@@ -595,6 +594,8 @@ class BookingMeetingRepository(
     }
 
     private fun eventIsNotDeletedByOwner(event: Event): Boolean {
+        if (event.attendees == null) return true
+        
         val organiserEmail = findOrganiser(event)
         for (attendee in event.attendees) {
             if (attendee.email == organiserEmail && attendee.responseStatus == "declined") {
