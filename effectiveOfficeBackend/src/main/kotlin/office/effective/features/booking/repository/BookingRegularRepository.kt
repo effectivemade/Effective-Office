@@ -1,7 +1,6 @@
 package office.effective.features.booking.repository
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
-import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.Event
 import office.effective.common.constants.BookingConstants
@@ -9,7 +8,7 @@ import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
 import office.effective.common.exception.WorkspaceUnavailableException
 import office.effective.features.booking.converters.GoogleCalendarConverter
-import office.effective.features.booking.converters.toGoogleDateTime
+import office.effective.features.booking.converters.toDateTime
 import office.effective.model.Booking
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -105,8 +104,8 @@ class BookingRegularRepository(
     ): Calendar.Events.List {
         return calendarEvents.list(calendarId)
             .setSingleEvents(singleEvents)
-            .setTimeMin(timeMin.toGoogleDateTime())
-            .setTimeMax(timeMax?.toGoogleDateTime())
+            .setTimeMin(timeMin.toDateTime())
+            .setTimeMax(timeMax?.toDateTime())
     }
 
     /**
