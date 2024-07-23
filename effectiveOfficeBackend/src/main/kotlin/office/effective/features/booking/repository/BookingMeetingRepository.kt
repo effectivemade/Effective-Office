@@ -3,10 +3,10 @@ package office.effective.features.booking.repository
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.Event
-import kotlinx.coroutines.delay
 import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
+import office.effective.common.exception.UnavailableDeleteEventException
 import office.effective.common.exception.WorkspaceUnavailableException
 import office.effective.features.booking.converters.GoogleCalendarConverter
 import office.effective.features.booking.converters.toGoogleDateTime
@@ -68,8 +68,8 @@ class BookingMeetingRepository(
     override fun deleteById(id: String) {
         logger.debug("[deleteById] deleting the booking with id={}", id)
 
-        findByCalendarIdAndBookingId(id) ?: throw InstanceNotFoundException(
-            WorkspaceBookingEntity::class, "Booking with id $id in defaultCalendar not found"
+        findByCalendarIdAndBookingId(id) ?: throw UnavailableDeleteEventException(
+            "Booking with id $id, that not found in defaultCalendar, can't be deleted"
         )
 
         try {

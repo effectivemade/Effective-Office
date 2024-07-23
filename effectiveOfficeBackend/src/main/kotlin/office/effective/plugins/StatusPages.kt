@@ -33,6 +33,10 @@ fun Application.configureExceptionHandling() {
             logger.info("Exception handled: ", cause)
             call.respondText(text = "400: ${cause.reasons.joinToString()}", status = HttpStatusCode.BadRequest)
         }
+        exception<UnavailableDeleteEventException> {call, cause ->
+            logger.info("Exception handled: ", cause)
+            call.respondText(text = "400: $cause", status = HttpStatusCode.BadRequest)
+        }
         exception<UnavailableOperationException> { call, cause ->
             logger.info("Exception handled: ", cause)
             call.respondText(text = "400: $cause", status = HttpStatusCode.BadRequest)
