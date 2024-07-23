@@ -67,6 +67,11 @@ class BookingMeetingRepository(
      */
     override fun deleteById(id: String) {
         logger.debug("[deleteById] deleting the booking with id={}", id)
+
+        findByCalendarIdAndBookingId(id) ?: throw InstanceNotFoundException(
+            WorkspaceBookingEntity::class, "Booking with id $id in defaultCalendar not found"
+        )
+
         try {
             calendarEvents.delete(defaultCalendar, id).execute() //We can't delete directly from workspace calendar
         } catch (e: GoogleJsonResponseException) {
