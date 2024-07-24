@@ -6,6 +6,7 @@ import com.google.api.services.calendar.model.Event
 import office.effective.common.constants.BookingConstants
 import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
+import office.effective.common.exception.UnavailableDeleteEventException
 import office.effective.common.exception.WorkspaceUnavailableException
 import office.effective.features.booking.converters.GoogleCalendarConverter
 import office.effective.features.booking.converters.toDateTime
@@ -66,6 +67,11 @@ class BookingMeetingRepository(
      */
     override fun deleteById(id: String) {
         logger.debug("[deleteById] deleting the booking with id={}", id)
+
+        findByCalendarIdAndBookingId(id) ?: throw UnavailableDeleteEventException(
+            "Booking with id $id, that not found in defaultCalendar, can't be deleted"
+        )
+
         try {
             calendarEvents.delete(defaultCalendar, id).execute() //We can't delete directly from workspace calendar
         } catch (e: GoogleJsonResponseException) {
