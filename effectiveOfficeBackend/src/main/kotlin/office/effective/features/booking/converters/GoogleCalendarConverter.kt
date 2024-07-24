@@ -20,6 +20,8 @@ import office.effective.features.workspace.repository.WorkspaceRepository
 import office.effective.model.RecurrenceModel.Companion.toRecurrence
 import org.slf4j.LoggerFactory
 import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.collections.List as List
 
@@ -349,9 +351,12 @@ class GoogleCalendarConverter(
      * @return [Instant]
      */
     private fun toLocalInstant(googleDateTime: EventDateTime?) : Instant {
-        val gmtEpoch: Long? = googleDateTime?.dateTime?.value
-        val localEpoch = gmtEpoch?.let { it + BookingConstants.DEFAULT_TIMEZONE_OFFSET_MILLIS } ?: 0
-        return Instant.ofEpochMilli(localEpoch)
+        if (googleDateTime == null) return Instant.ofEpochMilli(0)
+        
+        val instant = Instant.ofEpochMilli(googleDateTime.dateTime.value)
+        val correctedTime = ZonedDateTime.ofInstant(instant, ZoneId.of(googleDateTime.timeZone))
+            .withZoneSameInstant(ZoneId.of(BookingConstants.DEFAULT_TIMEZONE_ID))
+        return correctedTime.toInstant()
     }
 
     /**
@@ -361,7 +366,7 @@ class GoogleCalendarConverter(
      */
     private fun Instant.toGoogleEventDateTime() : EventDateTime {
         val googleEventDateTime = EventDateTime()
-        googleEventDateTime.dateTime = this.toEpochMilli().toGoogleDateTime()
+        googleEventDateTime.dateTime = this.toEpochMilli().toDateTime()
         googleEventDateTime.timeZone = BookingConstants.DEFAULT_TIMEZONE_ID
         return googleEventDateTime
     }

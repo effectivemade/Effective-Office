@@ -8,7 +8,7 @@ import office.effective.common.exception.InstanceNotFoundException
 import office.effective.common.exception.MissingIdException
 import office.effective.common.exception.WorkspaceUnavailableException
 import office.effective.features.booking.converters.GoogleCalendarConverter
-import office.effective.features.booking.converters.toGoogleDateTime
+import office.effective.features.booking.converters.toDateTime
 import office.effective.features.calendar.repository.CalendarIdsRepository
 import office.effective.features.user.repository.UserEntity
 import office.effective.features.user.repository.UserRepository
@@ -137,7 +137,7 @@ class BookingMeetingRepository(
     /**
      * Request template containing all required parameters
      *
-     * @param timeMin lover bound for filtering bookings by start time.
+     * @param timeMin lower bound for filtering bookings by start time.
      * Old Google calendar events may not appear correctly in the system and cause unexpected exceptions.
      * Should be a time in the default timezone.
      * @param timeMax upper bound (exclusive) for an event's start time to filter by.
@@ -154,8 +154,8 @@ class BookingMeetingRepository(
     ): Calendar.Events.List {
         return calendarEvents.list(calendarId)
             .setSingleEvents(singleEvents)
-            .setTimeMin(timeMin.toGoogleDateTime())
-            .setTimeMax(timeMax?.toGoogleDateTime())
+            .setTimeMin(timeMin.toDateTime())
+            .setTimeMax(timeMax?.toDateTime())
     }
 
     /**
