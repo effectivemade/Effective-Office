@@ -88,12 +88,12 @@ fun StoryContent(
                     is AnnualAnniversaryUI -> {
                         Text(
                             text =
-                            stringResource(id = R.string.with_us) + " " + employeeInfo.yearsInCompany + " " + getCorrectDeclension(
+                            stringResource(id = R.string.with_us_period, employeeInfo.yearsInCompany, getCorrectDeclension(
                                 employeeInfo.yearsInCompany,
                                 "год",
                                 "года",
                                 "лет"
-                            ),
+                            )),
                             style = storyBodyStyle,
                         )
                     }
@@ -108,12 +108,12 @@ fun StoryContent(
                     is MonthAnniversaryUI -> {
                         Text(
                             text =
-                            stringResource(id = R.string.with_us) + " " + employeeInfo.monthsInCompany + " " + getCorrectDeclension(
+                            stringResource(id = R.string.with_us_period, employeeInfo.monthsInCompany, getCorrectDeclension(
                                 employeeInfo.monthsInCompany,
                                 "месяц",
                                 "месяца",
                                 "месяцев"
-                            ),
+                            )),
                             style = storyBodyStyle,
                         )
                     }

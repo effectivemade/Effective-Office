@@ -64,7 +64,7 @@ fun isYearCelebrationToday(date: String): Boolean {
             && calendar.get(Calendar.MONTH) + 1 == monthNumber)
 }
 
-fun isFirstOrThirdMonthCelebrationToday(date: String, isIntern: Boolean): Boolean {
+fun isFirstOrThirdMonthCelebrationToday(date: String, isEmployeeIntern: Boolean): Boolean {
     val dateInfo = date.split('-')
     val dayOfMonth = dateInfo[2].toInt()
     val monthNumber = dateInfo[1].toInt()
@@ -79,12 +79,12 @@ fun isFirstOrThirdMonthCelebrationToday(date: String, isIntern: Boolean): Boolea
     val threeMonthsCheck = (calendar.clone() as Calendar)
         .apply { add(Calendar.MONTH, -3) }
 
-    return oneMonthCheck.isSameDay(employeeStartDate) && !isIntern
+    return oneMonthCheck.isSameDay(employeeStartDate) && !isEmployeeIntern
             || threeMonthsCheck.isSameDay(employeeStartDate)
 }
 
-fun isNewEmployeeToday(date: String, isIntern: Boolean): Boolean {
-    if (isIntern) return false
+fun isNewEmployeeToday(date: String, isEmployeeIntern: Boolean): Boolean {
+    if (isEmployeeIntern) return false
 
     val dateInfo = date.split('-')
     val dayOfMonth = dateInfo[2].toInt()
