@@ -4,6 +4,7 @@ import band.effective.office.tv.core.network.entity.Either
 import band.effective.office.tv.domain.model.duolingo.DuolingoUser
 import band.effective.office.tv.domain.model.message.MessageQueue
 import band.effective.office.tv.domain.model.notion.EmployeeInfoEntity
+import band.effective.office.tv.domain.model.notion.EmploymentType
 import band.effective.office.tv.domain.model.notion.processEmployeeInfo
 import band.effective.office.tv.repository.duolingo.DuolingoRepository
 import band.effective.office.tv.repository.workTogether.Teammate
@@ -32,15 +33,19 @@ class EventStoryDataCombinerUseCase @Inject constructor(
                 firstName = name,
                 startDate = formater.format(startDate.time),
                 nextBirthdayDate = formater.format(nextBDay.time),
-                photoUrl = photo
+                photoUrl = photo,
+                isIntern = employment == EmploymentType.Intern.value,
             )
         }
 
     private fun getNotionDataForStories() = flow {
         val response = try {
-            Either.Success(
-                workTogether.getAll()
-                    .filter { it.employment in setOf("Band", "Intern") && it.status == "Active" })
+            val activeEmployees = workTogether.getAll()
+                .filter {
+                    it.employment in setOf(EmploymentType.Band.value, EmploymentType.Intern.value)
+                        && it.status == "Active"
+                }
+            Either.Success(activeEmployees)
         } catch (t: Throwable) {
             Either.Failure(
                 t.message ?: "Error in EventStoryDataCombinerUseCase.getNotionDataForStories"

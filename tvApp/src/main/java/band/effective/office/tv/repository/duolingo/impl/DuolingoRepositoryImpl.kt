@@ -3,6 +3,7 @@ package band.effective.office.tv.repository.duolingo.impl
 import band.effective.office.tv.core.network.entity.Either
 import band.effective.office.tv.domain.model.duolingo.DuolingoUser
 import band.effective.office.tv.domain.model.duolingo.toDomain
+import band.effective.office.tv.domain.model.notion.EmploymentType
 import band.effective.office.tv.network.duolingo.DuolingoApi
 import band.effective.office.tv.repository.duolingo.DuolingoRepository
 import band.effective.office.tv.repository.workTogether.WorkTogether
@@ -16,7 +17,11 @@ class DuolingoRepositoryImpl @Inject constructor(
 ) : DuolingoRepository {
     override suspend fun getUsers(): Flow<Either<String, List<DuolingoUser>>> =
         flow {
-            val users = workTogether.getAll().filter { it.duolingo != null && it.employment in setOf("Band", "Intern") && it.status == "Active" }
+            val users = workTogether.getAll().filter {
+                it.duolingo != null
+                        && it.employment == EmploymentType.Band.value
+                        && it.status == "Active"
+            }
             var error = false
             val data = users.mapNotNull {
                 when (val response = duolingoApi.getUserInfo(it.duolingo!!)) {
@@ -29,7 +34,7 @@ class DuolingoRepositoryImpl @Inject constructor(
                     is Either.Success -> response.data.toDomain()?.copy(username = it.name)
                 }
             }
-            if (!error){
+            if (!error) {
                 emit(Either.Success(data))
             }
         }

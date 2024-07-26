@@ -10,11 +10,11 @@
     <string name="message_screen_title">Message</string>
     <string name="no_messages">There are no messages at the moment</string>
     <string name="no_messages_have_facts">There are no messages at the moment, but there are facts</string>
+    <string name="intern">Стажер</string>
     <string name="congratulations_birthday">с днем рождения!</string>
-    <string name="with_us">с нами</string>
     <string name="month">месяц</string>
     <string name="for_years">года</string>
-    <string name="welcome_to_the_team">теперь в комаде</string>
+    <string name="welcome_to_the_team">теперь в команде</string>
     <string name="error_occurred">Произошла ошибка, подробнее:</string>
     <string name="today_no_stories">На сегодня Stories нет</string>
     <string name="back">Назад</string>
@@ -38,4 +38,5 @@
     <string name="photo">Фото</string>
     <string name="video">Видео</string>
     <string name="autoplay_settings">Настроить автоплей</string>
+    <string name="with_us_period">С нами %1$d %2$s</string>
 </resources>
