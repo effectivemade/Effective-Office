@@ -6,6 +6,7 @@ import band.effective.office.network.dto.BookingResponseDTO
 import band.effective.office.network.dto.WorkspaceDTO
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
+import band.effective.office.tablet.domain.model.ErrorWithData
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
 import band.effective.office.tablet.domain.model.RoomInfo
@@ -24,7 +25,7 @@ class NetworkEventRepository(
 ) : BookingRepository {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    override suspend fun getRoomsInfo(): Either<ErrorResponse, List<RoomInfo>> {
+    override suspend fun getRoomsInfo(): Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>> {
         val start = GregorianCalendar().apply {
             val minutes = get(Calendar.MINUTE)
             val excess = minutes % 15 + 1
@@ -33,14 +34,19 @@ class NetworkEventRepository(
             set(Calendar.MILLISECOND, 0)
         }
         val finish = GregorianCalendar().apply { add(Calendar.DAY_OF_MONTH, 14) }
-        return api.getWorkspacesWithBookings(
-            tag = "meeting",
-            freeFrom = start.timeInMillis,
-            freeUntil =  finish.timeInMillis
-        ).map(
-            errorMapper = { it },
-            successMapper = { it.map { workspace ->  workspace.toRoom() }}
-        )
+        val response = api.getWorkspacesWithBookings(
+                tag = "meeting",
+                freeFrom = start.timeInMillis,
+                freeUntil =  finish.timeInMillis
+            )
+        return when (response) {
+            is Either.Error -> {
+                Either.Error(ErrorWithData(response.error, null))
+            }
+            is Either.Success -> {
+                Either.Success(response.data.map { it.toRoom() })
+            }
+        }
     }
 
     override suspend fun createBooking(
@@ -73,9 +79,9 @@ class NetworkEventRepository(
         )
     }
 
-    override fun subscribeOnUpdates(): Flow<List<RoomInfo>> =
+    override fun subscribeOnUpdates(): Flow<Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>> =
         api.subscribeOnBookingsList("", scope)
-            .map { emptyList() }
+            .map { Either.Success(emptyList()) }
 
     /**Map domain model to DTO*/
     private fun EventInfo.toBookingRequestDTO(room: RoomInfo): BookingRequestDTO = BookingRequestDTO(

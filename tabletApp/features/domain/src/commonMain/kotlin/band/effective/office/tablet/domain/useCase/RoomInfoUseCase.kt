@@ -1,17 +1,16 @@
 package band.effective.office.tablet.domain.useCase
 
-import band.effective.office.network.model.Either
-import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.network.repository.impl.EventManager
 import band.effective.office.tablet.utils.map
+import band.effective.office.tablet.utils.unbox
 import kotlinx.coroutines.flow.map
 import java.util.GregorianCalendar
 
 /**Use case for get info about room*/
 class RoomInfoUseCase(private val eventManager: EventManager) {
     /**Get all rooms names*/
-    suspend fun getRoomsNames(): Either<ErrorResponse, List<String>> {
+    suspend fun getRoomsNames(): List<String> {
         return eventManager.getRoomNames()
     }
     /**Update repository cache*/
@@ -28,7 +27,11 @@ class RoomInfoUseCase(private val eventManager: EventManager) {
         )
     /**get update room flow*/
     fun subscribe() =
-        eventManager.getEventsFlow().map { it.mapRoomsInfo() }
+        eventManager.getEventsFlow().map { either ->
+            either.unbox(
+                errorHandler = { it.saveData }
+            ) ?: emptyList()
+        }
 
     /**Get info about room
      * @param room room name*/

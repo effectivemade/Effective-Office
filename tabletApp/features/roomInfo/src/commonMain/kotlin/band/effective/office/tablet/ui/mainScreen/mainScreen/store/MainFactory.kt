@@ -3,7 +3,7 @@ package band.effective.office.tablet.ui.mainScreen.mainScreen.store
 import android.os.Build
 import androidx.annotation.RequiresApi
 import band.effective.office.network.model.Either
-import band.effective.office.network.model.ErrorResponse
+import band.effective.office.tablet.domain.model.ErrorWithData
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.useCase.CheckSettingsUseCase
@@ -82,10 +82,9 @@ class MainFactory(
                     }
                     // update events list
                     launch(Dispatchers.Main) {
-                        roomInfoUseCase.subscribe().collect { roomInfos ->
-                            if (roomInfos.isNotEmpty()) {
+                        roomInfoUseCase.subscribe().collect { roomsInfo ->
+                            if (roomsInfo.isNotEmpty())
                                 dispatch(Action.OnUpdateRoomInfo)
-                            }
                         }
                     }
                     // reset selected room
@@ -128,7 +127,7 @@ class MainFactory(
     }
 
     private sealed interface Action {
-        data class OnLoad(val roomInfos: Either<ErrorResponse, List<RoomInfo>>) :
+        data class OnLoad(val roomInfos: Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>) :
             Action
 
         data object OnSettings : Action
@@ -205,24 +204,35 @@ class MainFactory(
                 if (!state.isData) {
                     dispatch(Message.Reboot)
                 }
-                withContext(Dispatchers.IO) {
-                    roomInfoUseCase.updateCache()
-                }
+
+                roomInfoUseCase.updateCache()
             }
-            val roomInfos = (roomInfoUseCase() as? Either.Success)?.data
-                ?: emptyList()
-            if (roomInfos.isNotEmpty()) {
-                dispatch(Message.UpdateDisconnect(false))
-                dispatch(
-                    Message.Load(
-                        isSuccess = true,
-                        roomList = roomInfos,
-                        indexSelectRoom = roomIndex
+            when (val roomInfos = roomInfoUseCase()) {
+                is Either.Success -> {
+                    dispatch(Message.UpdateDisconnect(false))
+                    dispatch(
+                        Message.Load(
+                            isSuccess = true,
+                            roomList = roomInfos.data,
+                            indexSelectRoom = roomIndex
+                        )
                     )
-                )
-                updateRoomInfo(roomInfos[roomIndex], state.selectDate)
-            } else {
-                Message.UpdateDisconnect(true)
+                    updateRoomInfo(roomInfos.data[roomIndex], state.selectDate)
+                }
+                is Either.Error -> {
+                    val save = roomInfos.error.saveData
+                    if (!state.isData) {
+                        dispatch(
+                            Message.Load(
+                                isSuccess = false,
+                                roomList = save ?: listOf(RoomInfo.defaultValue),
+                                indexSelectRoom = 0
+                            )
+                        )
+                    } else {
+                        Message.UpdateDisconnect(true)
+                    }
+                }
             }
         }
 
@@ -241,10 +251,11 @@ class MainFactory(
                             reboot(getState())
                         }
                         is Either.Error -> {
+                            val save = roomInfos.error.saveData
                             dispatch(
                                 Message.Load(
                                     isSuccess = false,
-                                    roomList = listOf(RoomInfo.defaultValue),
+                                    roomList = save ?: listOf(RoomInfo.defaultValue),
                                     indexSelectRoom = 0
                                 )
                             )

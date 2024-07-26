@@ -2,10 +2,13 @@ package band.effective.office.tablet.network.repository.impl
 
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
+import band.effective.office.tablet.domain.model.ErrorWithData
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.network.repository.LocalBookingRepository
+import band.effective.office.tablet.utils.map
 import band.effective.office.tablet.utils.removeSeconds
+import band.effective.office.tablet.utils.unbox
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,15 +16,20 @@ import kotlinx.coroutines.flow.update
 import java.util.GregorianCalendar
 
 class LocalEventStoreRepository : LocalBookingRepository {
-    private val buffer = MutableStateFlow<List<RoomInfo>>(
-        emptyList()
+    private val buffer = MutableStateFlow<Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>>(
+        Either.Error(
+            ErrorWithData(
+                error = ErrorResponse.getResponse(400),
+                saveData = emptyList()
+            )
+        )
     )
     val flow = buffer.asStateFlow()
 
-    override fun subscribeOnUpdates(): Flow<List<RoomInfo>> = flow
+    override fun subscribeOnUpdates(): Flow<Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>> = flow
 
-    override fun updateRoomsInfo(roomsInfo: List<RoomInfo>) {
-        buffer.update { roomsInfo }
+    override fun updateRoomsInfo(either: Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>>) {
+        buffer.update { either }
     }
 
     override suspend fun createBooking(
@@ -45,7 +53,9 @@ class LocalEventStoreRepository : LocalBookingRepository {
     }
 
     override suspend fun getBooking(eventInfo: EventInfo): Either<ErrorResponse, EventInfo> {
-        return buffer.value.firstNotNullOfOrNull {
+        return buffer.value.unbox(
+            errorHandler = { it.saveData }
+        )?.firstNotNullOfOrNull {
             it.eventList.firstOrNull { event -> event.id == eventInfo.id }
         }?.let { Either.Success(it) }
             ?: Either.Error(
@@ -70,21 +80,39 @@ class LocalEventStoreRepository : LocalBookingRepository {
     }
 
     private fun updateRoomInBuffer(roomName: String, action: (List<EventInfo>) -> List<EventInfo>) {
-        buffer.update { rooms ->
-            val roomIndex = rooms.indexOfFirst { room -> room.name == roomName }
-            if (roomIndex == -1) return
-            val mutableRooms = rooms.toMutableList()
-            val room = mutableRooms[roomIndex]
-            val newEvents = action(room.eventList)
-            mutableRooms[roomIndex] = room.copy(eventList = newEvents)
-            mutableRooms
+        buffer.update { either ->
+            either.map(
+                errorMapper = {
+                    val rooms = it.saveData?.updateRoom(roomName, action)
+                    it.copy(saveData = rooms)
+                              },
+                successMapper = { it.updateRoom(roomName, action) }
+            )
         }
     }
 
-    override suspend fun getRoomsInfo(): Either<ErrorResponse, List<RoomInfo>> {
-        return if (buffer.value.isEmpty())
-            Either.Error(ErrorResponse(404, "No rooms were loaded"))
-        else Either.Success(buffer.value.map { it.updateCurrentEvent() })
+    private fun List<RoomInfo>.updateRoom(
+        roomName: String,
+        action: (List<EventInfo>) -> (List<EventInfo>)
+    ): List<RoomInfo> {
+        val rooms = this
+        val roomIndex = rooms.indexOfFirst { room -> room.name == roomName }
+
+        if (roomIndex == -1) return rooms
+        val mutableRooms = rooms.toMutableList()
+        val room = mutableRooms[roomIndex]
+        val newEvents = action(room.eventList)
+        mutableRooms[roomIndex] = room.copy(eventList = newEvents)
+        return mutableRooms
+    }
+
+    override suspend fun getRoomsInfo(): Either<ErrorWithData<List<RoomInfo>>, List<RoomInfo>> {
+        return buffer.value.map(
+            errorMapper = { it.copy(saveData = it.saveData?.map {
+                room -> room.updateCurrentEvent() })
+                          },
+            successMapper =  { it.map { room -> room.updateCurrentEvent() }}
+        )
     }
 
     private fun RoomInfo.removePastEvents(): RoomInfo {

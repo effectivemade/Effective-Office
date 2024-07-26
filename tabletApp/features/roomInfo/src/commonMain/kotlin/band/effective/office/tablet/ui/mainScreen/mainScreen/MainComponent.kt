@@ -118,7 +118,7 @@ class MainComponent(
                 },
                 onCloseRequest = { closeModalWindow() },
                 onEventCreation = { eventInfo ->
-                    val res = this.componentContext.componentCoroutineScope().launch {
+                    this.componentContext.componentCoroutineScope().launch {
                         val roomName = modalWindows.room
                         val result = eventManager.createBooking(
                             eventInfo = eventInfo,

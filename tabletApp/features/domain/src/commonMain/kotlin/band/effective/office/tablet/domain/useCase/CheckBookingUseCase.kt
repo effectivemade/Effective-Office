@@ -1,6 +1,5 @@
 package band.effective.office.tablet.domain.useCase
 
-import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.utils.removeSeconds
@@ -26,8 +25,8 @@ class CheckBookingUseCase(
     }
 
     private suspend fun eventList(room: String): List<EventInfo> {
-        val roomInfo = roomInfoUseCase.getRoom(room) as? Either.Success
-        return roomInfo?.data?.getAllEvents() ?: emptyList()
+        val roomInfo = roomInfoUseCase.getRoom(room)
+        return roomInfo?.getAllEvents() ?: emptyList()
     }
 
     /**

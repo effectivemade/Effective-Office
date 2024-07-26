@@ -2,7 +2,6 @@ package band.effective.office.tablet.ui.mainScreen.slotComponent.store
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.OfficeTime
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.Organizer
@@ -54,39 +53,38 @@ class SlotStoreFactory(
     private fun bootstrapper() = coroutineBootstrapper {
         updateTimer.init(this, 15.minutes) {
             withContext(Dispatchers.Main) {
-                (roomInfoUseCase.getRoom(roomName()) as? Either.Success)?.let {
-                    dispatch(Action.UpdateSlots(getUiSlots(it.data)))
+                roomInfoUseCase.getRoom(roomName())?.let {
+                    dispatch(Action.UpdateSlots(getUiSlots(it)))
                 }
             }
         }
         launch {
-            val room = roomInfoUseCase.getRoom(roomName()) as? Either.Success
-            room?.let {
+            roomInfoUseCase.getRoom(roomName())?.let {
                 dispatch(
                     Action.UpdateSlots(
-                        getUiSlots(it.data)
+                        getUiSlots(it)
                     )
                 )
             }
         }
         launch(Dispatchers.IO) {
-            roomInfoUseCase.subscribe().collect { roomInfos ->
-                if (roomInfos.isNotEmpty()) {
-                    val roomInfo = roomInfos.firstOrNull{ it.name == roomName() } ?: return@collect
+            roomInfoUseCase.subscribe().collect { roomsInfo ->
+                    val roomInfo = roomsInfo.firstOrNull { it.name == roomName() }
+                        ?: return@collect
+
                     withContext(Dispatchers.Main) {
                         dispatch(Action.UpdateSlots(getUiSlots(roomInfo)))
                     }
                 }
-            }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun getUiSlots(
-        either: RoomInfo,
+        roomInfo: RoomInfo,
         start: Calendar = GregorianCalendar(),
         finish: Calendar = OfficeTime.finishWorkTime(start.clone() as Calendar),
-    ) = getSlots(either, start, finish).map {
+    ) = getSlots(roomInfo, start, finish).map {
         when (it) {
             is Slot.EmptySlot -> SlotUi.SimpleSlot(it)
             is Slot.EventSlot -> SlotUi.SimpleSlot(it)
@@ -146,11 +144,11 @@ class SlotStoreFactory(
                 }
 
                 is SlotStore.Intent.UpdateDate -> scope.launch {
-                    (roomInfoUseCase.getRoom(room = roomName()) as? Either.Success)?.let {
+                    roomInfoUseCase.getRoom(room = roomName())?.let {
                         dispatch(
                             message = Message.UpdateSlots(
                                 slots = getUiSlots(
-                                    either = it.data,
+                                    roomInfo = it,
                                     start = maxOf(
                                         OfficeTime.startWorkTime(intent.newDate),
                                         GregorianCalendar()
@@ -241,10 +239,10 @@ class SlotStoreFactory(
                         roomInfoUseCase.updateCache()
                     }
                 }
-                (roomInfoUseCase.getRoom(roomName) as? Either.Success)?.let {
+                roomInfoUseCase.getRoom(roomName)?.let {
                     dispatch(
                         Message.UpdateSlots(
-                            getUiSlots(it.data)
+                            getUiSlots(it)
                         )
                     )
                 }
