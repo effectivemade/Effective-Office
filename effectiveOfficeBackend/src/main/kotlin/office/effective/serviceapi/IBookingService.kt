@@ -40,6 +40,8 @@ interface IBookingService {
      * @param returnInstances return recurring bookings as non-recurrent instances
      * @param bookingRangeTo upper bound (exclusive) for a beginBooking to filter by. Optional.
      * @param bookingRangeFrom lower bound (exclusive) for a endBooking to filter by.
+     * @param shouldFindIntegrationsAndUtilities whether function should find all
+     * workspace utilities and user integrations or not
      * @throws InstanceNotFoundException if [UserModel] or [Workspace] with the given id doesn't exist in database
      */
     fun findAll(
@@ -47,7 +49,8 @@ interface IBookingService {
         workspaceId: UUID? = null,
         returnInstances: Boolean = true,
         bookingRangeTo: Long? = null,
-        bookingRangeFrom: Long
+        bookingRangeFrom: Long,
+        shouldFindIntegrationsAndUtilities: Boolean = true
     ): List<Booking>
 
     /**

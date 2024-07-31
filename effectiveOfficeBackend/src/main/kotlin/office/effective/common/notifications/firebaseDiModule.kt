@@ -4,6 +4,8 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
+import office.effective.features.calendar.repository.CalendarIdsRepository
+import office.effective.serviceapi.IBookingService
 import org.koin.dsl.module
 import java.io.ByteArrayInputStream
 
@@ -20,7 +22,11 @@ val firebaseDiModule  = module(createdAtStart = true) {
     single<FirebaseMessaging> {
         FirebaseMessaging.getInstance(get<FirebaseApp>())
     }
+    single { FcmWorkspaceWithBookingsDTOModelConverter() }
     single<INotificationSender> {
-        FcmNotificationSender(get<FirebaseMessaging>())
+        FcmNotificationSender(
+            get<FirebaseMessaging>(), get<CalendarIdsRepository>(),
+            get<IBookingService>(), get<FcmWorkspaceWithBookingsDTOModelConverter>()
+        )
     }
 }
