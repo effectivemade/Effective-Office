@@ -1,18 +1,22 @@
 package band.effective.office.tv.domain.use_cases
 
 import band.effective.office.tv.core.network.entity.Either
+import band.effective.office.tv.domain.model.clockify.ClockifyUser
 import band.effective.office.tv.domain.model.duolingo.DuolingoUser
 import band.effective.office.tv.domain.model.message.MessageQueue
 import band.effective.office.tv.domain.model.notion.EmployeeInfoEntity
 import band.effective.office.tv.domain.model.notion.EmploymentType
 import band.effective.office.tv.domain.model.notion.processEmployeeInfo
+import band.effective.office.tv.repository.clockify.ClockifyRepository
 import band.effective.office.tv.repository.duolingo.DuolingoRepository
 import band.effective.office.tv.repository.workTogether.Teammate
 import band.effective.office.tv.repository.workTogether.WorkTogether
+import band.effective.office.tv.screen.sport.model.toUi
 import band.effective.office.tv.screen.duolingo.model.toUI
 import band.effective.office.tv.screen.eventStory.KeySortDuolingoUser
 import band.effective.office.tv.screen.eventStory.models.DuolingoUserInfo
 import band.effective.office.tv.screen.eventStory.models.MessageInfo
+import band.effective.office.tv.screen.eventStory.models.SportUserInfo
 import band.effective.office.tv.screen.eventStory.models.StoryModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -23,6 +27,7 @@ import kotlinx.coroutines.flow.flow as flow
 // this use case combine data from many data sources for EvenStory screen
 class EventStoryDataCombinerUseCase @Inject constructor(
     private val duolingoRepository: DuolingoRepository,
+    private val clockifyRepository: ClockifyRepository,
     private val workTogether: WorkTogether
 ) {
     private val countShowUsers = 10
@@ -62,8 +67,11 @@ class EventStoryDataCombinerUseCase @Inject constructor(
     }
 
     suspend fun getAllDataForStories() =
-        getNotionDataForStories()
-            .combine(duolingoRepository.getUsers()) { employeeInfoEntities: Either<String, List<EmployeeInfoEntity>>, usersDuolingo: Either<String, List<DuolingoUser>> ->
+            combine(
+                getNotionDataForStories(),
+                duolingoRepository.getUsers(),
+                clockifyRepository.getTimeEntries()
+                ) { employeeInfoEntities, usersDuolingo, clockifyUsers ->
                 var error = ""
                 val duolingoInfo = when (usersDuolingo) {
                     is Either.Success -> {
@@ -84,39 +92,54 @@ class EventStoryDataCombinerUseCase @Inject constructor(
                         emptyList()
                     }
                 }
+
+                val clockifyInfo = when (clockifyUsers) {
+                    is Either.Success -> {
+                        setClockifyDataForScreens(clockifyUsers.data)
+                    }
+                    is Either.Failure -> {
+                        error = clockifyUsers.error
+                        emptyList()
+                    }
+                }
+
                 val messagesFromMattermost = MessageQueue.secondQueue.toListOfEmployeeInfo()
 
-                if (notionInfo.isEmpty() && duolingoInfo.isEmpty()) return@combine Either.Failure(
+                if (notionInfo.isEmpty() && duolingoInfo.isEmpty() && clockifyInfo.isEmpty()) return@combine Either.Failure(
                     error
                 )
-                else Either.Success(notionInfo + duolingoInfo + messagesFromMattermost)
+                else Either.Success(notionInfo + duolingoInfo + clockifyInfo + messagesFromMattermost)
             }
 
     private fun MessageQueue.toListOfEmployeeInfo(): List<MessageInfo> =
         this.queue.value.queue.map { MessageInfo(it) }
 
-    private fun List<DuolingoUser>.subListForScreen() =
+    private fun<T> List<T>.subListForScreen() =
         subList(
             fromIndex = 0,
             toIndex = if (size <= countShowUsers) size else countShowUsers + 1
         )
-            .toUI()
 
     private fun setDuolingoDataForScreens(duolingoUsers: List<DuolingoUser>) =
         run {
             val userXpSort = DuolingoUserInfo(
                 users = duolingoUsers
                     .sortedByDescending { it.totalXp }
-                    .subListForScreen(),
+                    .subListForScreen().toUI(),
                 keySort = KeySortDuolingoUser.Xp
             ) as StoryModel
             val userStreakSort = DuolingoUserInfo(
                 users = duolingoUsers
                     .sortedByDescending { it.streakDay }
-                    .subListForScreen()
+                    .subListForScreen().toUI()
                     .filter { it.streakDay != 0 },
                 keySort = KeySortDuolingoUser.Streak
             ) as StoryModel
             listOf(userXpSort, userStreakSort)
         }
+
+    private fun setClockifyDataForScreens(clockifyUsers: List<ClockifyUser>) =
+        listOf(SportUserInfo(
+            users = clockifyUsers.subListForScreen().toUi()
+        ) as StoryModel)
 }

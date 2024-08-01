@@ -5,6 +5,8 @@ import band.effective.office.tv.BuildConfig
 import band.effective.office.tv.core.network.*
 import band.effective.office.tv.core.network.UnsafeOkHttpClient
 import band.effective.office.tv.network.*
+import band.effective.office.tv.network.clockify.ApiKeyInterceptor
+import band.effective.office.tv.network.clockify.ClockifyApi
 import band.effective.office.tv.network.duolingo.DuolingoApi
 import band.effective.office.tv.network.leader.LeaderApi
 import band.effective.office.tv.network.mattermost.MattermostApi
@@ -64,6 +66,11 @@ class NetworkModule {
 
     @Singleton
     @Provides
+    @ClockifyClient
+    fun provideApiKeyInterceptor(): ApiKeyInterceptor = ApiKeyInterceptor(BuildConfig.clockifyApiKey)
+
+    @Singleton
+    @Provides
     @MattermostClient
     fun provideMattermostOkHttpClient(@MattermostClient authInterceptor: AuthInterceptor) =
         OkHttpClient.Builder()
@@ -73,6 +80,18 @@ class NetworkModule {
                     .apply {
                         level = HttpLoggingInterceptor.Level.BODY
                     })
+            .build()
+
+    @Singleton
+    @Provides
+    @ClockifyClient
+    fun provideClockifyOkHttpClient(@ClockifyClient apiKeyInterceptor: ApiKeyInterceptor) =
+        OkHttpClient.Builder()
+            .addInterceptor(apiKeyInterceptor)
+            .addInterceptor(HttpLoggingInterceptor()
+                .apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                })
             .build()
 
     @Singleton
@@ -120,6 +139,12 @@ class NetworkModule {
     @DualingoRetrofitClient
     fun provideEitherDuolingoAdapterFactory(): CallAdapter.Factory =
         EitherDuolingoAdapterFactory()
+
+    @Singleton
+    @Provides
+    @ClockifyClient
+    fun provideEitherClockifyAdapterFactory(): Factory =
+        EitherClockifyAdapterFactory()
 
     @Singleton
     @Provides
@@ -174,6 +199,22 @@ class NetworkModule {
 
     @Singleton
     @Provides
+    @ClockifyClient
+    fun provideClockifyRetrofit(
+        moshiConverterFactory: MoshiConverterFactory,
+        @ClockifyClient client: OkHttpClient,
+        @ClockifyClient callAdapter: Factory
+    ): Retrofit =
+        Retrofit.Builder()
+            .addConverterFactory(moshiConverterFactory)
+            .addCallAdapterFactory(callAdapter)
+            .client(client)
+            .baseUrl(BuildConfig.clockifyUrl)
+            .build()
+
+
+    @Singleton
+    @Provides
     fun provideLeaderApi(@LeaderIdRetrofitClient retrofit: Retrofit): LeaderApi =
         retrofit.create()
 
@@ -218,4 +259,9 @@ class NetworkModule {
     @Provides
     fun provideWorkTogether(notionClient: NotionClient): WorkTogether =
         WorkTogetherImpl(notionClient)
+
+    @Singleton
+    @Provides
+    fun provideClockifyApi(@ClockifyClient retrofit: Retrofit) =
+        retrofit.create(ClockifyApi::class.java)
 }
