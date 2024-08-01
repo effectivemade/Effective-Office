@@ -17,6 +17,7 @@ fun GregorianCalendar.fullDay(): GregorianCalendar {
     val result = this
     result.set(Calendar.HOUR, 23)
     result.set(Calendar.MINUTE, 59)
+    result.set(Calendar.SECOND, 59)
     return result
 }
 
@@ -30,3 +31,7 @@ fun Calendar.isSameDay(other: Calendar): Boolean =
     get(Calendar.YEAR) == other.get(Calendar.YEAR)
             && get(Calendar.MONTH) == other.get(Calendar.MONTH)
             && get(Calendar.DAY_OF_MONTH) == other.get(Calendar.DAY_OF_MONTH)
+
+fun GregorianCalendar.setLastDayOfMonth() = apply {
+    set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+}

@@ -8,14 +8,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import band.effective.office.tv.screen.sport.ClockifyScreen
 import band.effective.office.tv.screen.duolingo.DuolingoScreen
 import band.effective.office.tv.screen.eventStory.models.DuolingoUserInfo
 import band.effective.office.tv.screen.eventStory.models.EmployeeInfoUI
 import band.effective.office.tv.screen.eventStory.models.MessageInfo
+import band.effective.office.tv.screen.eventStory.models.SportUserInfo
 import band.effective.office.tv.screen.eventStory.models.StoryModel
 import band.effective.office.tv.screen.eventStory.models.StoryType
 import band.effective.office.tv.screen.message.component.OneMessageScreen
+import band.effective.office.tv.ui.theme.EffectiveColor
 import band.effective.office.tv.ui.theme.IndependentColors
 import coil.ImageLoader
 
@@ -30,7 +34,11 @@ fun EventStoryScreenContent(
     onImageLoaded: () -> Unit,
 ) {
     Surface(
-        modifier = modifier, color = IndependentColors.StoryBackgroundGray
+        modifier = modifier,
+        color = when(eventsInfo[currentStoryIndex].storyType) {
+            StoryType.Sport -> EffectiveColor.backgroundSportColor
+            else -> Color.White
+        }
     ) {
         Column {
             StoryIndicator(
@@ -65,6 +73,13 @@ fun EventStoryScreenContent(
                         modifier = modifier,
                         imageLoader = imageLoader,
                         message = messageItem.message
+                    )
+                }
+
+                StoryType.Sport -> {
+                    val sportItem = eventsInfo[currentStoryIndex] as SportUserInfo
+                    ClockifyScreen(
+                        sportUsers = sportItem.users
                     )
                 }
             }
