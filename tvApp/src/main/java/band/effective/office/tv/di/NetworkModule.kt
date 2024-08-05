@@ -7,10 +7,14 @@ import band.effective.office.tv.core.network.UnsafeOkHttpClient
 import band.effective.office.tv.network.*
 import band.effective.office.tv.network.clockify.ApiKeyInterceptor
 import band.effective.office.tv.network.clockify.ClockifyApi
+import band.effective.office.tv.network.clockify.models.error.ClockifyApiError
 import band.effective.office.tv.network.duolingo.DuolingoApi
 import band.effective.office.tv.network.leader.LeaderApi
+import band.effective.office.tv.network.leader.models.errorNetwork.ErrorNetworkResponse
 import band.effective.office.tv.network.mattermost.MattermostApi
+import band.effective.office.tv.network.mattermost.model.MattermostErrorResponse
 import band.effective.office.tv.network.synology.SynologyApi
+import band.effective.office.tv.network.synology.models.error.SynologyApiError
 import band.effective.office.tv.network.uselessFact.UselessFactApi
 import band.effective.office.tv.repository.workTogether.WorkTogether
 import band.effective.office.tv.repository.workTogether.WorkTogetherImpl
@@ -29,8 +33,6 @@ import kotlinx.coroutines.SupervisorJob
 import notion.api.v1.NotionClient
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.CallAdapter
-import retrofit2.CallAdapter.Factory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
@@ -72,7 +74,7 @@ class NetworkModule {
     @Singleton
     @Provides
     @MattermostClient
-    fun provideMattermostOkHttpClient(@MattermostClient authInterceptor: AuthInterceptor) =
+    fun provideMattermostOkHttpClient() =
         OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(BuildConfig.mattermostBotToken))
             .addInterceptor(
@@ -97,18 +99,12 @@ class NetworkModule {
     @Singleton
     @Provides
     @LeaderIdRetrofitClient
-    fun provideEitherAdapterFactory(): EitherLeaderIdAdapterFactory = EitherLeaderIdAdapterFactory()
-
-    @Singleton
-    @Provides
-    @LeaderIdRetrofitClient
     fun provideLeaderIdRetrofit(
         moshiConverterFactory: MoshiConverterFactory,
-        client: OkHttpClient,
-        eitherLeaderIdAdapterFactory: EitherLeaderIdAdapterFactory
+        client: OkHttpClient
     ): Retrofit =
         Retrofit.Builder().addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(eitherLeaderIdAdapterFactory).client(client)
+            .addCallAdapterFactory(EitherCallAdapterFactory(ErrorNetworkResponse::class.java)).client(client)
             .baseUrl(BuildConfig.apiLeaderUrl).build()
 
     @Singleton
@@ -117,10 +113,9 @@ class NetworkModule {
     fun provideUselessFactRetrofit(
         moshiConverterFactory: MoshiConverterFactory,
         client: OkHttpClient,
-        eitherLeaderIdAdapterFactory: EitherLeaderIdAdapterFactory
     ): Retrofit =
         Retrofit.Builder().addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(eitherLeaderIdAdapterFactory).client(client)
+            .addCallAdapterFactory(EitherCallAdapterFactory(ErrorNetworkResponse::class.java)).client(client)
             .baseUrl(BuildConfig.uselessFactsApi).build()
 
     @Singleton
@@ -131,38 +126,13 @@ class NetworkModule {
     @Singleton
     @Provides
     @SynologyRetrofitClient
-    fun provideEitherSynologyAdapterFactory(): CallAdapter.Factory =
-        EitherSynologyAdapterFactory()
-
-    @Singleton
-    @Provides
-    @DualingoRetrofitClient
-    fun provideEitherDuolingoAdapterFactory(): CallAdapter.Factory =
-        EitherDuolingoAdapterFactory()
-
-    @Singleton
-    @Provides
-    @ClockifyClient
-    fun provideEitherClockifyAdapterFactory(): Factory =
-        EitherClockifyAdapterFactory()
-
-    @Singleton
-    @Provides
-    @MattermostClient
-    fun provideEitherMattermostAdapterFactory(): CallAdapter.Factory =
-        EitherMattermostAdapterFactory()
-
-    @Singleton
-    @Provides
-    @SynologyRetrofitClient
     fun provideSynologyRetrofit(
         moshiConverterFactory: MoshiConverterFactory,
         @band.effective.office.tv.network.UnsafeOkHttpClient client: OkHttpClient,
-        @DualingoRetrofitClient callAdapter: CallAdapter.Factory
     ): Retrofit =
         Retrofit.Builder()
             .addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(callAdapter)
+            .addCallAdapterFactory(EitherCallAdapterFactory(SynologyApiError::class.java))
             .client(client)
             .baseUrl(BuildConfig.apiSynologyUrl)
             .build()
@@ -173,11 +143,12 @@ class NetworkModule {
     fun provideMattermostRetrofit(
         moshiConverterFactory: MoshiConverterFactory,
         @MattermostClient client: OkHttpClient,
-        @MattermostClient callAdapter: Factory
     ): Retrofit =
         Retrofit.Builder()
             .addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(callAdapter)
+            .addCallAdapterFactory(
+                EitherCallAdapterFactory(MattermostErrorResponse::class.java)
+            )
             .client(client)
             .baseUrl("https://${BuildConfig.apiMattermostUrl}")
             .build()
@@ -188,11 +159,10 @@ class NetworkModule {
     fun provideDuolingoRetrofit(
         moshiConverterFactory: MoshiConverterFactory,
         client: OkHttpClient,
-        @DualingoRetrofitClient callAdapter: CallAdapter.Factory
     ): Retrofit =
         Retrofit.Builder()
             .addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(callAdapter)
+            .addCallAdapterFactory(EitherCallAdapterFactory(SynologyApiError::class.java))
             .client(client)
             .baseUrl(BuildConfig.duolingoUrl)
             .build()
@@ -203,11 +173,12 @@ class NetworkModule {
     fun provideClockifyRetrofit(
         moshiConverterFactory: MoshiConverterFactory,
         @ClockifyClient client: OkHttpClient,
-        @ClockifyClient callAdapter: Factory
     ): Retrofit =
         Retrofit.Builder()
             .addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(callAdapter)
+            .addCallAdapterFactory(
+                EitherCallAdapterFactory(ClockifyApiError::class.java)
+            )
             .client(client)
             .baseUrl(BuildConfig.clockifyUrl)
             .build()

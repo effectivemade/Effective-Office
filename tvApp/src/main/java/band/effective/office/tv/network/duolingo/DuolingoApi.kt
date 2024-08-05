@@ -1,7 +1,7 @@
 package band.effective.office.tv.network.duolingo
 
-import band.effective.office.tv.core.network.entity.Either
-import band.effective.office.tv.core.network.entity.ErrorReason
+import band.effective.office.tv.core.network.Either
+import band.effective.office.tv.core.network.ErrorReason
 import band.effective.office.tv.network.duolingo.models.DuolingoResponse
 import retrofit2.http.GET
 import retrofit2.http.Headers
