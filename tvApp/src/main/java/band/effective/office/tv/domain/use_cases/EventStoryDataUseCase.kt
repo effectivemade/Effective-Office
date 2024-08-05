@@ -1,6 +1,6 @@
 package band.effective.office.tv.domain.use_cases
 
-import band.effective.office.tv.core.network.entity.Either
+import band.effective.office.tv.core.network.Either
 import band.effective.office.tv.domain.model.clockify.ClockifyUser
 import band.effective.office.tv.domain.model.duolingo.DuolingoUser
 import band.effective.office.tv.domain.model.message.MessageQueue

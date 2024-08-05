@@ -1,7 +1,7 @@
 package band.effective.office.tv.repository.clockify.impl
 
 import band.effective.office.tv.BuildConfig
-import band.effective.office.tv.core.network.entity.Either
+import band.effective.office.tv.core.network.Either
 import band.effective.office.tv.domain.model.clockify.ClockifyUser
 import band.effective.office.tv.domain.model.clockify.toDomainList
 import band.effective.office.tv.network.clockify.ClockifyApi
