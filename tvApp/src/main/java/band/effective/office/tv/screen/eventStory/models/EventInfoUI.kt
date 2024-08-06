@@ -44,7 +44,7 @@ data class DuolingoUserInfo(
 ): StoryModel(StoryType.Duolingo)
 
 data class SportUserInfo(
-    val users: List<SportUserUi>
+    val users: List<List<SportUserUi>>
 ) : StoryModel(StoryType.Sport)
 
 data class MessageInfo(

@@ -8,5 +8,4 @@ import com.squareup.moshi.JsonClass
 data class ClockifyResponse(
     @Json(name = "timeentries")
     val timeEntries: List<TimeEntry>,
-    val totals: List<Total>
 )

@@ -1,7 +1,7 @@
 package band.effective.office.tv.domain.use_cases
 
-import band.effective.office.tv.core.network.entity.Either
-import band.effective.office.tv.core.network.entity.map
+import band.effective.office.tv.core.network.Either
+import band.effective.office.tv.core.network.map
 import band.effective.office.tv.domain.model.synology.PhotoDomain
 import band.effective.office.tv.repository.synology.PhotoSynologyRepository
 import kotlinx.coroutines.flow.Flow

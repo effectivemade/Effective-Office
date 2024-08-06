@@ -52,16 +52,16 @@ fun SportItem(
                     error = painterResource(id = R.drawable.sport_logo)
                 )
                 Spacer(modifier = Modifier.width(15.dp))
-                    Text(
-                        modifier = Modifier.width(190.dp),
-                        text = user.name,
-                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = EffectiveColor.fontEventStoryColor,
-                        textAlign = TextAlign.Start,
-                        maxLines = 1
-                    )
+                Text(
+                    modifier = Modifier.width(190.dp),
+                    text = user.name,
+                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = EffectiveColor.fontEventStoryColor,
+                    textAlign = TextAlign.Start,
+                    maxLines = 1
+                )
             }
             Text(
                 text = "${user.totalTime.secondsToHours()} " + getCorrectDeclension(

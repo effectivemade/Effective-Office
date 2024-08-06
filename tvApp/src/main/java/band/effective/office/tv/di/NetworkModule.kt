@@ -64,16 +64,6 @@ class NetworkModule {
     @Singleton
     @Provides
     @MattermostClient
-    fun provideAuthInterceptor(): AuthInterceptor = AuthInterceptor(BuildConfig.mattermostBotToken)
-
-    @Singleton
-    @Provides
-    @ClockifyClient
-    fun provideApiKeyInterceptor(): ApiKeyInterceptor = ApiKeyInterceptor(BuildConfig.clockifyApiKey)
-
-    @Singleton
-    @Provides
-    @MattermostClient
     fun provideMattermostOkHttpClient() =
         OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(BuildConfig.mattermostBotToken))
@@ -87,9 +77,9 @@ class NetworkModule {
     @Singleton
     @Provides
     @ClockifyClient
-    fun provideClockifyOkHttpClient(@ClockifyClient apiKeyInterceptor: ApiKeyInterceptor) =
+    fun provideClockifyOkHttpClient() =
         OkHttpClient.Builder()
-            .addInterceptor(apiKeyInterceptor)
+            .addInterceptor(ApiKeyInterceptor(BuildConfig.clockifyApiKey))
             .addInterceptor(HttpLoggingInterceptor()
                 .apply {
                     level = HttpLoggingInterceptor.Level.BODY
@@ -98,52 +88,41 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    @LeaderIdRetrofitClient
-    fun provideLeaderIdRetrofit(
-        moshiConverterFactory: MoshiConverterFactory,
-        client: OkHttpClient
-    ): Retrofit =
-        Retrofit.Builder().addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(EitherCallAdapterFactory(ErrorNetworkResponse::class.java)).client(client)
-            .baseUrl(BuildConfig.apiLeaderUrl).build()
-
-    @Singleton
-    @Provides
-    @UselessFactClient
-    fun provideUselessFactRetrofit(
-        moshiConverterFactory: MoshiConverterFactory,
-        client: OkHttpClient,
-    ): Retrofit =
-        Retrofit.Builder().addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(EitherCallAdapterFactory(ErrorNetworkResponse::class.java)).client(client)
-            .baseUrl(BuildConfig.uselessFactsApi).build()
-
-    @Singleton
-    @Provides
     fun provideMoshiConverterFactory(moshi: Moshi): MoshiConverterFactory =
         MoshiConverterFactory.create(moshi).asLenient()
 
     @Singleton
     @Provides
-    @SynologyRetrofitClient
-    fun provideSynologyRetrofit(
+    fun provideLeaderApi(
+        moshiConverterFactory: MoshiConverterFactory,
+        client: OkHttpClient
+    ): LeaderApi = Retrofit.Builder()
+            .addConverterFactory(moshiConverterFactory)
+            .addCallAdapterFactory(EitherCallAdapterFactory(ErrorNetworkResponse::class.java))
+            .client(client)
+            .baseUrl(BuildConfig.apiLeaderUrl)
+            .build()
+            .create()
+
+    @Singleton
+    @Provides
+    fun provideApiSynology(
         moshiConverterFactory: MoshiConverterFactory,
         @band.effective.office.tv.network.UnsafeOkHttpClient client: OkHttpClient,
-    ): Retrofit =
-        Retrofit.Builder()
+    ) = Retrofit.Builder()
             .addConverterFactory(moshiConverterFactory)
             .addCallAdapterFactory(EitherCallAdapterFactory(SynologyApiError::class.java))
             .client(client)
             .baseUrl(BuildConfig.apiSynologyUrl)
             .build()
+            .create(SynologyApi::class.java)
 
     @Singleton
     @Provides
-    @MattermostClient
-    fun provideMattermostRetrofit(
+    fun provideApiMattermost(
         moshiConverterFactory: MoshiConverterFactory,
         @MattermostClient client: OkHttpClient,
-    ): Retrofit =
+    ): MattermostApi =
         Retrofit.Builder()
             .addConverterFactory(moshiConverterFactory)
             .addCallAdapterFactory(
@@ -152,62 +131,32 @@ class NetworkModule {
             .client(client)
             .baseUrl("https://${BuildConfig.apiMattermostUrl}")
             .build()
+            .create()
 
     @Singleton
     @Provides
-    @DualingoRetrofitClient
-    fun provideDuolingoRetrofit(
+    fun provideUselessFactApi(
+        moshiConverterFactory: MoshiConverterFactory,
+        @UselessFactClient client: OkHttpClient,
+    ): UselessFactApi =
+        Retrofit.Builder()
+            .addConverterFactory(moshiConverterFactory)
+            .addCallAdapterFactory(EitherCallAdapterFactory(ErrorNetworkResponse::class.java))
+            .client(client)
+            .baseUrl(BuildConfig.uselessFactsApi).build().create()
+
+    @Singleton
+    @Provides
+    fun provideApiDuolingo(
         moshiConverterFactory: MoshiConverterFactory,
         client: OkHttpClient,
-    ): Retrofit =
-        Retrofit.Builder()
+    ) = Retrofit.Builder()
             .addConverterFactory(moshiConverterFactory)
             .addCallAdapterFactory(EitherCallAdapterFactory(SynologyApiError::class.java))
             .client(client)
             .baseUrl(BuildConfig.duolingoUrl)
             .build()
-
-    @Singleton
-    @Provides
-    @ClockifyClient
-    fun provideClockifyRetrofit(
-        moshiConverterFactory: MoshiConverterFactory,
-        @ClockifyClient client: OkHttpClient,
-    ): Retrofit =
-        Retrofit.Builder()
-            .addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(
-                EitherCallAdapterFactory(ClockifyApiError::class.java)
-            )
-            .client(client)
-            .baseUrl(BuildConfig.clockifyUrl)
-            .build()
-
-
-    @Singleton
-    @Provides
-    fun provideLeaderApi(@LeaderIdRetrofitClient retrofit: Retrofit): LeaderApi =
-        retrofit.create()
-
-    @Singleton
-    @Provides
-    fun provideApiSynology(@SynologyRetrofitClient retrofit: Retrofit) =
-        retrofit.create(SynologyApi::class.java)
-
-    @Singleton
-    @Provides
-    fun provideApiMattermost(@MattermostClient retrofit: Retrofit): MattermostApi =
-        retrofit.create()
-
-    @Singleton
-    @Provides
-    fun provideUselessFactApi(@UselessFactClient retrofit: Retrofit): UselessFactApi =
-        retrofit.create()
-
-    @Singleton
-    @Provides
-    fun provideApiDuolingo(@DualingoRetrofitClient retrofit: Retrofit) =
-        retrofit.create(DuolingoApi::class.java)
+            .create(DuolingoApi::class.java)
 
     @Singleton
     @Provides
@@ -233,6 +182,16 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideClockifyApi(@ClockifyClient retrofit: Retrofit) =
-        retrofit.create(ClockifyApi::class.java)
+    fun provideClockifyApi(
+        moshiConverterFactory: MoshiConverterFactory,
+        @ClockifyClient client: OkHttpClient
+    ) = Retrofit.Builder()
+            .addConverterFactory(moshiConverterFactory)
+            .addCallAdapterFactory(
+                EitherCallAdapterFactory(ClockifyApiError::class.java)
+            )
+            .client(client)
+            .baseUrl(BuildConfig.clockifyUrl)
+            .build()
+            .create(ClockifyApi::class.java)
 }

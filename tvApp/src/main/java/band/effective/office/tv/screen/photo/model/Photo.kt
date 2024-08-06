@@ -1,6 +1,6 @@
 package band.effective.office.tv.screen.photo.model
 
-import band.effective.office.tv.core.network.entity.Either
+import band.effective.office.tv.core.network.Either
 import band.effective.office.tv.domain.model.synology.PhotoDomain
 
 data class Photo(
