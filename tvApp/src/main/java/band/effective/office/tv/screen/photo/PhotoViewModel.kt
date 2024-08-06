@@ -2,7 +2,7 @@ package band.effective.office.tv.screen.photo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import band.effective.office.tv.core.network.entity.Either
+import band.effective.office.tv.core.network.Either
 import band.effective.office.tv.core.ui.screen_with_controls.TimerSlideShow
 import band.effective.office.tv.network.UnsafeOkHttpClient
 import band.effective.office.tv.repository.synology.SynologyRepository

@@ -16,3 +16,13 @@ fun ClockifyUser.toUi() =
     )
 
 fun List<ClockifyUser>.toUi() = map { it.toUi() }
+
+fun List<SportUserUi>.toColumns(countShowUsers: Int): List<List<SportUserUi>> =
+    when (this.size) {
+        in 6..countShowUsers -> listOf(
+            this.subList(0, 5),
+            this.subList(5, this.size)
+        )
+
+        else -> listOf(this)
+    }

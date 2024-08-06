@@ -17,13 +17,13 @@ import band.effective.office.tv.ui.theme.EffectiveColor
 
 @Composable
 fun ClockifyScreen(
-    sportUsers: List<SportUserUi>
+    sportUsers: List<List<SportUserUi>>
 ) {
     Box(
         modifier = Modifier
             .background(EffectiveColor.backgroundSportColor)
             .fillMaxSize()
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -31,7 +31,7 @@ fun ClockifyScreen(
         ) {
             SportTitle()
             Spacer(modifier = Modifier.height(40.dp))
-            TopSportUsers(users = sportUsers.sortedByDescending { it.totalTime })
+            TopSportUsers(users = sportUsers)
         }
     }
 }

@@ -24,4 +24,5 @@ object EffectiveColor{
     val fontEventStoryColor = Color(0xFFE6E3E2)
     val orange = Color(0xFFFE7B1C)
     val purple = Color(0xFF5800CB)
+    val white = Color(0xFFFFFFFF)
 }

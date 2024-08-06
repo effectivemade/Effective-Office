@@ -1,9 +1,9 @@
 package band.effective.office.tv.repository.synology.impl
 
 import band.effective.office.tv.BuildConfig
-import band.effective.office.tv.core.network.entity.Either
-import band.effective.office.tv.core.network.entity.ErrorReason
-import band.effective.office.tv.core.network.entity.unpack
+import band.effective.office.tv.core.network.Either
+import band.effective.office.tv.core.network.ErrorReason
+import band.effective.office.tv.core.network.unpack
 import band.effective.office.tv.network.synology.SynologyApi
 import band.effective.office.tv.network.synology.models.AuthModel
 import band.effective.office.tv.network.synology.models.response.SynologyAuthResponse

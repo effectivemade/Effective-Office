@@ -16,7 +16,7 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
-class EitherCallAdapterFactory<E : Any> @Inject constructor(
+class EitherCallAdapterFactory<E> @Inject constructor(
     private val errorType: Class<E>
 ) : CallAdapter.Factory() {
 
@@ -54,7 +54,7 @@ class EitherCallAdapterFactory<E : Any> @Inject constructor(
         )
     }
 
-    private class ResultCallAdapter<R, T, E : Any>(
+    private class ResultCallAdapter<R, T, E>(
         private val resultType: Type,
         private val errorBodyConverter: Converter<ResponseBody, E>
     ) : CallAdapter<R, Call<Either<ErrorReason, T>>> {
@@ -68,7 +68,7 @@ class EitherCallAdapterFactory<E : Any> @Inject constructor(
         override fun responseType() = resultType
     }
 
-    private class ResultCallWrapper<F, T, E : Any>(
+    private class ResultCallWrapper<F, T, E>(
         private val delegate: Call<T>,
         private val errorBodyConverter: Converter<ResponseBody, E>
     ) : Call<Either<ErrorReason, F>> {

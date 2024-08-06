@@ -1,7 +1,7 @@
 package band.effective.office.tv.network.synology
 
-import band.effective.office.tv.core.network.entity.Either
-import band.effective.office.tv.core.network.entity.ErrorReason
+import band.effective.office.tv.core.network.Either
+import band.effective.office.tv.core.network.ErrorReason
 import band.effective.office.tv.network.synology.models.response.SynologyAlbumsResponse
 import band.effective.office.tv.network.synology.models.response.SynologyAuthResponse
 import band.effective.office.tv.network.synology.models.response.SynologyListResponse
