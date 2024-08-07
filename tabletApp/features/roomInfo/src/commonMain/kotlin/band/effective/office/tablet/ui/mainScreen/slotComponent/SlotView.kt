@@ -139,7 +139,12 @@ private fun DeletedSlotView(
 ) {
     Box(modifier = modifier.height(IntrinsicSize.Min).width(IntrinsicSize.Min)) {
         var isCancelability by remember { mutableStateOf(true) }
-        CommonSlotView(modifier = Modifier.padding(paddingValues), slotUi = slotUi) {
+        CommonSlotView(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxWidth(),
+            slotUi = slotUi
+        ) {
             if (isCancelability) {
                 Text(
                     modifier = Modifier.clickable { onCancel(slotUi) },
@@ -227,7 +232,11 @@ private fun LoadingSlotView(
     ) {
         Column {
             Text(
-                text = "Загрузка слота на время: ${slot.start.toFormattedString("HH:mm")} - ${slot.finish.toFormattedString("HH:mm")}",
+                text = "Загрузка слота на время: ${slot.start.toFormattedString("HH:mm")} - ${
+                    slot.finish.toFormattedString(
+                        "HH:mm"
+                    )
+                }",
                 style = MaterialTheme.typography.h5,
                 color = MaterialTheme.colors.onPrimary
             )
