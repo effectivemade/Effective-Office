@@ -232,7 +232,7 @@ private fun LoadingSlotView(
     ) {
         Column {
             Text(
-                text = "Загрузка слота на время: ${slot.start.toFormattedString("HH:mm")} - ${
+                text = "${MainRes.string.loading_slot_for_time} ${slot.start.toFormattedString("HH:mm")} - ${
                     slot.finish.toFormattedString(
                         "HH:mm"
                     )
