@@ -232,11 +232,10 @@ private fun LoadingSlotView(
     ) {
         Column {
             Text(
-                text = "${MainRes.string.loading_slot_for_time} ${slot.start.toFormattedString("HH:mm")} - ${
-                    slot.finish.toFormattedString(
-                        "HH:mm"
-                    )
-                }",
+                text = MainRes.string.loading_slot_for_time.format(
+                    slot.start.toFormattedString("HH:mm"),
+                    slot.finish.toFormattedString("HH:mm")
+                ),
                 style = MaterialTheme.typography.h5,
                 color = MaterialTheme.colors.onPrimary
             )
