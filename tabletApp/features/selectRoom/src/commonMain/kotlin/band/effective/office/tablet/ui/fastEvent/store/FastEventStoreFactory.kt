@@ -25,9 +25,10 @@ import kotlin.time.Duration.Companion.minutes
 class FastEventStoreFactory(
     private val storeFactory: StoreFactory,
     private val navigate: (FastEventComponent.ModalConfig) -> Unit,
-    private val room: String,
-    private val onEventCreation: suspend (EventInfo) -> Either<ErrorResponse, EventInfo>,
-    private val onRemoveEvent: suspend (EventInfo) -> Either<ErrorResponse, String>,
+    private val selectedRoom: String,
+    private val rooms: List<String>,
+    private val onEventCreation: suspend (EventInfo, String) -> Either<ErrorResponse, EventInfo>,
+    private val onRemoveEvent: suspend (EventInfo, String) -> Either<ErrorResponse, String>,
     private val eventInfo: EventInfo,
     private val onCloseRequest: () -> Unit,
 ) : KoinComponent {
@@ -43,38 +44,45 @@ class FastEventStoreFactory(
                 initialState = FastEventStore.State.defaultState,
                 bootstrapper = coroutineBootstrapper {
                     launch {
-                        val checkBookings = checkBookingUseCase.busyEvents(
-                            event = eventInfo,
-                            room = room
+
+                        val checkSelectedRoom = checkBookingUseCase.busyEvents(
+                            event = eventInfo, room = selectedRoom
                         )
 
-                        if(checkBookings.isEmpty())
-
-                        {
-                            val result = onEventCreation(eventInfo)
-                            when (result) {
-                                is Either.Success -> {
-                                    dispatch(Action.UpdateEvent(event = eventInfo.copy(
-                                        id = result.data.id
-                                    )))
-                                    dispatch(Action.FastBooking(isSuccess = true))
-                                    navigate(FastEventComponent.ModalConfig.SuccessModal)
-                                }
-                                is Either.Error -> {
-                                    dispatch(Action.FastBooking(isSuccess = false))
-                                    navigate(FastEventComponent.ModalConfig.FailureModal)
-                                }
+                        if (checkSelectedRoom.isEmpty()) {
+                            dispatch(Action.CreateEvent(selectedRoom))
+                            return@launch
+                        }
+                        val bookings = rooms
+                            .apply { this - selectedRoom }
+                            .map { roomName ->
+                                roomName to checkBookingUseCase.busyEvents(
+                                    event = eventInfo,
+                                    room = roomName
+                                )
                             }
+
+                        val nearestRoom = bookings.find { roomEvent ->
+                            roomEvent.second.isEmpty()
+                        }?.first
+
+                        if (nearestRoom != null) {
+                            dispatch(Action.CreateEvent(nearestRoom))
+                            return@launch
                         }
-                        else {
-                            dispatch(Action.FastBooking(isSuccess = false))
-                            dispatch(Action.GetDifferenceInTime(
-                                endTime = checkBookings[0].finishTime.timeInMillis,
+                        dispatch(Action.FastBooking(isSuccess = false))
+                        val nearestFreeRoom = bookings.map {
+                            it.first to it.second[0].finishTime.timeInMillis
+                        }.minBy { it.second }
+                        dispatch(
+                            Action.GetDifferenceInTime(
+                                endTime = nearestFreeRoom.second,
                                 startTime = GregorianCalendar().timeInMillis
-                            ))
-                            navigate(FastEventComponent.ModalConfig.FailureModal)
-                        }
+                            )
+                        )
+                        navigate(FastEventComponent.ModalConfig.FailureModal(nearestFreeRoom.first))
                     }
+
                     dispatch(Action.RefreshTime)
                     currentTimeTimer.start(this, 1.minutes) {
                         withContext(Dispatchers.Main) {
@@ -96,6 +104,8 @@ class FastEventStoreFactory(
     }
 
     sealed interface Action {
+        data class CreateEvent(val room: String) : Action
+
         data class FastBooking(val isSuccess: Boolean) : Action
         data class UpdateEvent(val event: EventInfo) : Action
         object RefreshTime : Action
@@ -110,15 +120,15 @@ class FastEventStoreFactory(
             getState: () -> FastEventStore.State
         ) {
             when (intent) {
-                is FastEventStore.Intent.OnFreeSelectRequest -> freeRoom(state = getState())
+                is FastEventStore.Intent.OnFreeSelectRequest -> freeRoom(state = getState(), intent.room)
                 is FastEventStore.Intent.OnCloseWindowRequest -> onCloseRequest()
 
             }
         }
 
-        private fun freeRoom(state: FastEventStore.State) = scope.launch() {
+        private fun freeRoom(state: FastEventStore.State, room: String) = scope.launch() {
             dispatch(Message.Load)
-            if (onRemoveEvent(state.event) is Either.Success) {
+            if (onRemoveEvent(state.event, room ) is Either.Success) {
                 onCloseRequest()
             } else dispatch(Message.Fail)
         }
@@ -138,6 +148,27 @@ class FastEventStoreFactory(
                     dispatch(
                         Message.UntilFinish(((action.endTime - action.startTime) / (1000 * 60)).toInt())
                     )
+                }
+                is Action.CreateEvent -> createEvent(action.room)
+            }
+        }
+
+        private fun createEvent(room: String) = scope.launch {
+            when (val result = onEventCreation(eventInfo, room)) {
+                is Either.Success -> {
+                    dispatch(
+                        Message.UpdateEvent(
+                            event = eventInfo.copy(
+                                id = result.data.id
+                            )
+                        )
+                    )
+                    dispatch(Message.Success)
+                    navigate(FastEventComponent.ModalConfig.SuccessModal(room))
+                }
+                is Either.Error -> {
+                    dispatch(Message.Fail)
+                    navigate(FastEventComponent.ModalConfig.FailureModal(room))
                 }
             }
         }

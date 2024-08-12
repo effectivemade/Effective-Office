@@ -22,9 +22,10 @@ class FastEventComponent(
     private val componentContext: ComponentContext,
     storeFactory: StoreFactory,
     val eventInfo: EventInfo,
-    val room: String,
-    private val onEventCreation : suspend (EventInfo) -> Either<ErrorResponse, EventInfo>,
-    private val onRemoveEvent : suspend (EventInfo) -> Either<ErrorResponse, String>,
+    val selectedRoom: String,
+    val rooms: List<String>,
+    private val onEventCreation : suspend (EventInfo, String) -> Either<ErrorResponse, EventInfo>,
+    private val onRemoveEvent : suspend (EventInfo, String) -> Either<ErrorResponse, String>,
     private val onCloseRequest: () -> Unit
 ) : ComponentContext by componentContext, KoinComponent, ModalWindow {
 
@@ -40,7 +41,8 @@ class FastEventComponent(
         FastEventStoreFactory(
             storeFactory = storeFactory,
             navigate = { navigation.push(it) },
-            room = room,
+            selectedRoom = selectedRoom,
+            rooms = rooms,
             eventInfo = eventInfo,
             onEventCreation = onEventCreation,
             onRemoveEvent = onRemoveEvent,
@@ -57,10 +59,10 @@ class FastEventComponent(
 
     sealed interface ModalConfig : Parcelable {
         @Parcelize
-        object SuccessModal : ModalConfig
+        data class SuccessModal(val room: String) : ModalConfig
 
         @Parcelize
-        object FailureModal : ModalConfig
+        data class FailureModal(val room: String) : ModalConfig
 
         @Parcelize
         object LoadingModal: ModalConfig
