@@ -8,7 +8,7 @@ import java.util.Date
 interface FastEventStore : Store<FastEventStore.Intent, FastEventStore.State, Nothing> {
 
     sealed interface Intent {
-        object OnFreeSelectRequest : Intent
+        data class OnFreeSelectRequest(val room: String) : Intent
         object OnCloseWindowRequest : Intent
     }
 

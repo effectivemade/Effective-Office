@@ -170,7 +170,8 @@ class MainFactory(
                                     )
                                 }.removeSeconds()
                             ),
-                            room = getState().run { roomList[indexSelectRoom].name }
+                            selectedRoom = getState().run { roomList[indexSelectRoom].name },
+                            rooms = getState().run { roomList.map { it.name } }
                         )
                     )
                 }

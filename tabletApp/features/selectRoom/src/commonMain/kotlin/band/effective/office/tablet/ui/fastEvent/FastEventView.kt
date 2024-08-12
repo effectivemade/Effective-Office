@@ -40,11 +40,11 @@ fun FastEventView(
     val state by component.state.collectAsState()
     val timeFormat = remember { SimpleDateFormat("HH:mm") }
 
-    Children(stack = component.childStack, modifier = Modifier.padding(35.dp)) {
+    Children(stack = component.childStack, modifier = Modifier.padding(35.dp)) { modal ->
         Dialog(
             onDismissRequest = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest)},
             properties = DialogProperties(
-                usePlatformDefaultWidth = it.instance != FastEventComponent.ModalConfig.FailureModal
+                usePlatformDefaultWidth = modal.instance != FastEventComponent.ModalConfig.LoadingModal
             )
         ) {
             Column(
@@ -62,22 +62,22 @@ fun FastEventView(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    when (it.instance) {
+                    when (modal.instance) {
                         FastEventComponent.ModalConfig.LoadingModal -> FastEventView(
                             onDismissRequest = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest) }
                         )
 
-                        FastEventComponent.ModalConfig.FailureModal -> FailureFastSelectRoomView(
+                        is FastEventComponent.ModalConfig.FailureModal -> FailureFastSelectRoomView(
                             onDismissRequest = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest) },
                             minutes = state.minutesLeft,
-                            room = component.room
+                            room = (modal.instance as FastEventComponent.ModalConfig.FailureModal).room
                         )
 
-                        FastEventComponent.ModalConfig.SuccessModal -> SuccessFastSelectRoomView(
-                            roomName = component.room,
+                        is FastEventComponent.ModalConfig.SuccessModal -> SuccessFastSelectRoomView(
+                            roomName = (modal.instance as FastEventComponent.ModalConfig.SuccessModal).room,
                             eventInfo = component.eventInfo,
                             close = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest) },
-                            onFreeRoomRequest = { component.sendIntent(FastEventStore.Intent.OnFreeSelectRequest) },
+                            onFreeRoomRequest = { component.sendIntent(FastEventStore.Intent.OnFreeSelectRequest(it)) },
                             isLoading = state.isLoad
                         )
                     }
