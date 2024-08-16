@@ -9,7 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import band.effective.office.tv.screen.sport.ClockifyScreen
+import band.effective.office.tv.screen.sport.SportScreen
 import band.effective.office.tv.screen.duolingo.DuolingoScreen
 import band.effective.office.tv.screen.eventStory.models.DuolingoUserInfo
 import band.effective.office.tv.screen.eventStory.models.EmployeeInfoUI
@@ -75,9 +75,9 @@ fun EventStoryScreenContent(
                 }
 
                 StoryType.Sport -> {
-                    val sportItem = eventsInfo[currentStoryIndex] as SportUserInfo
-                    ClockifyScreen(
-                        sportUsers = sportItem.users
+                    val sportItem = eventsInfo[currentStoryIndex]
+                    SportScreen(
+                        sportUsers = if (sportItem is SportUserInfo) sportItem.users else emptyList()
                     )
                 }
             }

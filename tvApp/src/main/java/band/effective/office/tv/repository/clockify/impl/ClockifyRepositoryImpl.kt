@@ -32,7 +32,8 @@ class ClockifyRepositoryImpl @Inject constructor(
                 exportType = "JSON",
                 rounding = false,
                 detailedFilter = DetailedFilter(
-                    sortColumn = "USER"
+                    sortColumn = "USER",
+                    pageSize = 1000
                 ),
                 projects = Projects(
                     ids = listOf(BuildConfig.clockifyProjectId)

@@ -16,7 +16,7 @@ import band.effective.office.tv.screen.sport.model.SportUserUi
 import band.effective.office.tv.ui.theme.EffectiveColor
 
 @Composable
-fun ClockifyScreen(
+fun SportScreen(
     sportUsers: List<List<SportUserUi>>
 ) {
     Box(

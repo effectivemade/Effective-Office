@@ -4,5 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class DetailedFilter(
-    val sortColumn: String
+    val sortColumn: String,
+    val pageSize: Int
 )
