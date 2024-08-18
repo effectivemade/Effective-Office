@@ -139,7 +139,7 @@ class MainComponent(
             is ModalWindowsConfig.FastEvent -> FastEventComponent(
                 componentContext = componentContext,
                 storeFactory = storeFactory,
-                eventInfo = modalWindows.event,
+                minEventDuration = modalWindows.minEventDuration,
                 onEventCreation = { eventInfo, room ->
                         val result = this.componentContext.componentCoroutineScope().async {
                             eventManager.createBooking(
@@ -216,9 +216,9 @@ class MainComponent(
 
         @Parcelize
         data class FastEvent(
-            val event: EventInfo,
-            val selectedRoom: String,
-            val rooms: List<String>
+            val minEventDuration: Int,
+            val selectedRoom: RoomInfo,
+            val rooms: List<RoomInfo>
         ) : ModalWindowsConfig
     }
 }

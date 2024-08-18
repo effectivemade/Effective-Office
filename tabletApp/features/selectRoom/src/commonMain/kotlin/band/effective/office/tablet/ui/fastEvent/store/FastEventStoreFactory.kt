@@ -3,11 +3,13 @@ package band.effective.office.tablet.ui.fastEvent.store
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
+import band.effective.office.tablet.domain.model.RoomInfo
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
-import band.effective.office.tablet.domain.useCase.CheckBookingUseCase
+import band.effective.office.tablet.domain.useCase.SelectRoomUseCase
 import band.effective.office.tablet.domain.useCase.TimerUseCase
 import band.effective.office.tablet.ui.fastEvent.FastEventComponent
 import band.effective.office.tablet.utils.BootstrapperTimer
+import band.effective.office.tablet.utils.removeSeconds
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -18,21 +20,23 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 class FastEventStoreFactory(
     private val storeFactory: StoreFactory,
     private val navigate: (FastEventComponent.ModalConfig) -> Unit,
-    private val selectedRoom: String,
-    private val rooms: List<String>,
+    private val selectedRoom: RoomInfo,
+    private val rooms: List<RoomInfo>,
     private val onEventCreation: suspend (EventInfo, String) -> Either<ErrorResponse, EventInfo>,
     private val onRemoveEvent: suspend (EventInfo, String) -> Either<ErrorResponse, String>,
-    private val eventInfo: EventInfo,
+    private val minEventDuration: Int,
     private val onCloseRequest: () -> Unit,
 ) : KoinComponent {
-    val checkBookingUseCase: CheckBookingUseCase by inject()
+    val selectRoomUseCase: SelectRoomUseCase by inject()
     private val timerUseCase: TimerUseCase by inject()
     private val currentTimeTimer = BootstrapperTimer<Action>(timerUseCase)
 
@@ -44,43 +48,22 @@ class FastEventStoreFactory(
                 initialState = FastEventStore.State.defaultState,
                 bootstrapper = coroutineBootstrapper {
                     launch {
-
-                        val checkSelectedRoom = checkBookingUseCase.busyEvents(
-                            event = eventInfo, room = selectedRoom
+                        val selectRoom: RoomInfo? = selectRoomUseCase.getRoom(
+                            currentRoom = selectedRoom,
+                            rooms = rooms,
+                            minEventDuration = minEventDuration
                         )
 
-                        if (checkSelectedRoom.isEmpty()) {
-                            dispatch(Action.CreateEvent(selectedRoom))
+                        if (selectRoom != null) {
+                            dispatch(Action.CreateEvent(selectRoom.name, minEventDuration))
                             return@launch
                         }
-                        val bookings = rooms
-                            .apply { this - selectedRoom }
-                            .map { roomName ->
-                                roomName to checkBookingUseCase.busyEvents(
-                                    event = eventInfo,
-                                    room = roomName
-                                )
-                            }
 
-                        val nearestRoom = bookings.find { roomEvent ->
-                            roomEvent.second.isEmpty()
-                        }?.first
-
-                        if (nearestRoom != null) {
-                            dispatch(Action.CreateEvent(nearestRoom))
-                            return@launch
-                        }
                         dispatch(Action.FastBooking(isSuccess = false))
-                        val nearestFreeRoom = bookings.map {
-                            it.first to it.second[0].finishTime.timeInMillis
-                        }.minBy { it.second }
-                        dispatch(
-                            Action.GetDifferenceInTime(
-                                endTime = nearestFreeRoom.second,
-                                startTime = GregorianCalendar().timeInMillis
-                            )
-                        )
-                        navigate(FastEventComponent.ModalConfig.FailureModal(nearestFreeRoom.first))
+                        val nearestFreeRoom = selectRoomUseCase.getNearestFreeRoom(rooms, minEventDuration)
+
+                        dispatch(Action.UntilFreeRoom(minDuration = nearestFreeRoom.second))
+                        navigate(FastEventComponent.ModalConfig.FailureModal(nearestFreeRoom.first.name))
                     }
 
                     dispatch(Action.RefreshTime)
@@ -104,12 +87,12 @@ class FastEventStoreFactory(
     }
 
     sealed interface Action {
-        data class CreateEvent(val room: String) : Action
+        data class CreateEvent(val room: String, val minDuration: Int) : Action
 
         data class FastBooking(val isSuccess: Boolean) : Action
         data class UpdateEvent(val event: EventInfo) : Action
         object RefreshTime : Action
-        data class GetDifferenceInTime(val endTime: Long, val startTime: Long) : Action
+        data class UntilFreeRoom(val minDuration: Long) : Action
     }
 
     private inner class ExecutorImpl() :
@@ -144,16 +127,28 @@ class FastEventStoreFactory(
                     dispatch(Message.UpdateEvent(event = action.event))
                 }
                 is Action.RefreshTime -> dispatch(Message.UpdateTime(GregorianCalendar().time))
-                is Action.GetDifferenceInTime -> {
+                is Action.UntilFreeRoom -> {
                     dispatch(
-                        Message.UntilFinish(((action.endTime - action.startTime) / (1000 * 60)).toInt())
+                        Message.UntilFinish(action.minDuration.milliseconds.inWholeMinutes.toInt())
                     )
                 }
-                is Action.CreateEvent -> createEvent(action.room)
+                is Action.CreateEvent -> createEvent(
+                    room = action.room,
+                    minDuration = action.minDuration
+                )
             }
         }
 
-        private fun createEvent(room: String) = scope.launch {
+        private fun createEvent(room: String, minDuration: Int) = scope.launch {
+            val eventInfo = EventInfo.emptyEvent.copy(
+                startTime = GregorianCalendar().removeSeconds(),
+                finishTime = GregorianCalendar().apply {
+                    add(
+                        Calendar.MINUTE,
+                        minDuration
+                    )
+                }.removeSeconds()
+            )
             when (val result = onEventCreation(eventInfo, room)) {
                 is Either.Success -> {
                     dispatch(
@@ -164,7 +159,7 @@ class FastEventStoreFactory(
                         )
                     )
                     dispatch(Message.Success)
-                    navigate(FastEventComponent.ModalConfig.SuccessModal(room))
+                    navigate(FastEventComponent.ModalConfig.SuccessModal(room, eventInfo))
                 }
                 is Either.Error -> {
                     dispatch(Message.Fail)

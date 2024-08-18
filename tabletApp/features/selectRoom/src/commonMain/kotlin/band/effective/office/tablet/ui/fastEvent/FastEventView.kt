@@ -62,7 +62,7 @@ fun FastEventView(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    when (modal.instance) {
+                    when (val modalInstance = modal.instance) {
                         FastEventComponent.ModalConfig.LoadingModal -> FastEventView(
                             onDismissRequest = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest) }
                         )
@@ -70,12 +70,12 @@ fun FastEventView(
                         is FastEventComponent.ModalConfig.FailureModal -> FailureFastSelectRoomView(
                             onDismissRequest = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest) },
                             minutes = state.minutesLeft,
-                            room = (modal.instance as FastEventComponent.ModalConfig.FailureModal).room
+                            room = modalInstance.room
                         )
 
                         is FastEventComponent.ModalConfig.SuccessModal -> SuccessFastSelectRoomView(
-                            roomName = (modal.instance as FastEventComponent.ModalConfig.SuccessModal).room,
-                            eventInfo = component.eventInfo,
+                            roomName = modalInstance.room,
+                            eventInfo = modalInstance.eventInfo,
                             close = { component.sendIntent(FastEventStore.Intent.OnCloseWindowRequest) },
                             onFreeRoomRequest = { component.sendIntent(FastEventStore.Intent.OnFreeSelectRequest(it)) },
                             isLoading = state.isLoad

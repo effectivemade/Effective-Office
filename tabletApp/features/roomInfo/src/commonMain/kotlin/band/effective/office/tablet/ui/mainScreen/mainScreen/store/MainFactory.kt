@@ -161,17 +161,9 @@ class MainFactory(
                 is MainStore.Intent.OnFastBooking -> {
                     navigate(
                         MainComponent.ModalWindowsConfig.FastEvent(
-                            event = EventInfo.emptyEvent.copy(
-                                startTime = GregorianCalendar().removeSeconds(),
-                                finishTime = GregorianCalendar().apply {
-                                    add(
-                                        Calendar.MINUTE,
-                                        intent.minDuration
-                                    )
-                                }.removeSeconds()
-                            ),
-                            selectedRoom = getState().run { roomList[indexSelectRoom].name },
-                            rooms = getState().run { roomList.map { it.name } }
+                            minEventDuration = intent.minDuration,
+                            selectedRoom = getState().run { roomList[indexSelectRoom] },
+                            rooms = getState().run { roomList }
                         )
                     )
                 }
