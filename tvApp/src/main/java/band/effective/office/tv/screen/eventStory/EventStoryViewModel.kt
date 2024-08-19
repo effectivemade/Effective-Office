@@ -108,8 +108,6 @@ class EventStoryViewModel @Inject constructor(
             updateStateAsException((exception as Error).message.orEmpty())
         }
         withContext(Dispatchers.IO + exceptionHandler) {
-            eventStoryData.getClockifyDataForStories().collectLatest {
-            }
             combine(
                 eventStoryData.getNotionDataForStories(),
                 eventStoryData.getDuolingoDataForStories(),
