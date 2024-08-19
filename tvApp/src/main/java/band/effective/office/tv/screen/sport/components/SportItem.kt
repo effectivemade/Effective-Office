@@ -37,7 +37,6 @@ fun SportItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
-            modifier = Modifier.width(400.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -64,6 +63,7 @@ fun SportItem(
                     maxLines = 1
                 )
             }
+            Spacer(modifier = Modifier.width(50.dp))
             Text(
                 text = "${user.totalSeconds.toDuration(DurationUnit.SECONDS).inWholeHours.toInt()} "
                         + getCorrectDeclension(
