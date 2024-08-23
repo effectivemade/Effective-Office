@@ -39,13 +39,14 @@ fun SportItem(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.width(480.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
                     model = user.photo,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(45.dp)
+                        .size(60.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.sport_logo),
@@ -56,14 +57,13 @@ fun SportItem(
                     modifier = Modifier.width(190.dp),
                     text = user.name,
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = EffectiveColor.fontEventStoryColor,
                     textAlign = TextAlign.Start,
                     maxLines = 1
                 )
             }
-            Spacer(modifier = Modifier.width(50.dp))
             Text(
                 text = "${user.totalSeconds.toDuration(DurationUnit.SECONDS).inWholeHours.toInt()} "
                         + getCorrectDeclension(
@@ -73,10 +73,11 @@ fun SportItem(
                     genitivePlural = stringResource(id = R.string.hour_plural)
                 ),
                 fontFamily = FontFamily(Font(R.font.druktextwidelcg_medium)),
-                fontSize = 18.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = EffectiveColor.fontEventStoryColor,
-                textAlign = TextAlign.Right
+                textAlign = TextAlign.Right,
+                maxLines = 1
             )
         }
     }

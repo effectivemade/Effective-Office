@@ -27,10 +27,10 @@ fun SportScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 80.dp)
+                .padding(start = 80.dp, end = 160.dp)
         ) {
             SportTitle()
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(60.dp))
             TopSportUsers(users = sportUsers)
         }
     }
