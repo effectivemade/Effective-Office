@@ -9,7 +9,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -23,15 +22,15 @@ import band.effective.office.tv.ui.theme.EffectiveColor
 fun SportTitle() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(45.dp),
             painter = painterResource(id = R.drawable.sport_logo),
             contentDescription = "sport_icon"
         )
-        Spacer(modifier = Modifier.width(30.dp))
+        Spacer(modifier = Modifier.width(20.dp))
         Text(
             text = stringResource(id = R.string.sport_title),
             fontFamily = FontFamily(Font(R.font.roboto_regular)),
-            fontSize = 14.sp,
+            fontSize = 17.sp,
             color = EffectiveColor.fontEventStoryColor
         )
     }
