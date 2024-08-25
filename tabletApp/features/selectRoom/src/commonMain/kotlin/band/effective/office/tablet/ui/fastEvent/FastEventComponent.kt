@@ -3,6 +3,7 @@ package band.effective.office.tablet.ui.fastEvent
 import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import band.effective.office.tablet.domain.model.EventInfo
+import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.ui.fastEvent.store.FastEventStore
 import band.effective.office.tablet.ui.fastEvent.store.FastEventStoreFactory
 import band.effective.office.tablet.ui.modal.ModalWindow
@@ -21,10 +22,11 @@ import org.koin.core.component.KoinComponent
 class FastEventComponent(
     private val componentContext: ComponentContext,
     storeFactory: StoreFactory,
-    val eventInfo: EventInfo,
-    val room: String,
-    private val onEventCreation : suspend (EventInfo) -> Either<ErrorResponse, EventInfo>,
-    private val onRemoveEvent : suspend (EventInfo) -> Either<ErrorResponse, String>,
+    val minEventDuration: Int,
+    val selectedRoom: RoomInfo,
+    val rooms: List<RoomInfo>,
+    private val onEventCreation : suspend (EventInfo, String) -> Either<ErrorResponse, EventInfo>,
+    private val onRemoveEvent : suspend (EventInfo, String) -> Either<ErrorResponse, String>,
     private val onCloseRequest: () -> Unit
 ) : ComponentContext by componentContext, KoinComponent, ModalWindow {
 
@@ -40,8 +42,9 @@ class FastEventComponent(
         FastEventStoreFactory(
             storeFactory = storeFactory,
             navigate = { navigation.push(it) },
-            room = room,
-            eventInfo = eventInfo,
+            selectedRoom = selectedRoom,
+            rooms = rooms,
+            minEventDuration = minEventDuration,
             onEventCreation = onEventCreation,
             onRemoveEvent = onRemoveEvent,
             onCloseRequest = onCloseRequest
@@ -57,10 +60,10 @@ class FastEventComponent(
 
     sealed interface ModalConfig : Parcelable {
         @Parcelize
-        object SuccessModal : ModalConfig
+        data class SuccessModal(val room: String, val eventInfo: EventInfo) : ModalConfig
 
         @Parcelize
-        object FailureModal : ModalConfig
+        data class FailureModal(val room: String) : ModalConfig
 
         @Parcelize
         object LoadingModal: ModalConfig

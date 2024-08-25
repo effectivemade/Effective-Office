@@ -29,7 +29,7 @@ fun SuccessFastSelectRoomView(
     roomName: String,
     eventInfo: EventInfo,
     close: () -> Unit,
-    onFreeRoomRequest: () -> Unit,
+    onFreeRoomRequest: (String) -> Unit,
     isLoading: Boolean
 ) {
     Column(
@@ -73,7 +73,7 @@ fun SuccessFastSelectRoomView(
             shape = RoundedCornerShape(100),
             text = MainRes.string.cancel_book,
             onClick = {
-                onFreeRoomRequest()
+                onFreeRoomRequest(roomName)
             },
             isLoading = isLoading
         )

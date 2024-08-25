@@ -139,26 +139,27 @@ class MainComponent(
             is ModalWindowsConfig.FastEvent -> FastEventComponent(
                 componentContext = componentContext,
                 storeFactory = storeFactory,
-                eventInfo = modalWindows.event,
-                onEventCreation = { eventInfo ->
+                minEventDuration = modalWindows.minEventDuration,
+                onEventCreation = { eventInfo, room ->
                         val result = this.componentContext.componentCoroutineScope().async {
                             eventManager.createBooking(
                                 eventInfo = eventInfo,
-                                roomName = modalWindows.room
+                                roomName = room
                             )
                         }
                     return@FastEventComponent result.await()
                     },
-                onRemoveEvent = { event ->
+                onRemoveEvent = { event, room ->
                     val result = this.componentContext.componentCoroutineScope().async {
                         eventManager.deleteBooking(
-                            roomName = state.value.run { roomList[indexSelectRoom].name },
+                            roomName = room,
                             eventInfo = event
                         )
                     }
                     return@FastEventComponent result.await()
                 },
-                room = modalWindows.room,
+                selectedRoom = modalWindows.selectedRoom,
+                rooms = modalWindows.rooms,
                 onCloseRequest = { closeModalWindow() }
             )
         }
@@ -215,8 +216,9 @@ class MainComponent(
 
         @Parcelize
         data class FastEvent(
-            val event: EventInfo,
-            val room: String
+            val minEventDuration: Int,
+            val selectedRoom: RoomInfo,
+            val rooms: List<RoomInfo>
         ) : ModalWindowsConfig
     }
 }
