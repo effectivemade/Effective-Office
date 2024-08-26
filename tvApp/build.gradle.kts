@@ -42,6 +42,10 @@ android {
         buildConfigField ("String", "duolingoUrl", localProperties["duolingoUrl"].toString())
         buildConfigField("String", "notionToken", localProperties["NOTION_TOKEN"].toString())
         buildConfigField("String", "notionDatabaseId", localProperties["NOTION_DATABASE_ID"].toString())
+        buildConfigField("String", "clockifyUrl", localProperties["clockifyUrl"].toString())
+        buildConfigField("String", "clockifyApiKey", localProperties["clockifyApiKey"].toString())
+        buildConfigField("String", "clockifyWorkspaceId", localProperties["clockifyWorkspaceId"].toString())
+        buildConfigField("String", "clockifyProjectId", localProperties["clockifyProjectId"].toString())
     }
 
     buildTypes {

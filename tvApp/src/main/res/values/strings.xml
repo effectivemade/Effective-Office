@@ -39,4 +39,8 @@
     <string name="video">Видео</string>
     <string name="autoplay_settings">Настроить автоплей</string>
     <string name="with_us_period">С нами %1$d %2$s</string>
+    <string name="sport_title">Sport</string>
+    <string name="hour_nominative">час</string>
+    <string name="hour_genitive">часа</string>
+    <string name="hour_plural">часов</string>
 </resources>

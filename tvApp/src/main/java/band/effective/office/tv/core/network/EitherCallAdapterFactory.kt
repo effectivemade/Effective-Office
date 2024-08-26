@@ -1,6 +1,6 @@
 package band.effective.office.tv.core.network
 
-import band.effective.office.tv.network.leader.models.errorNetwork.ErrorNetworkResponse
+import android.util.Log
 import okhttp3.Request
 import okhttp3.ResponseBody
 import okio.Timeout
@@ -16,7 +16,10 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
-class EitherLeaderIdAdapterFactory @Inject constructor() : CallAdapter.Factory() {
+class EitherCallAdapterFactory<E> @Inject constructor(
+    private val errorType: Class<E>
+) : CallAdapter.Factory() {
+
     override fun get(
         returnType: Type,
         annotations: Array<out Annotation>,
@@ -39,8 +42,8 @@ class EitherLeaderIdAdapterFactory @Inject constructor() : CallAdapter.Factory()
         if (getRawType(errorType) != ErrorReason::class.java)
             return null
 
-        val errorBodyConverter = retrofit.responseBodyConverter<ErrorNetworkResponse>(
-            ErrorNetworkResponse::class.java,
+        val errorBodyConverter = retrofit.responseBodyConverter<E>(
+            this.errorType,
             annotations
         )
 
@@ -51,11 +54,10 @@ class EitherLeaderIdAdapterFactory @Inject constructor() : CallAdapter.Factory()
         )
     }
 
-    private class ResultCallAdapter<R, T>(
+    private class ResultCallAdapter<R, T, E>(
         private val resultType: Type,
-        private val errorBodyConverter: Converter<ResponseBody, ErrorNetworkResponse>
-    ) :
-        CallAdapter<R, Call<Either<ErrorReason, T>>> {
+        private val errorBodyConverter: Converter<ResponseBody, E>
+    ) : CallAdapter<R, Call<Either<ErrorReason, T>>> {
 
         override fun adapt(call: Call<R>): Call<Either<ErrorReason, T>> =
             ResultCallWrapper(
@@ -66,9 +68,9 @@ class EitherLeaderIdAdapterFactory @Inject constructor() : CallAdapter.Factory()
         override fun responseType() = resultType
     }
 
-    private class ResultCallWrapper<F, T>(
+    private class ResultCallWrapper<F, T, E>(
         private val delegate: Call<T>,
-        private val errorBodyConverter: Converter<ResponseBody, ErrorNetworkResponse>
+        private val errorBodyConverter: Converter<ResponseBody, E>
     ) : Call<Either<ErrorReason, F>> {
 
         override fun execute() = wrapResponse(delegate.execute())
@@ -81,7 +83,7 @@ class EitherLeaderIdAdapterFactory @Inject constructor() : CallAdapter.Factory()
                     }
 
                     override fun onFailure(call: Call<T>, t: Throwable) {
-                        //Timber.e(t)
+                        Log.e("NetworkError", t.message.toString())
                         val errorReason = when (t) {
                             is UnknownHostException -> ErrorReason.NetworkError(t)
                             is TimeoutException -> ErrorReason.NetworkError(t)
@@ -93,7 +95,7 @@ class EitherLeaderIdAdapterFactory @Inject constructor() : CallAdapter.Factory()
                     }
                 })
             } catch (e: Exception) {
-                //Timber.e(e)
+                Log.e("NetworkError", e.message.toString())
                 val unexpectedErrorResponse = Response.success(
                     Either.Failure(ErrorReason.UnexpectedError(e)) as Either<ErrorReason, F>
                 )
@@ -111,7 +113,7 @@ class EitherLeaderIdAdapterFactory @Inject constructor() : CallAdapter.Factory()
 
         override fun timeout(): Timeout = delegate.timeout()
 
-        override fun clone() = ResultCallWrapper<F, T>(
+        override fun clone() = ResultCallWrapper<F, T, E>(
             delegate.clone(),
             errorBodyConverter
         )
@@ -122,26 +124,13 @@ class EitherLeaderIdAdapterFactory @Inject constructor() : CallAdapter.Factory()
                 if (response.isSuccessful) {
                     Response.success(Either.Success(response.body()) as Either<ErrorReason, F>)
                 } else {
-                    val errorResponse =
-                        errorBodyConverter.convert(response.errorBody() as ResponseBody)
-                            ?: error("Invalid format for error response")
-                    val reason = getReasonByCode(response, errorResponse)
+                    val reason = ErrorReason.ServerError("Server error")
                     Response.success(Either.Failure(reason))
                 }
             } catch (e: Exception) {
-                //Timber.e(e)
+                Log.e("NetworkError", e.message.toString())
                 Response.success(Either.Failure(ErrorReason.UnexpectedError(e)) as Either<ErrorReason, F>)
             }
-        }
-
-        private fun getReasonByCode(
-            response: Response<T>,
-            errorResponse: ErrorNetworkResponse
-        ) = when (response.code()) {
-            404 -> ErrorReason.NotFound(errorResponse.message ?: "")
-            else -> ErrorReason.ServerError(
-                errorResponse.message ?: errorResponse.error?.message ?: ""
-            )
         }
     }
 }

@@ -4,13 +4,6 @@ import javax.inject.Qualifier
 
 
 //this annotations for retrofit
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class LeaderIdRetrofitClient
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class SynologyRetrofitClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -23,8 +16,8 @@ annotation class UselessFactClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class DualingoRetrofitClient
+annotation class UnsafeOkHttpClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class UnsafeOkHttpClient
+annotation class ClockifyClient

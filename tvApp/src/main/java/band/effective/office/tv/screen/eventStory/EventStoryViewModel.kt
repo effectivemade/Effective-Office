@@ -2,19 +2,27 @@ package band.effective.office.tv.screen.eventStory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import band.effective.office.tv.core.network.entity.Either
+import band.effective.office.tv.core.network.Either
 import band.effective.office.tv.core.ui.screen_with_controls.TimerSlideShow
+import band.effective.office.tv.domain.model.clockify.ClockifyUser
+import band.effective.office.tv.domain.model.duolingo.DuolingoUser
 import band.effective.office.tv.domain.model.message.BotMessage
 import band.effective.office.tv.domain.model.message.MessageQueue
+import band.effective.office.tv.domain.model.notion.processEmployeeInfo
 import band.effective.office.tv.domain.use_cases.EventStoryDataCombinerUseCase
 import band.effective.office.tv.network.MattermostClient
 import band.effective.office.tv.screen.autoplayController.AutoplayController
 import band.effective.office.tv.screen.autoplayController.model.AutoplayState
 import band.effective.office.tv.screen.autoplayController.model.OnSwitchCallbacks
 import band.effective.office.tv.screen.autoplayController.model.ScreenState
+import band.effective.office.tv.screen.duolingo.model.toUI
+import band.effective.office.tv.screen.eventStory.models.DuolingoUserInfo
 import band.effective.office.tv.screen.eventStory.models.MessageInfo
+import band.effective.office.tv.screen.eventStory.models.SportUserInfo
 import band.effective.office.tv.screen.eventStory.models.StoryModel
 import band.effective.office.tv.screen.navigation.Screen
+import band.effective.office.tv.screen.sport.model.toTwoColumns
+import band.effective.office.tv.screen.sport.model.toUi
 import coil.ImageLoader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -22,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -99,16 +108,71 @@ class EventStoryViewModel @Inject constructor(
             updateStateAsException((exception as Error).message.orEmpty())
         }
         withContext(Dispatchers.IO + exceptionHandler) {
-            eventStoryData.getAllDataForStories().collectLatest { events ->
-                when (events) {
-                    is Either.Success -> updateStateAsSuccessfulFetch(events.data)
+            combine(
+                eventStoryData.getNotionDataForStories(),
+                eventStoryData.getDuolingoDataForStories(),
+                eventStoryData.getClockifyDataForStories(),
+            ) { notionData, duolingoInfo, clockifyInfo ->
 
-                    is Either.Failure -> updateStateAsException(events.error)
+                val events: MutableList<StoryModel> = mutableListOf()
+                var error = ""
+
+                when (notionData) {
+                    is Either.Success -> events += notionData.data.processEmployeeInfo()
+                    is Either.Failure -> error = notionData.error
+                }
+
+                when (duolingoInfo) {
+                    is Either.Success -> events += setDuolingoDataForScreens(duolingoInfo.data)
+                    is Either.Failure -> error = duolingoInfo.error
+                }
+
+                when (clockifyInfo) {
+                    is Either.Success -> events += setClockifyDataForScreens(clockifyInfo.data)
+                    is Either.Failure -> error = clockifyInfo.error
+                }
+
+                if (events.isEmpty()) return@combine Either.Failure(error)
+                else Either.Success(events)
+            }.collectLatest { result ->
+                when (result) {
+                    is Either.Success -> updateStateAsSuccessfulFetch(result.data)
+                    is Either.Failure -> updateStateAsException(result.error)
                 }
             }
         }
         startTimer()
     }
+
+    private fun setClockifyDataForScreens(clockifyUsers: List<ClockifyUser>) =
+        listOf(
+            SportUserInfo(
+            users = clockifyUsers
+                .take(countUsersToShow)
+                .toUi()
+                .sortedByDescending { it.totalSeconds }
+                .toTwoColumns(countUsersToShow)
+        ) as StoryModel)
+
+    private fun setDuolingoDataForScreens(duolingoUsers: List<DuolingoUser>) =
+        run {
+            val userXpSort = DuolingoUserInfo(
+                users = duolingoUsers
+                    .take(countUsersToShow)
+                    .sortedByDescending { it.totalXp }
+                    .toUI(),
+                keySort = KeySortDuolingoUser.Xp
+            ) as StoryModel
+            val userStreakSort = DuolingoUserInfo(
+                users = duolingoUsers
+                    .filter { it.streakDay != 0 }
+                    .take(countUsersToShow)
+                    .sortedByDescending { it.streakDay }
+                    .toUI(),
+                keySort = KeySortDuolingoUser.Streak
+            ) as StoryModel
+            listOf(userXpSort, userStreakSort)
+        }
 
     private fun updateStateAsException(error: String) {
         autoplayController.addError(Screen.Stories)
@@ -224,7 +288,9 @@ class EventStoryViewModel @Inject constructor(
 
     private fun BotMessage.toMessageInfo(): MessageInfo = MessageInfo(this)
 
-    private val countShowUsers = 10
+    private val countUsersToShow = 10
+
+    private val rowsInColumn = 5
     private fun LatestEventInfoUiState.toScreenState(direction: Boolean): ScreenState =
         ScreenState(isPlay = isPlay, isForwardDirection = direction)
 }

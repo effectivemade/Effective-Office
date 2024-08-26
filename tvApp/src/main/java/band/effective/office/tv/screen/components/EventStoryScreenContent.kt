@@ -9,14 +9,16 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import band.effective.office.tv.screen.sport.SportScreen
 import band.effective.office.tv.screen.duolingo.DuolingoScreen
 import band.effective.office.tv.screen.eventStory.models.DuolingoUserInfo
 import band.effective.office.tv.screen.eventStory.models.EmployeeInfoUI
 import band.effective.office.tv.screen.eventStory.models.MessageInfo
+import band.effective.office.tv.screen.eventStory.models.SportUserInfo
 import band.effective.office.tv.screen.eventStory.models.StoryModel
 import band.effective.office.tv.screen.eventStory.models.StoryType
 import band.effective.office.tv.screen.message.component.OneMessageScreen
-import band.effective.office.tv.ui.theme.IndependentColors
+import band.effective.office.tv.ui.theme.EffectiveColor
 import coil.ImageLoader
 
 @Composable
@@ -30,7 +32,11 @@ fun EventStoryScreenContent(
     onImageLoaded: () -> Unit,
 ) {
     Surface(
-        modifier = modifier, color = IndependentColors.StoryBackgroundGray
+        modifier = modifier,
+        color = when(eventsInfo[currentStoryIndex].storyType) {
+            StoryType.Sport -> EffectiveColor.backgroundSportColor
+            else -> EffectiveColor.white
+        }
     ) {
         Column {
             StoryIndicator(
@@ -65,6 +71,13 @@ fun EventStoryScreenContent(
                         modifier = modifier,
                         imageLoader = imageLoader,
                         message = messageItem.message
+                    )
+                }
+
+                StoryType.Sport -> {
+                    val sportItem = eventsInfo[currentStoryIndex]
+                    SportScreen(
+                        sportUsers = if (sportItem is SportUserInfo) sportItem.users else emptyList()
                     )
                 }
             }
