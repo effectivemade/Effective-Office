@@ -17,12 +17,10 @@ import javax.inject.Inject
 
 
 class ClockifyRepositoryImpl @Inject constructor(
-    private val clockifyApi: ClockifyApi,
-    private val workTogether: WorkTogether
+    private val clockifyApi: ClockifyApi
 ) : ClockifyRepository {
     override suspend fun getTimeEntries(): Flow<Either<String, List<ClockifyUser>>> =
         flow {
-            val users = workTogether.getAll().filter { it.employment in setOf("Band", "Intern") && it.status == "Active" }
             val rangeQuarter = DateUtlils.getDatesByCurrentQuarter()
             
             val clockifyRequestDTO = ClockifyRequest(
@@ -47,7 +45,7 @@ class ClockifyRepositoryImpl @Inject constructor(
 
             when(response) {
                 is Either.Failure -> emit(Either.Failure(error = response.error.message))
-                is Either.Success -> emit(Either.Success(response.data.toDomainList(users)))
+                is Either.Success -> emit(Either.Success(response.data.toDomainList()))
             }
         }
 }

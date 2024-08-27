@@ -17,7 +17,9 @@ import band.effective.office.tv.screen.eventStory.models.MessageInfo
 import band.effective.office.tv.screen.eventStory.models.SportUserInfo
 import band.effective.office.tv.screen.eventStory.models.StoryModel
 import band.effective.office.tv.screen.eventStory.models.StoryType
+import band.effective.office.tv.screen.eventStory.models.SupernovaUserInfo
 import band.effective.office.tv.screen.message.component.OneMessageScreen
+import band.effective.office.tv.screen.supernova.SupernovaScreen
 import band.effective.office.tv.ui.theme.EffectiveColor
 import coil.ImageLoader
 
@@ -35,6 +37,7 @@ fun EventStoryScreenContent(
         modifier = modifier,
         color = when(eventsInfo[currentStoryIndex].storyType) {
             StoryType.Sport -> EffectiveColor.backgroundSportColor
+            StoryType.Supernova -> EffectiveColor.backgroundSupernova
             else -> EffectiveColor.white
         }
     ) {
@@ -78,6 +81,12 @@ fun EventStoryScreenContent(
                     val sportItem = eventsInfo[currentStoryIndex]
                     SportScreen(
                         sportUsers = if (sportItem is SportUserInfo) sportItem.users else emptyList()
+                    )
+                }
+                StoryType.Supernova -> {
+                    val supernovaItem = eventsInfo[currentStoryIndex]
+                    SupernovaScreen(
+                        supernovaUsers = if (supernovaItem is SupernovaUserInfo) supernovaItem.users else emptyList()
                     )
                 }
             }

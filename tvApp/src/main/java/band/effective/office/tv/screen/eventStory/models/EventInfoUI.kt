@@ -4,6 +4,7 @@ import band.effective.office.tv.domain.model.message.BotMessage
 import band.effective.office.tv.screen.sport.model.SportUserUi
 import band.effective.office.tv.screen.duolingo.model.DuolingoUserUI
 import band.effective.office.tv.screen.eventStory.KeySortDuolingoUser
+import band.effective.office.tv.screen.supernova.model.SupernovaUserUi
 
 sealed class EmployeeInfoUI(
     val name: String,
@@ -51,8 +52,12 @@ data class MessageInfo(
     val message: BotMessage
 ): StoryModel(StoryType.Message)
 
+data class SupernovaUserInfo(
+    val users: List<List<SupernovaUserUi>>
+) : StoryModel(StoryType.Supernova)
+
 enum class StoryType {
-    Duolingo, Employee, Message, Sport
+    Duolingo, Employee, Message, Sport, Supernova
 }
 
 abstract class StoryModel(val storyType: StoryType)

@@ -22,6 +22,7 @@ object IndependentColors {
 object EffectiveColor{
     val backgroundSportColor = Color(0xFFE66D33)
     val fontEventStoryColor = Color(0xFFE6E3E2)
+    val backgroundSupernova = Color(0xFFAC78EF)
     val orange = Color(0xFFFE7B1C)
     val purple = Color(0xFF5800CB)
     val white = Color(0xFFFFFFFF)

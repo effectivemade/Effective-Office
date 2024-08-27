@@ -1,6 +1,7 @@
 package band.effective.office.tv.screen.sport.model
 
 import band.effective.office.tv.domain.model.clockify.ClockifyUser
+import band.effective.office.tv.domain.model.notion.EmployeeInfoEntity
 
 data class SportUserUi(
     val name: String,
@@ -8,14 +9,16 @@ data class SportUserUi(
     val totalSeconds: Int
 )
 
-fun ClockifyUser.toUi() =
-    SportUserUi(
-        name = this.name,
-        photo = this.photo,
-        totalSeconds = this.totalSeconds
-    )
-
-fun List<ClockifyUser>.toUi() = map { it.toUi() }
+fun List<ClockifyUser>.toUi(employees: List<EmployeeInfoEntity>) =
+    mapNotNull { user ->
+        employees.find { user.email == it.workEmail }?.let { employee ->
+            SportUserUi(
+                photo = employee.photoUrl,
+                name = employee.firstName.split(' ')[0],
+                totalSeconds = user.totalSeconds
+            )
+        }
+    }
 
 fun <T> List<T>.toTwoColumns(countUsersToShow: Int): List<List<T>> {
     val rows = countUsersToShow / 2

@@ -7,7 +7,9 @@ import band.effective.office.tv.utils.isSameDay
 import java.util.Calendar
 
 class EmployeeInfoEntity(
+    val id: String,
     val firstName: String,
+    val workEmail: String,
     val startDate: String,
     val nextBirthdayDate: String,
     val photoUrl: String,
