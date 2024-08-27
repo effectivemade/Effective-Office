@@ -10,14 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import band.effective.office.tv.screen.sport.components.SportTitle
-import band.effective.office.tv.screen.sport.components.TopSportUsers
+import band.effective.office.tv.R
+import band.effective.office.tv.screen.components.TitleRating
+import band.effective.office.tv.screen.components.TopRating
 import band.effective.office.tv.screen.sport.model.SportUserUi
 import band.effective.office.tv.ui.theme.EffectiveColor
 
 @Composable
 fun SportScreen(
-    sportUsers: List<List<SportUserUi>>
+    sportUsers: List<SportUserUi>
 ) {
     Box(
         modifier = Modifier
@@ -29,9 +30,17 @@ fun SportScreen(
                 .fillMaxSize()
                 .padding(start = 60.dp, end = 120.dp)
         ) {
-            SportTitle()
+            TitleRating(
+                imagePath = R.drawable.sport_logo,
+                stringPath = R.string.sport_title
+            )
             Spacer(modifier = Modifier.height(30.dp))
-            TopSportUsers(users = sportUsers)
+            TopRating(users = sportUsers) { modifier, sportUserUi ->
+                SportItem(
+                    modifier = modifier,
+                    user = sportUserUi
+                )
+            }
         }
     }
 }

@@ -45,7 +45,7 @@ data class DuolingoUserInfo(
 ): StoryModel(StoryType.Duolingo)
 
 data class SportUserInfo(
-    val users: List<List<SportUserUi>>
+    val users: List<SportUserUi>
 ) : StoryModel(StoryType.Sport)
 
 data class MessageInfo(
@@ -53,7 +53,7 @@ data class MessageInfo(
 ): StoryModel(StoryType.Message)
 
 data class SupernovaUserInfo(
-    val users: List<List<SupernovaUserUi>>
+    val users: List<SupernovaUserUi>
 ) : StoryModel(StoryType.Supernova)
 
 enum class StoryType {
