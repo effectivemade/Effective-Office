@@ -1,6 +1,5 @@
 package band.effective.office.tv.screen.supernova
 
-import band.effective.office.tv.screen.supernova.components.TopSupernova
 import band.effective.office.tv.screen.supernova.model.SupernovaUserUi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,12 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import band.effective.office.tv.screen.supernova.components.SupernovaTitle
+import band.effective.office.tv.R
+import band.effective.office.tv.screen.components.TitleRating
+import band.effective.office.tv.screen.components.TopRating
 import band.effective.office.tv.ui.theme.EffectiveColor
 
 @Composable
 fun SupernovaScreen(
-    supernovaUsers: List<List<SupernovaUserUi>>
+    supernovaUsers: List<SupernovaUserUi>
 ) {
     Box(
         modifier = Modifier
@@ -29,9 +30,17 @@ fun SupernovaScreen(
                 .fillMaxSize()
                 .padding(start = 60.dp, end = 120.dp)
         ) {
-            SupernovaTitle()
+            TitleRating(
+                imagePath = R.drawable.supernova,
+                stringPath = R.string.supernova_title
+            )
             Spacer(modifier = Modifier.height(30.dp))
-            TopSupernova(users = supernovaUsers)
+            TopRating(users = supernovaUsers) { modifier, supernovaUi ->
+                SupernovaItem(
+                    modifier = modifier,
+                    user = supernovaUi
+                )
+            }
         }
     }
 }

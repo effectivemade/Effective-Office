@@ -172,7 +172,6 @@ class EventStoryViewModel @Inject constructor(
                     .toUi(employees)
                     .take(countUsersToShow)
                     .sortedByDescending { it.totalSeconds }
-                    .toTwoColumns(countUsersToShow)
             ) as StoryModel
         )
 
@@ -186,7 +185,6 @@ class EventStoryViewModel @Inject constructor(
                     .toUi(employees)
                     .take(countUsersToShow)
                     .sortedByDescending { it.score }
-                    .toTwoColumns(countUsersToShow)
             ) as StoryModel
         )
 

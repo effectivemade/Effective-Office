@@ -1,4 +1,4 @@
-package band.effective.office.tv.screen.supernova.components
+package band.effective.office.tv.screen.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -19,16 +19,19 @@ import band.effective.office.tv.R
 import band.effective.office.tv.ui.theme.EffectiveColor
 
 @Composable
-fun SupernovaTitle() {
+fun TitleRating(
+    imagePath: Int,
+    stringPath: Int
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
             modifier = Modifier.size(32.dp),
-            painter = painterResource(id = R.drawable.supernova),
-            contentDescription = "supernova_icon"
+            painter = painterResource(id = imagePath),
+            contentDescription = "sport_icon"
         )
-        Spacer(modifier = Modifier.width(30.dp))
+        Spacer(modifier = Modifier.width(20.dp))
         Text(
-            text = stringResource(id = R.string.supernova_title),
+            text = stringResource(id = stringPath),
             fontFamily = FontFamily(Font(R.font.roboto_regular)),
             fontSize = 14.sp,
             color = EffectiveColor.fontEventStoryColor
