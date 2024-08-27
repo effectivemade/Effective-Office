@@ -39,14 +39,14 @@ fun SportItem(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.width(480.dp)
+            modifier = Modifier.width(350.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
                     model = user.photo,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(45.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.sport_logo),
@@ -54,10 +54,9 @@ fun SportItem(
                 )
                 Spacer(modifier = Modifier.width(15.dp))
                 Text(
-                    modifier = Modifier.width(190.dp),
                     text = user.name,
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                    fontSize = 20.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = EffectiveColor.fontEventStoryColor,
                     textAlign = TextAlign.Start,
@@ -73,7 +72,7 @@ fun SportItem(
                     genitivePlural = stringResource(id = R.string.hour_plural)
                 ),
                 fontFamily = FontFamily(Font(R.font.druktextwidelcg_medium)),
-                fontSize = 22.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = EffectiveColor.fontEventStoryColor,
                 textAlign = TextAlign.Right,

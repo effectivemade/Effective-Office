@@ -22,7 +22,7 @@ import band.effective.office.tv.ui.theme.EffectiveColor
 fun SupernovaTitle() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
-            modifier = Modifier.size(45.dp),
+            modifier = Modifier.size(32.dp),
             painter = painterResource(id = R.drawable.supernova),
             contentDescription = "supernova_icon"
         )
@@ -30,7 +30,7 @@ fun SupernovaTitle() {
         Text(
             text = stringResource(id = R.string.supernova_title),
             fontFamily = FontFamily(Font(R.font.roboto_regular)),
-            fontSize = 17.sp,
+            fontSize = 14.sp,
             color = EffectiveColor.fontEventStoryColor
         )
     }
