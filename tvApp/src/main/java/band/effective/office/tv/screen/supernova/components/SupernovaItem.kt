@@ -34,7 +34,7 @@ fun SupernovaItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
-            modifier = Modifier.width(480.dp),
+            modifier = Modifier.width(350.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -43,7 +43,7 @@ fun SupernovaItem(
                     model = user.photoUrl,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(45.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.supernova),
@@ -51,7 +51,6 @@ fun SupernovaItem(
                 )
                 Spacer(modifier = Modifier.width(15.dp))
                 Text(
-                    modifier = Modifier.width(190.dp),
                     text = user.name,
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 20.sp,
@@ -61,18 +60,22 @@ fun SupernovaItem(
                     maxLines = 1
                 )
             }
-            Text(
-                text = "${user.score}",
-                fontFamily = FontFamily(Font(R.font.druktextwidelcg_medium)),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = EffectiveColor.fontEventStoryColor,
-                textAlign = TextAlign.Right
-            )
-            Image(
-                painter = painterResource(id = R.drawable.currency),
-                contentDescription = null
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "${user.score}",
+                    fontFamily = FontFamily(Font(R.font.druktextwidelcg_medium)),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = EffectiveColor.fontEventStoryColor,
+                    textAlign = TextAlign.Right
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Image(
+                    modifier = Modifier.size(15.dp),
+                    painter = painterResource(id = R.drawable.currency),
+                    contentDescription = null
+                )
+            }
         }
     }
 

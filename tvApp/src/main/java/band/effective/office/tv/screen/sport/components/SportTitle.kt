@@ -22,7 +22,7 @@ import band.effective.office.tv.ui.theme.EffectiveColor
 fun SportTitle() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
-            modifier = Modifier.size(45.dp),
+            modifier = Modifier.size(32.dp),
             painter = painterResource(id = R.drawable.sport_logo),
             contentDescription = "sport_icon"
         )
@@ -30,7 +30,7 @@ fun SportTitle() {
         Text(
             text = stringResource(id = R.string.sport_title),
             fontFamily = FontFamily(Font(R.font.roboto_regular)),
-            fontSize = 17.sp,
+            fontSize = 14.sp,
             color = EffectiveColor.fontEventStoryColor
         )
     }

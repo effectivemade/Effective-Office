@@ -27,10 +27,10 @@ fun SupernovaScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 80.dp, end = 160.dp)
+                .padding(start = 60.dp, end = 120.dp)
         ) {
             SupernovaTitle()
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             TopSupernova(users = supernovaUsers)
         }
     }
