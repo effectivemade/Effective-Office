@@ -8,9 +8,12 @@ import band.effective.office.tv.domain.model.clockify.ClockifyUser
 import band.effective.office.tv.domain.model.duolingo.DuolingoUser
 import band.effective.office.tv.domain.model.message.BotMessage
 import band.effective.office.tv.domain.model.message.MessageQueue
+import band.effective.office.tv.domain.model.notion.EmployeeInfoEntity
 import band.effective.office.tv.domain.model.notion.processEmployeeInfo
 import band.effective.office.tv.domain.use_cases.EventStoryDataCombinerUseCase
 import band.effective.office.tv.network.MattermostClient
+import band.effective.office.tv.repository.workTogether.Talent
+import band.effective.office.tv.repository.workTogether.toUi
 import band.effective.office.tv.screen.autoplayController.AutoplayController
 import band.effective.office.tv.screen.autoplayController.model.AutoplayState
 import band.effective.office.tv.screen.autoplayController.model.OnSwitchCallbacks
@@ -20,6 +23,7 @@ import band.effective.office.tv.screen.eventStory.models.DuolingoUserInfo
 import band.effective.office.tv.screen.eventStory.models.MessageInfo
 import band.effective.office.tv.screen.eventStory.models.SportUserInfo
 import band.effective.office.tv.screen.eventStory.models.StoryModel
+import band.effective.office.tv.screen.eventStory.models.SupernovaUserInfo
 import band.effective.office.tv.screen.navigation.Screen
 import band.effective.office.tv.screen.sport.model.toTwoColumns
 import band.effective.office.tv.screen.sport.model.toUi
@@ -112,7 +116,8 @@ class EventStoryViewModel @Inject constructor(
                 eventStoryData.getNotionDataForStories(),
                 eventStoryData.getDuolingoDataForStories(),
                 eventStoryData.getClockifyDataForStories(),
-            ) { notionData, duolingoInfo, clockifyInfo ->
+                eventStoryData.getSupernovaData()
+            ) { notionData, duolingoInfo, clockifyInfo, supernovaInfo ->
 
                 val events: MutableList<StoryModel> = mutableListOf()
                 var error = ""
@@ -128,8 +133,21 @@ class EventStoryViewModel @Inject constructor(
                 }
 
                 when (clockifyInfo) {
-                    is Either.Success -> events += setClockifyDataForScreens(clockifyInfo.data)
+                    is Either.Success -> {
+                        if (notionData is Either.Success) {
+                            events += setClockifyDataForScreens(clockifyInfo.data, notionData.data)
+                        }
+                    }
                     is Either.Failure -> error = clockifyInfo.error
+                }
+
+                when (supernovaInfo) {
+                    is Either.Success -> {
+                        if (notionData is Either.Success) {
+                            events += setSupernovaDataForScreen(supernovaInfo.data, notionData.data)
+                        }
+                    }
+                    is Either.Failure -> error = supernovaInfo.error
                 }
 
                 if (events.isEmpty()) return@combine Either.Failure(error)
@@ -144,15 +162,33 @@ class EventStoryViewModel @Inject constructor(
         startTimer()
     }
 
-    private fun setClockifyDataForScreens(clockifyUsers: List<ClockifyUser>) =
+    private fun setClockifyDataForScreens(
+        clockifyUsers: List<ClockifyUser>,
+        employees: List<EmployeeInfoEntity>
+    ) =
         listOf(
             SportUserInfo(
-            users = clockifyUsers
-                .take(countUsersToShow)
-                .toUi()
-                .sortedByDescending { it.totalSeconds }
-                .toTwoColumns(countUsersToShow)
-        ) as StoryModel)
+                users = clockifyUsers
+                    .toUi(employees)
+                    .take(countUsersToShow)
+                    .sortedByDescending { it.totalSeconds }
+                    .toTwoColumns(countUsersToShow)
+            ) as StoryModel
+        )
+
+    private fun setSupernovaDataForScreen(
+        supernovaUsers: List<Talent>,
+        employees: List<EmployeeInfoEntity>
+    ) =
+        listOf(
+            SupernovaUserInfo(
+                users = supernovaUsers
+                    .toUi(employees)
+                    .take(countUsersToShow)
+                    .sortedByDescending { it.score }
+                    .toTwoColumns(countUsersToShow)
+            ) as StoryModel
+        )
 
     private fun setDuolingoDataForScreens(duolingoUsers: List<DuolingoUser>) =
         run {

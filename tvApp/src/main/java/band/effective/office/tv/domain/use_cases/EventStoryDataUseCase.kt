@@ -24,7 +24,9 @@ class EventStoryDataCombinerUseCase @Inject constructor(
     private fun Teammate.toEmployeeInfoEntity() =
         SimpleDateFormat("yyyy-MM-dd").let { formater ->
             EmployeeInfoEntity(
+                id = id,
                 firstName = name,
+                workEmail = workEmail ?: "",
                 startDate = formater.format(startDate.time),
                 nextBirthdayDate = formater.format(nextBDay.time),
                 photoUrl = photo,
@@ -56,6 +58,18 @@ class EventStoryDataCombinerUseCase @Inject constructor(
     }
 
     suspend fun getClockifyDataForStories() = clockifyRepository.getTimeEntries()
+
+    fun getSupernovaData() = flow {
+        val response = try {
+            val talents = workTogether.getSupernovaTalents()
+            Either.Success(talents)
+        } catch (e: Throwable) {
+            Either.Failure(
+                e.message ?: "Error in EventStoryDataCombinerUseCase.getNotionDataForStories"
+            )
+        }
+        emit(response)
+    }
 
     suspend fun getDuolingoDataForStories() = duolingoRepository.getUsers()
 

@@ -48,6 +48,8 @@ class EmployeeInfoRemoteDataSourceImpl @Inject constructor(
             )
             null
         }
+        val id = page.properties["id"]?.id ?: ""
+        val workMail = page.properties["Effective Email"]?.email ?: ""
         val firstName = page.properties["Name"]?.title?.get(0)?.text?.content?.split(" ")
             ?.get(0)
         val startDate = page.properties["Start Date"]?.date?.start
@@ -56,6 +58,8 @@ class EmployeeInfoRemoteDataSourceImpl @Inject constructor(
         if (firstName != null && (startDate != null || nextBirthdayDate != null)) {
             employeeInfoList.add(
                 EmployeeInfoDto(
+                    id = id,
+                    mail = workMail,
                     firstName = firstName,
                     startDate = startDate,
                     nextBirthdayDate = nextBirthdayDate,
