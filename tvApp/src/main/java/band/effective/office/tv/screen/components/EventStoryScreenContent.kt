@@ -36,8 +36,9 @@ fun EventStoryScreenContent(
     Surface(
         modifier = modifier,
         color = when(eventsInfo[currentStoryIndex].storyType) {
-            StoryType.Sport -> EffectiveColor.backgroundSportColor
-            StoryType.Supernova -> EffectiveColor.backgroundSupernova
+            StoryType.Duolingo -> EffectiveColor.duolingo
+            StoryType.Sport -> EffectiveColor.sport
+            StoryType.Supernova -> EffectiveColor.supernova
             else -> EffectiveColor.white
         }
     ) {

@@ -20,12 +20,13 @@ import band.effective.office.tv.ui.theme.EffectiveColor
 
 @Composable
 fun TitleRating(
+    modifier: Modifier = Modifier,
     imagePath: Int,
     stringPath: Int
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
-            modifier = Modifier.size(32.dp),
+            modifier = modifier.size(32.dp),
             painter = painterResource(id = imagePath),
             contentDescription = "sport_icon"
         )

@@ -31,7 +31,10 @@ class DuolingoRepositoryImpl @Inject constructor(
                         null
                     }
 
-                    is Either.Success -> response.data.toDomain()?.copy(username = it.name)
+                    is Either.Success -> response.data.toDomain()?.copy(
+                        username = it.name.split(' ')[0],
+                        photo = it.photo
+                    )
                 }
             }
             if (!error) {
