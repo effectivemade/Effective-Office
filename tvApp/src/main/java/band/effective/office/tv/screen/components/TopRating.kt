@@ -12,9 +12,10 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.foundation.lazy.grid.TvGridCells
 import androidx.tv.foundation.lazy.grid.TvLazyHorizontalGrid
 import androidx.tv.foundation.lazy.grid.items
+import androidx.tv.foundation.lazy.grid.itemsIndexed
 
 @Composable
-fun <T> TopRating(users: List<T>, item: @Composable (modifier: Modifier, T) -> Unit) {
+fun <T> TopRating(users: List<T>, item: @Composable (modifier: Modifier, T, index: Int) -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
         TvLazyHorizontalGrid(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f),
@@ -22,7 +23,8 @@ fun <T> TopRating(users: List<T>, item: @Composable (modifier: Modifier, T) -> U
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            items(users) { item(Modifier.width(maxWidth / 2.2f), it) }
+            itemsIndexed(users) { index, user ->
+                item(Modifier.width(maxWidth / 2.2f), user, index + 1) }
         }
     }
 }

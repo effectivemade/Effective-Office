@@ -22,7 +22,7 @@ fun SupernovaScreen(
 ) {
     Box(
         modifier = Modifier
-            .background(EffectiveColor.backgroundSupernova)
+            .background(EffectiveColor.supernova)
             .fillMaxSize()
     ) {
         Column(
@@ -35,7 +35,7 @@ fun SupernovaScreen(
                 stringPath = R.string.supernova_title
             )
             Spacer(modifier = Modifier.height(30.dp))
-            TopRating(users = supernovaUsers) { modifier, supernovaUi ->
+            TopRating(users = supernovaUsers) { modifier, supernovaUi, _ ->
                 SupernovaItem(
                     modifier = modifier,
                     user = supernovaUi

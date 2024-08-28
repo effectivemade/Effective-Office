@@ -44,4 +44,9 @@
     <string name="hour_genitive">часа</string>
     <string name="hour_plural">часов</string>
     <string name="supernova_title">Supernova</string>
+    <string name="duolingo_title">Duolingo</string>
+    <string name="day_nominative">день</string>
+    <string name="day_genitive">дня</string>
+    <string name="day_plural">дней</string>
+    <string name="xp">XP</string>
 </resources>

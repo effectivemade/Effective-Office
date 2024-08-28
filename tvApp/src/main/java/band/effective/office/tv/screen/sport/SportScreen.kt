@@ -22,7 +22,7 @@ fun SportScreen(
 ) {
     Box(
         modifier = Modifier
-            .background(EffectiveColor.backgroundSportColor)
+            .background(EffectiveColor.sport)
             .fillMaxSize()
     ) {
         Column(
@@ -35,7 +35,7 @@ fun SportScreen(
                 stringPath = R.string.sport_title
             )
             Spacer(modifier = Modifier.height(30.dp))
-            TopRating(users = sportUsers) { modifier, sportUserUi ->
+            TopRating(users = sportUsers) { modifier, sportUserUi, _ ->
                 SportItem(
                     modifier = modifier,
                     user = sportUserUi
