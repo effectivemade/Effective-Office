@@ -16,10 +16,12 @@ import band.effective.office.tv.network.mattermost.model.MattermostErrorResponse
 import band.effective.office.tv.network.synology.SynologyApi
 import band.effective.office.tv.network.synology.models.error.SynologyApiError
 import band.effective.office.tv.network.uselessFact.UselessFactApi
-import band.effective.office.tv.repository.workTogether.WorkTogether
-import band.effective.office.tv.repository.workTogether.WorkTogetherImpl
+import band.effective.office.tv.repository.supernova.SupernovaRepository
+import band.effective.office.tv.repository.supernova.SupernovaRepositoryImpl
 import band.effective.office.tv.utils.GregorianCalendarMoshiAdapter
 import band.effective.office.tv.utils.RStringGetter
+import band.effective.office.workTogether.WorkTogether
+import band.effective.office.workTogether.WorkTogetherImpl
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.addAdapter
 import dagger.Module
@@ -178,7 +180,12 @@ class NetworkModule {
     @Singleton
     @Provides
     fun provideWorkTogether(notionClient: NotionClient): WorkTogether =
-        WorkTogetherImpl(notionClient)
+        WorkTogetherImpl(notionClient, BuildConfig.notionDatabaseId)
+
+    @Singleton
+    @Provides
+    fun provideSupernova(notionClient: NotionClient): SupernovaRepository =
+        SupernovaRepositoryImpl(notionClient)
 
     @Singleton
     @Provides

@@ -1,5 +1,6 @@
 package band.effective.office.tv.domain.model.notion
 
+import band.effective.office.tv.domain.model.DomainModel
 import band.effective.office.tv.screen.eventStory.models.*
 import band.effective.office.tv.utils.DateUtlils
 import band.effective.office.tv.utils.atDayStart
@@ -14,7 +15,7 @@ class EmployeeInfoEntity(
     val nextBirthdayDate: String,
     val photoUrl: String,
     val isIntern: Boolean,
-)
+): DomainModel()
 
 fun List<EmployeeInfoEntity>.processEmployeeInfo(): List<EmployeeInfoUI> =
     map { employee ->

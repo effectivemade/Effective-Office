@@ -12,8 +12,8 @@ import band.effective.office.tv.domain.model.notion.EmployeeInfoEntity
 import band.effective.office.tv.domain.model.notion.processEmployeeInfo
 import band.effective.office.tv.domain.use_cases.EventStoryDataCombinerUseCase
 import band.effective.office.tv.network.MattermostClient
-import band.effective.office.tv.repository.workTogether.Talent
-import band.effective.office.tv.repository.workTogether.toUi
+import band.effective.office.tv.repository.supernova.Talent
+import band.effective.office.tv.repository.supernova.toUi
 import band.effective.office.tv.screen.autoplayController.AutoplayController
 import band.effective.office.tv.screen.autoplayController.model.AutoplayState
 import band.effective.office.tv.screen.autoplayController.model.OnSwitchCallbacks
@@ -25,7 +25,6 @@ import band.effective.office.tv.screen.eventStory.models.SportUserInfo
 import band.effective.office.tv.screen.eventStory.models.StoryModel
 import band.effective.office.tv.screen.eventStory.models.SupernovaUserInfo
 import band.effective.office.tv.screen.navigation.Screen
-import band.effective.office.tv.screen.sport.model.toTwoColumns
 import band.effective.office.tv.screen.sport.model.toUi
 import coil.ImageLoader
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -112,83 +110,55 @@ class EventStoryViewModel @Inject constructor(
             updateStateAsException((exception as Error).message.orEmpty())
         }
         withContext(Dispatchers.IO + exceptionHandler) {
-            combine(
-                eventStoryData.getNotionDataForStories(),
-                eventStoryData.getDuolingoDataForStories(),
-                eventStoryData.getClockifyDataForStories(),
-                eventStoryData.getSupernovaData()
-            ) { notionData, duolingoInfo, clockifyInfo, supernovaInfo ->
-
-                val events: MutableList<StoryModel> = mutableListOf()
-                var error = ""
-
-                when (notionData) {
-                    is Either.Success -> events += notionData.data.processEmployeeInfo()
-                    is Either.Failure -> error = notionData.error
-                }
-
-                when (duolingoInfo) {
-                    is Either.Success -> events += setDuolingoDataForScreens(duolingoInfo.data)
-                    is Either.Failure -> error = duolingoInfo.error
-                }
-
-                when (clockifyInfo) {
+            eventStoryData.getAllDataForStories().collectLatest { events ->
+                when (events) {
                     is Either.Success -> {
-                        if (notionData is Either.Success) {
-                            events += setClockifyDataForScreens(clockifyInfo.data, notionData.data)
-                        }
+                        val teammates = events.data.filterIsInstance<EmployeeInfoEntity>()
+                        updateStateAsSuccessfulFetch(
+                            teammates.processEmployeeInfo() +
+                                    setDuolingoDataToStoryModel(
+                                        events.data.filterIsInstance<DuolingoUser>()
+                                    ) +
+                                    setClockifyDataToStoryModel(
+                                        events.data.filterIsInstance<ClockifyUser>(),
+                                        teammates
+                                    ) +
+                                    setSupernovaDataToStoryModel(
+                                        events.data.filterIsInstance<Talent>(),
+                                        teammates
+                                    )
+                        )
                     }
-                    is Either.Failure -> error = clockifyInfo.error
-                }
-
-                when (supernovaInfo) {
-                    is Either.Success -> {
-                        if (notionData is Either.Success) {
-                            events += setSupernovaDataForScreen(supernovaInfo.data, notionData.data)
-                        }
-                    }
-                    is Either.Failure -> error = supernovaInfo.error
-                }
-
-                if (events.isEmpty()) return@combine Either.Failure(error)
-                else Either.Success(events)
-            }.collectLatest { result ->
-                when (result) {
-                    is Either.Success -> updateStateAsSuccessfulFetch(result.data)
-                    is Either.Failure -> updateStateAsException(result.error)
+                    is Either.Failure -> updateStateAsException(events.error)
                 }
             }
         }
         startTimer()
     }
 
-    private fun setClockifyDataForScreens(
+    private fun setClockifyDataToStoryModel(
         clockifyUsers: List<ClockifyUser>,
         employees: List<EmployeeInfoEntity>
     ) =
-        listOf(
-            SportUserInfo(
-                users = clockifyUsers
-                    .toUi(employees)
-                    .take(countUsersToShow)
-                    .sortedByDescending { it.totalSeconds }
-            ) as StoryModel
-        )
+        SportUserInfo(
+            users = clockifyUsers
+                .toUi(employees)
+                .take(countUsersToShow)
+                .sortedByDescending { it.totalSeconds }
+        ) as StoryModel
 
-    private fun setSupernovaDataForScreen(
+    private fun setSupernovaDataToStoryModel(
         supernovaUsers: List<Talent>,
         employees: List<EmployeeInfoEntity>
     ) =
-        listOf(
-            SupernovaUserInfo(
-                users = supernovaUsers
-                    .toUi(employees)
-                    .take(countUsersToShow)
-                    .sortedByDescending { it.score }
-            ) as StoryModel
-        )
+        SupernovaUserInfo(
+            users = supernovaUsers
+                .toUi(employees)
+                .take(countUsersToShow)
+                .sortedByDescending { it.score }
+        ) as StoryModel
 
-    private fun setDuolingoDataForScreens(duolingoUsers: List<DuolingoUser>) =
+    private fun setDuolingoDataToStoryModel(duolingoUsers: List<DuolingoUser>) =
         run {
             val userXpSort = DuolingoUserInfo(
                 users = duolingoUsers
