@@ -6,18 +6,17 @@ import band.effective.office.tv.domain.model.duolingo.toDomain
 import band.effective.office.tv.domain.model.notion.EmploymentType
 import band.effective.office.tv.network.duolingo.DuolingoApi
 import band.effective.office.tv.repository.duolingo.DuolingoRepository
-import band.effective.office.tv.repository.workTogether.WorkTogether
+import band.effective.office.workTogether.Teammate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class DuolingoRepositoryImpl @Inject constructor(
     private val duolingoApi: DuolingoApi,
-    private val workTogether: WorkTogether
 ) : DuolingoRepository {
-    override suspend fun getUsers(): Flow<Either<String, List<DuolingoUser>>> =
+    override suspend fun getUsers(teammates: List<Teammate>): Flow<Either<String, List<DuolingoUser>>> =
         flow {
-            val users = workTogether.getAll().filter {
+            val users = teammates.filter {
                 it.duolingo != null
                         && it.employment == EmploymentType.Band.value
                         && it.status == "Active"

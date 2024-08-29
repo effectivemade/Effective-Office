@@ -1,6 +1,5 @@
 package band.effective.office.tv.repository.workTogether
 
-import android.util.Log
 import band.effective.office.tv.BuildConfig
 import notion.api.v1.NotionClient
 import notion.api.v1.model.common.File
@@ -19,19 +18,6 @@ class WorkTogetherImpl @Inject constructor(private val notionClient: NotionClien
         return notionClient.queryDatabase(
             request = QueryDatabaseRequest(BuildConfig.notionDatabaseId)
         ).results.map { it.toTeammate() }
-    }
-
-    override fun getSupernovaTalents(): List<Talent> {
-        return notionClient.queryDatabase(
-            request = QueryDatabaseRequest(BuildConfig.supernovaDatabaseId)
-        ).results
-            .groupBy { it.getStringFromProp("Talent") }
-            .map { (id, page) ->
-                Talent(
-                    id = id ?: "",
-                    score = page.sumOf { it.getNumberFromProp("Number") ?: 0 }
-                )
-            }
     }
 
     override fun getProperty(name: String): Map<String, String?> {
@@ -54,38 +40,38 @@ class WorkTogetherImpl @Inject constructor(private val notionClient: NotionClien
             photo = getIconUrl() ?: "",
             status = getStringFromProp("Status") ?: "Empty status"
         )
+    }
 
-    private fun Page.getStringFromProp(propName: String) =
-        properties[propName]?.run {
-            when (type) {
-                PropertyType.Title -> title?.firstOrNull()?.text?.content
-                PropertyType.RichText -> richText?.firstOrNull()?.text?.content
-                PropertyType.MultiSelect -> multiSelect?.fold("") { acc, option -> "$acc ${option.name}" }
-                PropertyType.Select -> select?.name
-                PropertyType.Date -> date?.start
-                PropertyType.Email -> email
-                PropertyType.Relation -> relation?.firstOrNull()?.id
-                else -> null
-            }
-        }
-
-    private fun Page.getNumberFromProp(propName: String) =
-        properties[propName]?.run {
-            when (type) {
-                PropertyType.Number -> number?.toInt()
-                else -> null
-            }
-        }
-
-    private fun Page.getDateFromProp(propName: String) = GregorianCalendar().apply {
-        val date = getStringFromProp(propName)
-        val simpleDateFormatter = SimpleDateFormat("yyyy-MM-dd")
-        time = if (date != null) {
-            simpleDateFormatter.parse(date) ?: Date(0)
-        } else {
-            Date(0)
+fun Page.getStringFromProp(propName: String) =
+    properties[propName]?.run {
+        when (type) {
+            PropertyType.Title -> title?.firstOrNull()?.text?.content
+            PropertyType.RichText -> richText?.firstOrNull()?.text?.content
+            PropertyType.MultiSelect -> multiSelect?.fold("") { acc, option -> "$acc ${option.name}" }
+            PropertyType.Select -> select?.name
+            PropertyType.Date -> date?.start
+            PropertyType.Email -> email
+            PropertyType.Relation -> relation?.firstOrNull()?.id
+            else -> null
         }
     }
 
-    private fun Page.getIconUrl() = (icon as? File)?.file?.url
+fun Page.getNumberFromProp(propName: String) =
+    properties[propName]?.run {
+        when (type) {
+            PropertyType.Number -> number?.toInt()
+            else -> null
+        }
+    }
+
+fun Page.getDateFromProp(propName: String) = GregorianCalendar().apply {
+    val date = getStringFromProp(propName)
+    val simpleDateFormatter = SimpleDateFormat("yyyy-MM-dd")
+    time = if (date != null) {
+        simpleDateFormatter.parse(date) ?: Date(0)
+    } else {
+        Date(0)
+    }
 }
+
+private fun Page.getIconUrl() = (icon as? File)?.file?.url

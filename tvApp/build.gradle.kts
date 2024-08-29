@@ -93,6 +93,7 @@ dependencies {
 
     // moshi
     implementation(libs.bundles.moshi.core)
+    implementation(project(":notion"))
     ksp(libs.moshi.gen)
 
     //hilt di
