@@ -26,6 +26,7 @@ import band.effective.office.tv.screen.eventStory.models.StoryModel
 import band.effective.office.tv.screen.eventStory.models.SupernovaUserInfo
 import band.effective.office.tv.screen.navigation.Screen
 import band.effective.office.tv.screen.sport.model.toUi
+import band.effective.office.tv.utils.StringResource
 import coil.ImageLoader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -107,7 +108,9 @@ class EventStoryViewModel @Inject constructor(
 
     private suspend fun initDataStory() {
         val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-            updateStateAsException((exception as Error).message.orEmpty())
+            updateStateAsException(
+                StringResource.DynamicResource((exception as Error).message.orEmpty())
+            )
         }
         withContext(Dispatchers.IO + exceptionHandler) {
             eventStoryData.getAllDataForStories().collectLatest { events ->
@@ -178,7 +181,7 @@ class EventStoryViewModel @Inject constructor(
             listOf(userXpSort, userStreakSort)
         }
 
-    private fun updateStateAsException(error: String) {
+    private fun updateStateAsException(error: StringResource) {
         autoplayController.addError(Screen.Stories)
         mutableState.update { state ->
             state.copy(

@@ -49,4 +49,6 @@
     <string name="day_genitive">дня</string>
     <string name="day_plural">дней</string>
     <string name="xp">XP</string>
+    <string name="error_supernova_usecase">Error in SupernovaDataUseCase.getSupernovaData</string>
+    <string name="error_notion_usecase">Error in WorkTogetherUseCase.getNotionDataForStories</string>
 </resources>
