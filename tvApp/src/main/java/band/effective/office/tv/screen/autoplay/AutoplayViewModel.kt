@@ -33,6 +33,7 @@ class AutoplayViewModel @Inject constructor(val autoplayController: AutoplayCont
         isLoading = isLoading,
         isLoaded = isData,
         isError = isError,
+        errorMessage = errorMessage,
         currentScreen = screensList.getOrNull(currentScreenNumber) ?: Screen.Menu
     )
 }

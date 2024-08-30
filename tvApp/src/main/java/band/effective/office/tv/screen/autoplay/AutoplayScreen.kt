@@ -30,7 +30,7 @@ fun AutoplayScreen(viewModel: AutoplayViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     when {
         state.isLoading -> LoadScreen()
-        state.isError -> ErrorScreen("error")
+        state.isError -> ErrorScreen(state.errorMessage.asString())
         state.isLoaded -> getScreen(screenName = state.currentScreen)
     }
 }

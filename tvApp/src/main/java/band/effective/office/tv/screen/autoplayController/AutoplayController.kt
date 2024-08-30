@@ -4,6 +4,7 @@ import band.effective.office.tv.screen.autoplayController.model.AutoplayState
 import band.effective.office.tv.screen.autoplayController.model.OnSwitchCallbacks
 import band.effective.office.tv.screen.autoplayController.model.ScreenState
 import band.effective.office.tv.screen.navigation.Screen
+import band.effective.office.tv.utils.StringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,14 +51,17 @@ class AutoplayController {
         }
     }
 
-    fun addError(screen: Screen) {
+    fun addError(screen: Screen, errorText: StringResource) {
         mutableState.update {
             it.copy(
                 screensList = it.screensList - screen,
                 currentScreenNumber = if (it.currentScreenNumber >= it.screensList.size) it.screensList.size - 1 else it.currentScreenNumber
             )
         }
-        if (state.value.screensList.size == 0) error = true
+        if (state.value.screensList.size == 0) {
+            error = true
+            mutableState.update { it.copy(errorMessage = errorText) }
+        }
         checkData()
     }
 

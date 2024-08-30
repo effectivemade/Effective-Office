@@ -1,7 +1,6 @@
 package band.effective.office.tv.domain.use_cases
 
 import android.annotation.SuppressLint
-import band.effective.office.tv.R
 import band.effective.office.tv.core.network.Either
 import band.effective.office.tv.domain.model.DomainModel
 import band.effective.office.tv.domain.model.message.MessageQueue
@@ -61,7 +60,7 @@ class EventStoryDataCombinerUseCase @Inject constructor(
                         }
                     }
                     is Either.Failure -> {
-                        return@flatMapConcat flowOf(Either.Failure(notionUsers.error))
+                        flowOf(Either.Failure(notionUsers.error))
                     }
                 }
             }
