@@ -37,26 +37,26 @@ class EventStoryDataCombinerUseCase @Inject constructor(
                             clockifyDataUseCase.getClockifyDataForStories(),
                             supernovaDataUseCase.getSupernovaData()
                         ) { duolingoData, clockifyData, supernovaData ->
-                            val storyModels: MutableList<DomainModel> = mutableListOf()
+                            val domainModels: MutableList<DomainModel> = mutableListOf()
                             lateinit var error: StringResource
 
-                            storyModels += notionUsers.data.map { it.toEmployeeInfoEntity() }
+                            domainModels += notionUsers.data.map { it.toEmployeeInfoEntity() }
 
                             when (duolingoData) {
-                                is Either.Success -> storyModels += duolingoData.data
+                                is Either.Success -> domainModels += duolingoData.data
                                 is Either.Failure -> error = StringResource.DynamicResource(duolingoData.error)
                             }
                             when (clockifyData) {
-                                is Either.Success -> storyModels += clockifyData.data
+                                is Either.Success -> domainModels += clockifyData.data
                                 is Either.Failure -> error = StringResource.DynamicResource(clockifyData.error)
                             }
                             when (supernovaData) {
-                                is Either.Success -> storyModels += supernovaData.data
+                                is Either.Success -> domainModels += supernovaData.data
                                 is Either.Failure -> error = supernovaData.error
                             }
 
-                            if (storyModels.isEmpty()) return@combine Either.Failure(error)
-                            else Either.Success(storyModels)
+                            if (domainModels.isEmpty()) return@combine Either.Failure(error)
+                            else Either.Success(domainModels)
                         }
                     }
                     is Either.Failure -> {
