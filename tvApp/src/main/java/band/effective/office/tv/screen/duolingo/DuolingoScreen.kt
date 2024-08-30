@@ -14,8 +14,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import band.effective.office.tv.R
-import band.effective.office.tv.screen.components.TitleRating
-import band.effective.office.tv.screen.components.TopRating
+import band.effective.office.tv.screen.ratings.TitleRating
+import band.effective.office.tv.screen.ratings.TopRating
 import band.effective.office.tv.screen.duolingo.components.DuolingoItem
 import band.effective.office.tv.screen.duolingo.model.DuolingoUserUI
 import band.effective.office.tv.screen.eventStory.KeySortDuolingoUser

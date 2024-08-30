@@ -25,7 +25,7 @@ import band.effective.office.tv.screen.eventStory.models.SportUserInfo
 import band.effective.office.tv.screen.eventStory.models.StoryModel
 import band.effective.office.tv.screen.eventStory.models.SupernovaUserInfo
 import band.effective.office.tv.screen.navigation.Screen
-import band.effective.office.tv.screen.sport.model.toUi
+import band.effective.office.tv.screen.ratings.sport.model.toUi
 import band.effective.office.tv.utils.StringResource
 import coil.ImageLoader
 import dagger.hilt.android.lifecycle.HiltViewModel

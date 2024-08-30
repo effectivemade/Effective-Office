@@ -24,8 +24,6 @@ class EventStoryDataCombinerUseCase @Inject constructor(
     val supernovaDataUseCase: SupernovaDataUseCase
 ) {
 
-    fun getMessagesFromMattermost() = MessageQueue.secondQueue.toListOfEmployeeInfo()
-
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun getAllDataForStories() =
         workTogetherUseCase.getNotionDataForStories()

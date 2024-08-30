@@ -9,7 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import band.effective.office.tv.screen.sport.SportScreen
+import band.effective.office.tv.R
 import band.effective.office.tv.screen.duolingo.DuolingoScreen
 import band.effective.office.tv.screen.eventStory.models.DuolingoUserInfo
 import band.effective.office.tv.screen.eventStory.models.EmployeeInfoUI
@@ -19,7 +19,10 @@ import band.effective.office.tv.screen.eventStory.models.StoryModel
 import band.effective.office.tv.screen.eventStory.models.StoryType
 import band.effective.office.tv.screen.eventStory.models.SupernovaUserInfo
 import band.effective.office.tv.screen.message.component.OneMessageScreen
-import band.effective.office.tv.screen.supernova.SupernovaScreen
+import band.effective.office.tv.screen.ratings.RatingScreen
+import band.effective.office.tv.screen.ratings.TopRating
+import band.effective.office.tv.screen.ratings.sport.SportItem
+import band.effective.office.tv.screen.ratings.supernova.SupernovaItem
 import band.effective.office.tv.ui.theme.EffectiveColor
 import coil.ImageLoader
 
@@ -66,7 +69,7 @@ fun EventStoryScreenContent(
                     val duolingoItem = eventsInfo[currentStoryIndex] as DuolingoUserInfo
                     DuolingoScreen(
                         keySort = duolingoItem.keySort,
-                        duolingoUser = duolingoItem.users.take(10)
+                        duolingoUser = duolingoItem.users
                     )
                 }
                 StoryType.Message -> {
@@ -79,19 +82,44 @@ fun EventStoryScreenContent(
                 }
 
                 StoryType.Sport -> {
-                    val sportItem = eventsInfo[currentStoryIndex]
-                    SportScreen(
-                        sportUsers = if (sportItem is SportUserInfo) sportItem.users else emptyList()
-                    )
+                    val sportItems = eventsInfo[currentStoryIndex].let {
+                        if (it is SportUserInfo) it.users
+                        else emptyList()
+                    }
+                    RatingScreen(
+                        users = sportItems,
+                        backgroundColor = EffectiveColor.sport,
+                        titlePath = R.string.sport_title,
+                        logoPath = R.drawable.sport_logo
+                    ) {
+                        TopRating(users = it) { modifier, user, _ ->
+                            SportItem(
+                                modifier = modifier,
+                                user = user
+                            )
+                        }
+                    }
                 }
                 StoryType.Supernova -> {
-                    val supernovaItem = eventsInfo[currentStoryIndex]
-                    SupernovaScreen(
-                        supernovaUsers = if (supernovaItem is SupernovaUserInfo) supernovaItem.users else emptyList()
-                    )
+                    val supernovaItems = eventsInfo[currentStoryIndex].let {
+                        if (it is SupernovaUserInfo ) it.users
+                        else emptyList()
+                    }
+                    RatingScreen(
+                        users = supernovaItems,
+                        backgroundColor = EffectiveColor.supernova,
+                        titlePath = R.string.supernova_title,
+                        logoPath = R.drawable.supernova
+                    ) {
+                        TopRating(users = it) { modifier, user, _ ->
+                            SupernovaItem(
+                                modifier = modifier,
+                                user = user
+                            )
+                        }
+                    }
                 }
             }
-
         }
     }
 }

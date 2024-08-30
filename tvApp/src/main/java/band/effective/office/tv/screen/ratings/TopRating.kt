@@ -1,4 +1,4 @@
-package band.effective.office.tv.screen.components
+package band.effective.office.tv.screen.ratings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.tv.foundation.lazy.grid.TvGridCells
 import androidx.tv.foundation.lazy.grid.TvLazyHorizontalGrid
-import androidx.tv.foundation.lazy.grid.items
 import androidx.tv.foundation.lazy.grid.itemsIndexed
 
 @Composable

@@ -1,10 +1,10 @@
 package band.effective.office.tv.screen.eventStory.models
 
 import band.effective.office.tv.domain.model.message.BotMessage
-import band.effective.office.tv.screen.sport.model.SportUserUi
+import band.effective.office.tv.screen.ratings.sport.model.SportUserUi
 import band.effective.office.tv.screen.duolingo.model.DuolingoUserUI
 import band.effective.office.tv.screen.eventStory.KeySortDuolingoUser
-import band.effective.office.tv.screen.supernova.model.SupernovaUserUi
+import band.effective.office.tv.screen.ratings.supernova.model.SupernovaUserUi
 
 sealed class EmployeeInfoUI(
     val name: String,

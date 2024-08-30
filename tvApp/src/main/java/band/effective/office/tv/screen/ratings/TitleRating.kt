@@ -1,4 +1,4 @@
-package band.effective.office.tv.screen.components
+package band.effective.office.tv.screen.ratings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row

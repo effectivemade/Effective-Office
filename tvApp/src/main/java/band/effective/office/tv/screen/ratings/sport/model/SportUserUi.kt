@@ -1,4 +1,4 @@
-package band.effective.office.tv.screen.sport.model
+package band.effective.office.tv.screen.ratings.sport.model
 
 import band.effective.office.tv.domain.model.clockify.ClockifyUser
 import band.effective.office.tv.domain.model.notion.EmployeeInfoEntity
