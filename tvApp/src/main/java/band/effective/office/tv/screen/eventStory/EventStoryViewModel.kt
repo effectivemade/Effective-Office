@@ -182,7 +182,10 @@ class EventStoryViewModel @Inject constructor(
         }
 
     private fun updateStateAsException(error: StringResource) {
-        autoplayController.addError(Screen.Stories)
+        autoplayController.addError(
+            screen = Screen.Stories,
+            errorText = error
+        )
         mutableState.update { state ->
             state.copy(
                 isError = true,

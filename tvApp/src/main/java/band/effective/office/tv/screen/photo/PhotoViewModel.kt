@@ -12,6 +12,7 @@ import band.effective.office.tv.screen.autoplayController.model.OnSwitchCallback
 import band.effective.office.tv.screen.autoplayController.model.ScreenState
 import band.effective.office.tv.screen.navigation.Screen
 import band.effective.office.tv.screen.photo.model.toUIModel
+import band.effective.office.tv.utils.StringResource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -119,7 +120,10 @@ class PhotoViewModel @Inject constructor(
         repository.getPhotosUrl().collect { result ->
             when (result) {
                 is Either.Failure -> {
-                    autoplayController.addError(Screen.BestPhoto)
+                    autoplayController.addError(
+                        screen = Screen.BestPhoto,
+                        errorText = StringResource.DynamicResource(result.error)
+                    )
                     mutableState.update { state ->
                         state.copy(isError = true, error = result.error, isLoading = false)
                     }

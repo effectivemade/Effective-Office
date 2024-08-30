@@ -1,24 +1,21 @@
 package band.effective.office.tv.screen.leaderIdEvents
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import band.effective.office.tv.core.network.Either
 import band.effective.office.tv.core.ui.screen_with_controls.TimerSlideShow
 import band.effective.office.tv.repository.leaderId.LeaderIdEventsInfoRepository
-import band.effective.office.tv.repository.workTogether.WorkTogether
 import band.effective.office.tv.screen.autoplayController.AutoplayController
 import band.effective.office.tv.screen.autoplayController.model.AutoplayState
 import band.effective.office.tv.screen.autoplayController.model.OnSwitchCallbacks
 import band.effective.office.tv.screen.autoplayController.model.ScreenState
 import band.effective.office.tv.screen.navigation.Screen
+import band.effective.office.tv.utils.StringResource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
 import javax.inject.Inject
@@ -81,7 +78,10 @@ class LeaderIdEventsViewModel @Inject constructor(
         leaderIdEventsInfoRepository.getEventsInfo(finish).collect { either ->
             when {
                 either is Either.Failure -> mutableState.update {
-                    autoplayController.addError(Screen.Events)
+                    autoplayController.addError(
+                        screen = Screen.Events,
+                        errorText = StringResource.DynamicResource(either.error)
+                    )
                     it.copy(
                         isLoading = false,
                         isError = true,
