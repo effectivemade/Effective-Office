@@ -1,4 +1,4 @@
-package band.effective.office.tv.screen.supernova.model
+package band.effective.office.tv.screen.ratings.supernova.model
 
 data class SupernovaUserUi(
     val photoUrl: String,

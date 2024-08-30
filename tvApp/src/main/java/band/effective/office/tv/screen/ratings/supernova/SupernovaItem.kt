@@ -1,5 +1,6 @@
-package band.effective.office.tv.screen.sport
+package band.effective.office.tv.screen.ratings.supernova
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -22,17 +22,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import band.effective.office.tv.R
-import band.effective.office.tv.screen.sport.model.SportUserUi
+import band.effective.office.tv.screen.ratings.supernova.model.SupernovaUserUi
 import band.effective.office.tv.ui.theme.EffectiveColor
-import band.effective.office.tv.utils.getCorrectDeclension
 import coil.compose.AsyncImage
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @Composable
-fun SportItem(
+fun SupernovaItem(
     modifier: Modifier,
-    user: SportUserUi
+    user: SupernovaUserUi
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -41,14 +38,14 @@ fun SportItem(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
-                model = user.photo,
+                model = user.photoUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .size(45.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.sport_logo),
-                error = painterResource(id = R.drawable.sport_logo)
+                placeholder = painterResource(id = R.drawable.supernova),
+                error = painterResource(id = R.drawable.supernova)
             )
             Spacer(modifier = Modifier.width(15.dp))
             Text(
@@ -61,20 +58,21 @@ fun SportItem(
                 maxLines = 1
             )
         }
-        Text(
-            text = "${user.totalSeconds.toDuration(DurationUnit.SECONDS).inWholeHours.toInt()} "
-                    + getCorrectDeclension(
-                number = user.totalSeconds.toDuration(DurationUnit.SECONDS).inWholeHours.toInt(),
-                nominativeCase = stringResource(id = R.string.hour_nominative),
-                genitive = stringResource(id = R.string.hour_genitive),
-                genitivePlural = stringResource(id = R.string.hour_plural)
-            ),
-            fontFamily = FontFamily(Font(R.font.druktextwidelcg_medium)),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = EffectiveColor.fontEventStoryColor,
-            textAlign = TextAlign.Right,
-            maxLines = 1
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "${user.score}",
+                fontFamily = FontFamily(Font(R.font.druktextwidelcg_medium)),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = EffectiveColor.fontEventStoryColor,
+                textAlign = TextAlign.Right
+            )
+            Spacer(modifier = Modifier.width(2.dp))
+            Image(
+                modifier = Modifier.size(15.dp),
+                painter = painterResource(id = R.drawable.currency),
+                contentDescription = null
+            )
+        }
     }
 }
