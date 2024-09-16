@@ -1,5 +1,7 @@
 package band.effective.office.tv.screen.components
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,7 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import band.effective.office.tv.R
 import band.effective.office.tv.screen.duolingo.DuolingoScreen
@@ -25,6 +29,11 @@ import band.effective.office.tv.screen.ratings.sport.SportItem
 import band.effective.office.tv.screen.ratings.supernova.SupernovaItem
 import band.effective.office.tv.ui.theme.EffectiveColor
 import coil.ImageLoader
+import coil.decode.DecodeResult
+import coil.decode.Decoder
+import coil.imageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 
 @Composable
 fun EventStoryScreenContent(
@@ -36,6 +45,39 @@ fun EventStoryScreenContent(
     onImageLoading: () -> Unit,
     onImageLoaded: () -> Unit,
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        val paths: MutableList<String> = mutableListOf()
+        eventsInfo.forEach { event ->
+            when (event) {
+                is DuolingoUserInfo -> {
+                    event.users.forEach {
+                        paths.add(it.photo)
+                    }
+                }
+                is SportUserInfo -> {
+                    event.users.forEach {
+                        paths.add(it.photo)
+                    }
+                }
+                is SupernovaUserInfo -> {
+                    event.users.forEach {
+                        paths.add(it.photoUrl)
+                    }
+                }
+            }
+        }
+        paths.forEach {
+            val request = ImageRequest.Builder(context)
+                .data(it)
+                .memoryCachePolicy(CachePolicy.DISABLED)
+                .decoderFactory { _, _, _ ->
+                    Decoder { DecodeResult(ColorDrawable(Color.BLACK), false) }
+                }
+                .build()
+            context.imageLoader.enqueue(request)
+        }
+    }
     Surface(
         modifier = modifier,
         color = when(eventsInfo[currentStoryIndex].storyType) {
