@@ -58,7 +58,7 @@ class AutoplayController {
                 currentScreenNumber = if (it.currentScreenNumber >= it.screensList.size) it.screensList.size - 1 else it.currentScreenNumber
             )
         }
-        if (state.value.screensList.size == 0) {
+        if (state.value.screensList.isEmpty()) {
             error = true
             mutableState.update { it.copy(errorMessage = errorText) }
         }

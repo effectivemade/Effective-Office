@@ -1,13 +1,13 @@
 package band.effective.office.tv.domain.model.clockify
 
-import band.effective.office.tv.domain.model.DomainModel
+import band.effective.office.tv.domain.model.StoryDomainModel
 import band.effective.office.tv.network.clockify.models.responce.ClockifyResponse
 
 data class ClockifyUser(
     val name: String,
     val email: String,
     val totalSeconds: Int
-) : DomainModel()
+) : StoryDomainModel()
 
 fun ClockifyResponse.toDomainList(): List<ClockifyUser> =
     timeEntries

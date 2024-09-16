@@ -2,7 +2,7 @@ package band.effective.office.tv.domain.use_cases
 
 import android.annotation.SuppressLint
 import band.effective.office.tv.core.network.Either
-import band.effective.office.tv.domain.model.DomainModel
+import band.effective.office.tv.domain.model.StoryDomainModel
 import band.effective.office.tv.domain.model.message.MessageQueue
 import band.effective.office.tv.domain.model.notion.EmployeeInfoEntity
 import band.effective.office.tv.domain.model.notion.EmploymentType
@@ -35,26 +35,26 @@ class EventStoryDataCombinerUseCase @Inject constructor(
                             clockifyDataUseCase.getClockifyDataForStories(),
                             supernovaDataUseCase.getSupernovaData()
                         ) { duolingoData, clockifyData, supernovaData ->
-                            val domainModels: MutableList<DomainModel> = mutableListOf()
+                            val combinedStoryModels: MutableList<StoryDomainModel> = mutableListOf()
                             lateinit var error: StringResource
 
-                            domainModels += notionUsers.data.map { it.toEmployeeInfoEntity() }
+                            combinedStoryModels += notionUsers.data.map { it.toEmployeeInfoEntity() }
 
                             when (duolingoData) {
-                                is Either.Success -> domainModels += duolingoData.data
+                                is Either.Success -> combinedStoryModels += duolingoData.data
                                 is Either.Failure -> error = StringResource.DynamicResource(duolingoData.error)
                             }
                             when (clockifyData) {
-                                is Either.Success -> domainModels += clockifyData.data
+                                is Either.Success -> combinedStoryModels += clockifyData.data
                                 is Either.Failure -> error = StringResource.DynamicResource(clockifyData.error)
                             }
                             when (supernovaData) {
-                                is Either.Success -> domainModels += supernovaData.data
+                                is Either.Success -> combinedStoryModels += supernovaData.data
                                 is Either.Failure -> error = supernovaData.error
                             }
 
-                            if (domainModels.isEmpty()) return@combine Either.Failure(error)
-                            else Either.Success(domainModels)
+                            if (combinedStoryModels.isEmpty()) return@combine Either.Failure(error)
+                            else Either.Success(combinedStoryModels)
                         }
                     }
                     is Either.Failure -> {
