@@ -1,6 +1,6 @@
 package band.effective.office.tv.domain.model.duolingo
 
-import band.effective.office.tv.domain.model.DomainModel
+import band.effective.office.tv.domain.model.StoryDomainModel
 import band.effective.office.tv.network.duolingo.models.DuolingoResponse
 
 data class DuolingoUser(
@@ -9,7 +9,7 @@ data class DuolingoUser(
     val photo: String,
     val streakDay: Int,
     val countryLang: List<String>
-): DomainModel()
+): StoryDomainModel()
 
 fun DuolingoResponse.toDomain(): DuolingoUser? {
     return if (users.isEmpty()) null
