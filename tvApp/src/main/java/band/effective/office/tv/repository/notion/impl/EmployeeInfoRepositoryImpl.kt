@@ -19,7 +19,9 @@ class EmployeeInfoRepositoryImpl @Inject constructor(private val employeeInfoRem
                 is Either.Success -> {
                     emit(Either.Success(either.data.map { employee ->
                         EmployeeInfoEntity(
+                            employee.id,
                             employee.firstName.orEmpty(),
+                            employee.mail,
                             employee.startDate.orEmpty(),
                             employee.nextBirthdayDate.orEmpty(),
                             employee.photoUrl.orEmpty(),

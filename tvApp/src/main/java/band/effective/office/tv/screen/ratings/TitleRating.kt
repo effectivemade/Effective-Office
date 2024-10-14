@@ -1,4 +1,4 @@
-package band.effective.office.tv.screen.sport.components
+package band.effective.office.tv.screen.ratings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -19,18 +19,22 @@ import band.effective.office.tv.R
 import band.effective.office.tv.ui.theme.EffectiveColor
 
 @Composable
-fun SportTitle() {
+fun TitleRating(
+    modifier: Modifier = Modifier,
+    imagePath: Int,
+    stringPath: Int
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
-            modifier = Modifier.size(45.dp),
-            painter = painterResource(id = R.drawable.sport_logo),
+            modifier = modifier.size(32.dp),
+            painter = painterResource(id = imagePath),
             contentDescription = "sport_icon"
         )
         Spacer(modifier = Modifier.width(20.dp))
         Text(
-            text = stringResource(id = R.string.sport_title),
+            text = stringResource(id = stringPath),
             fontFamily = FontFamily(Font(R.font.roboto_regular)),
-            fontSize = 17.sp,
+            fontSize = 14.sp,
             color = EffectiveColor.fontEventStoryColor
         )
     }

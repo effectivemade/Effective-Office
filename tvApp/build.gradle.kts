@@ -46,6 +46,7 @@ android {
         buildConfigField("String", "clockifyApiKey", localProperties["clockifyApiKey"].toString())
         buildConfigField("String", "clockifyWorkspaceId", localProperties["clockifyWorkspaceId"].toString())
         buildConfigField("String", "clockifyProjectId", localProperties["clockifyProjectId"].toString())
+        buildConfigField("String", "supernovaDatabaseId", localProperties["NOTION_SUPERNOVA_DB_ID"].toString())
     }
 
     buildTypes {
@@ -92,6 +93,7 @@ dependencies {
 
     // moshi
     implementation(libs.bundles.moshi.core)
+    implementation(project(":notion"))
     ksp(libs.moshi.gen)
 
     //hilt di

@@ -1,5 +1,6 @@
 package band.effective.office.tv.domain.model.notion
 
+import band.effective.office.tv.domain.model.StoryDomainModel
 import band.effective.office.tv.screen.eventStory.models.*
 import band.effective.office.tv.utils.DateUtlils
 import band.effective.office.tv.utils.atDayStart
@@ -7,12 +8,14 @@ import band.effective.office.tv.utils.isSameDay
 import java.util.Calendar
 
 class EmployeeInfoEntity(
+    val id: String,
     val firstName: String,
+    val workEmail: String,
     val startDate: String,
     val nextBirthdayDate: String,
     val photoUrl: String,
     val isIntern: Boolean,
-)
+): StoryDomainModel()
 
 fun List<EmployeeInfoEntity>.processEmployeeInfo(): List<EmployeeInfoUI> =
     map { employee ->

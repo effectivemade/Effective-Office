@@ -7,49 +7,63 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.Text
 import band.effective.office.tv.R
-import band.effective.office.tv.screen.duolingo.components.DuolingoTitle
-import band.effective.office.tv.screen.duolingo.components.TopsUser
+import band.effective.office.tv.screen.ratings.TitleRating
+import band.effective.office.tv.screen.ratings.TopRating
+import band.effective.office.tv.screen.duolingo.components.DuolingoItem
 import band.effective.office.tv.screen.duolingo.model.DuolingoUserUI
 import band.effective.office.tv.screen.eventStory.KeySortDuolingoUser
+import band.effective.office.tv.ui.theme.EffectiveColor
+import band.effective.office.tv.utils.getCorrectDeclension
 
 @Composable
-fun DuolingoScreen(keySort: KeySortDuolingoUser, duolingoUser: List<DuolingoUserUI>) {
+fun DuolingoScreen(
+    keySort: KeySortDuolingoUser,
+    duolingoUser: List<DuolingoUserUI>
+) {
     Box(
         modifier = Modifier
-            .background(Color.White)
+            .background(EffectiveColor.duolingo)
             .fillMaxSize()
     ) {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 80.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 60.dp, end = 120.dp)
         ) {
-            DuolingoTitle(Modifier.padding(start = 10.dp))
-            Spacer(modifier = Modifier.height(10.dp))
-            val textTitle = when (keySort){
-                KeySortDuolingoUser.Xp -> {
-                    stringResource(id = R.string.top_for_XP)
-                }
-                KeySortDuolingoUser.Streak -> {
-                   stringResource(id = R.string.top_for_days)
-                }
-            }
-            Text(
-                text = textTitle,
-                fontFamily = MaterialTheme.typography.h1.fontFamily,
-                fontSize = MaterialTheme.typography.h1.fontSize,
-                fontWeight = FontWeight.SemiBold
+            TitleRating(
+                modifier = Modifier.clip(CircleShape),
+                imagePath = R.drawable.duolingo_logo,
+                stringPath = R.string.duolingo_title
             )
-            Spacer(modifier = Modifier.height(10.dp))
-            TopsUser(users = duolingoUser, keySort = keySort)
+            Spacer(modifier = Modifier.height(30.dp))
+            TopRating(users = duolingoUser) { modifier, duolingoUserUi, index ->
+                val result = when (keySort) {
+                    KeySortDuolingoUser.Streak -> {
+                        "${duolingoUserUi.streakDay} " +
+                                getCorrectDeclension(
+                                    number = duolingoUserUi.streakDay,
+                                    nominativeCase = stringResource(id = R.string.day_nominative),
+                                    genitive = stringResource(id = R.string.day_genitive),
+                                    genitivePlural = stringResource(id = R.string.day_plural)
+                                )
+                    }
+                    KeySortDuolingoUser.Xp -> "${duolingoUserUi.totalXp} " + stringResource(id = R.string.xp)
+                }
+                DuolingoItem(
+                    modifier = modifier,
+                    user = duolingoUserUi,
+                    indicatorUsers = result,
+                    place = index,
+                    keySort = keySort
+                )
+            }
         }
     }
 }
