@@ -12,7 +12,6 @@ interface EmployeeStore: Store<EmployeeStore.Intent, EmployeeStore.State, Employ
 
     data class State(
         val changeShowedEmployeeCards: List<EmployeeCard>,
-        val countShowedEmployeeCards:String,
         val query:String,
         val isLoading: Boolean = true,
         val allEmployeeList: List<EmployeeInfo> // TODO(Artem Gruzdev) change model of this list
