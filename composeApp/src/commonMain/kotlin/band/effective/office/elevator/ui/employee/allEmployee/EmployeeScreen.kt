@@ -3,38 +3,44 @@ package band.effective.office.elevator.ui.employee.allEmployee
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import band.effective.office.elevator.ExtendedThemeColors
@@ -55,7 +61,6 @@ fun EmployeeScreen(component: EmployeeComponent) {
 
     val employState by component.employState.collectAsState()
     val employeesData = employState.changeShowedEmployeeCards
-    val employeesCount = employState.countShowedEmployeeCards
     val userMessageState = employState.query
 
 
@@ -73,7 +78,6 @@ fun EmployeeScreen(component: EmployeeComponent) {
     EmployeeScreenContent(
         isLoading = employState.isLoading,
         employeesData = employeesData,
-        employeesCount = employeesCount,
         userMessageState = userMessageState,
         onCardClick = { component.onEvent(EmployeeStore.Intent.OnClickOnEmployee(it)) },
         onTextFieldUpdate = { component.onEvent(EmployeeStore.Intent.OnTextFieldUpdate(it)) })
@@ -81,8 +85,8 @@ fun EmployeeScreen(component: EmployeeComponent) {
 
 @Composable
 fun EmployeeScreenContent(
+    modifier: Modifier = Modifier,
     employeesData: List<EmployeeCard>,
-    employeesCount: String,
     userMessageState: String,
     onCardClick: (String) -> Unit,
     onTextFieldUpdate: (String) -> Unit,
@@ -95,78 +99,35 @@ fun EmployeeScreenContent(
 
     Column {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .background(theme_light_onPrimary)
                 .padding(bottom = 15.dp)
                 .fillMaxWidth()
         ) {
             Text(
                 text = stringResource(MainRes.strings.employees),
-                fontSize = 20.sp,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
                 fontWeight = FontWeight(600),//?
                 color = ExtendedThemeColors.colors.blackColor,
-                modifier = Modifier.padding(start = 20.dp, top = 55.dp, end = 15.dp, bottom = 25.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, top = 55.dp, end = 15.dp, bottom = 25.dp)
             )
-            TextField(
-                value = query, onValueChange = {
+            SearchTextField(
+                query = query,
+                onTextFieldUpdate = {
                     query = it
                     onTextFieldUpdate(it)
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 5.dp),
-                textStyle = TextStyle(
-                    color = ExtendedThemeColors.colors.trinidad_400,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight(500)
-                ),
-                colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = ExtendedThemeColors.colors.transparentColor,
-                    disabledIndicatorColor = ExtendedThemeColors.colors.transparentColor,
-                    unfocusedIndicatorColor = ExtendedThemeColors.colors.transparentColor,
-                    backgroundColor = MaterialTheme.colors.background
-                ),
-                placeholder = {
-                    Text(
-                        text = stringResource(MainRes.strings.search_employee),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight(500),//Style. maththeme
-                        color = textInBorderGray
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(MainRes.images.baseline_search_24),
-                        contentDescription = "SearchField",
-                        tint = textInBorderGray
-                    )
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(32.dp)
-
+                }
             )
-
         }
-        Column (
+        Column(
             modifier = Modifier
-                .background(MaterialTheme.colors.onBackground)
+                .background(theme_light_onPrimary)
                 .fillMaxSize()
                 .padding(start = 20.dp, top = 25.dp, end = 20.dp)
         ) {
-            Row(modifier = Modifier.padding(bottom = 25.dp).fillMaxWidth()) {
-                Text(
-                    text = stringResource(MainRes.strings.employees) + " ",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight(500),
-                    color = ExtendedThemeColors.colors.blackColor
-                )
-                Text(
-                    text = "($employeesCount)",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight(400),
-                    color = ExtendedThemeColors.colors.purple_heart_800
-                )
-            }
-
             when (isLoading) {
                 true -> {
                     LoadingIndicator()
@@ -185,8 +146,73 @@ fun EmployeeScreenContent(
 }
 
 @Composable
+private fun SearchTextField(
+    modifier: Modifier = Modifier,
+    query: String,
+    onTextFieldUpdate: (String) -> Unit,
+) {
+    val interactionSource = MutableInteractionSource()
+    val isFocused by interactionSource.collectIsFocusedAsState()
 
-fun EveryEmployeeCard(emp: EmployeeCard, onCardClick: (String) -> Unit) {
+    Row(
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .border(1.dp, color = Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+            .padding(vertical = 4.dp)
+            .padding(start = 24.dp, end = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(MainRes.images.ic_search),
+            tint = if (isFocused) ExtendedThemeColors.colors.trinidad_400 else Color.LightGray,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
+        )
+        BasicTextField(
+            modifier = Modifier
+                .padding(16.dp)
+                .weight(1f),
+            value = query,
+            onValueChange = onTextFieldUpdate,
+            interactionSource = interactionSource,
+            textStyle = TextStyle.Default.copy(fontSize = 14.sp),
+            singleLine = true,
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.wrapContentSize(align = Alignment.CenterStart),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    val hint = if (query.isEmpty()) {
+                        stringResource(MainRes.strings.search_employee)
+                    } else {
+                        ""
+                    }
+                    Text(
+                        text = hint,
+                        fontSize = 14.sp,
+                    )
+                    innerTextField()
+                }
+            }
+        )
+        if (query.isNotEmpty()) {
+            IconButton(
+                onClick = { onTextFieldUpdate("") },
+            ) {
+                Icon(
+                    painter = painterResource(MainRes.images.ic_cross),
+                    tint = Color.LightGray,
+                    contentDescription = stringResource(MainRes.strings.clear_text_field),
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EveryEmployeeCard(emp: EmployeeCard, onCardClick: (String) -> Unit) {
     var isExpanded by remember { mutableStateOf(false) }
     if (isExpanded) {
         onCardClick(emp.id)
@@ -201,7 +227,7 @@ fun EveryEmployeeCard(emp: EmployeeCard, onCardClick: (String) -> Unit) {
             .padding(bottom = 15.dp)
             .animateContentSize()
             .clickable { isExpanded = !isExpanded },
-        color = MaterialTheme.colors.onPrimary
+        color = MaterialTheme.colors.onPrimary,
     ) {
         Row(modifier = Modifier.padding(6.dp, 15.dp)) {
             emp.logoUrl.let { url ->
@@ -218,7 +244,7 @@ fun EveryEmployeeCard(emp: EmployeeCard, onCardClick: (String) -> Unit) {
                 )
                 Image(
                     painter = painter,
-                    contentDescription = "Employee logo",
+                    contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .clip(CircleShape)
@@ -226,23 +252,21 @@ fun EveryEmployeeCard(emp: EmployeeCard, onCardClick: (String) -> Unit) {
                 )
             }
 
-            Column(modifier = Modifier.padding(15.dp, 0.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 15.dp)) {
                 Text(
                     text = emp.name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight(500),
-                    color = ExtendedThemeColors.colors.blackColor
+                    color = ExtendedThemeColors.colors.blackColor,
                 )
-
                 Spacer(modifier = Modifier.padding(0.dp, 4.dp))
                 Text(
                     text = emp.post,
                     fontSize = 16.sp,
                     fontWeight = FontWeight(400),
-                    color = textInBorderGray
+                    color = textInBorderGray,
                 )
             }
         }
     }
 }
-

@@ -83,7 +83,7 @@ kotlin {
 
 val apiKey: String = gradleLocalProperties(rootDir).getProperty("apiKey")
 buildConfig {
-    buildConfigField("String", "apiKey", apiKey)
+    buildConfigField("String", "apiKey", "\"$apiKey\"")
     buildConfigField(
         "String",
         "releaseServerUrl",
