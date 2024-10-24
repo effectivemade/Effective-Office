@@ -134,13 +134,19 @@ private fun calculateAnimatedAlpha(
 }
 
 private fun calculateSnappedItemIndex(lazyListState: LazyListState, rowCount: Int): Int {
-    return lazyListState.layoutInfo.visibleItemsInfo
-        .maxBy { calculateAnimatedAlpha(
-            lazyListState = lazyListState,
-            index = it.index,
-            rowCount = rowCount
-        ) }
-        .index
+    val visibleItems = lazyListState.layoutInfo.visibleItemsInfo
+    return if (visibleItems.isNotEmpty()) {
+        visibleItems.maxByOrNull {
+            calculateAnimatedAlpha(
+                lazyListState = lazyListState,
+                index = it.index,
+                rowCount = rowCount
+            )
+        }?.index ?: 0
+    }
+    else {
+        lazyListState.firstVisibleItemIndex
+    }
 }
 
 //@Composable
@@ -217,4 +223,3 @@ internal class DefaultSelectorProperties(
         return rememberUpdatedState(border)
     }
 }
-
