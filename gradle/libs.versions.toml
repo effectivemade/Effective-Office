@@ -100,6 +100,7 @@ plugin-serialization = {module = "org.jetbrains.kotlin:kotlin-serialization", ve
 plugin-android = {module = "com.android.tools.build:gradle", version = "7.3.1"}
 plugin-shadow = {module = "gradle.plugin.com.github.johnrengelman:shadow", version = "7.1.2"}
 plugin-kotlin = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin"}
+libphonenumber = {module = "io.github.luca992.libphonenumber-kotlin:libphonenumber", version = "0.1.1" }
 junit = {module = "junit:junit", version.ref = "junit-ver"}
 androidJunit = {module = "androidx.test.ext:junit", version.ref = "androidJunit-ver"}
 espresso = {module = "androidx.test.espresso:espresso-core", version.ref = "espresso-ver"}

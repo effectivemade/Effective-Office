@@ -13,17 +13,9 @@ interface AboutEmployeeStore : Store<AboutEmployeeStore.Intent,AboutEmployeeStor
         object TelegramClicked : Intent
         object BackClicked : Intent
         object TransferMoneyClicked: Intent
-        object OpenCalendarClicked: Intent
-        object CloseCalendarClicked: Intent
         data class OnClickApplyDate(val date: List<LocalDate>): Intent
         object OpenBottomDialog: Intent
         data class CloseBottomDialog(val bookingsFilter: BookingsFilter): Intent
-
-        data object OnClickCopyTelegram : Intent
-
-        data object OnClickCopyEmail : Intent
-
-        data object OnClickCopyPhone : Intent
     }
 
     data class State(
@@ -43,5 +35,4 @@ interface AboutEmployeeStore : Store<AboutEmployeeStore.Intent,AboutEmployeeStor
         object OpenBottomDialog: Label
         object CloseBottomDialog: Label
     }
-
 }

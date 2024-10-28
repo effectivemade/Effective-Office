@@ -85,6 +85,7 @@ kotlin {
                 implementation(Dependencies.Calendar.composeDatePicker)
 
                 implementation(Dependencies.SqlDelight.primitiveadaper)
+                implementation(libs.libphonenumber)
 
                 implementation(project(":wheel-picker-compose"))
                 implementation(project(":modal_custom_dialog"))
