@@ -1,7 +1,7 @@
 package band.effective.office.elevator.ui.employee
 
 import androidx.compose.runtime.Composable
-import band.effective.office.elevator.ui.employee.aboutEmployee.AboutEmployee
+import band.effective.office.elevator.ui.employee.aboutEmployee.AboutEmployeeScreen
 import band.effective.office.elevator.ui.employee.allEmployee.EmployeeScreen
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
@@ -17,7 +17,7 @@ fun Employee (component: FullEmployeeComponent){
     ){
         when(val child = it.instance){
             is FullEmployeeComponent.Child.AllEmployeeChild -> EmployeeScreen(child.component)
-            is FullEmployeeComponent.Child.AboutEmployeeChild -> AboutEmployee(child.component)
+            is FullEmployeeComponent.Child.AboutEmployeeChild -> AboutEmployeeScreen(child.component)
         }
     }
 }
