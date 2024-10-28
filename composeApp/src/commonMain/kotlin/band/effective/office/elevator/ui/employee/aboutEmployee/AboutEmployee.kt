@@ -1,8 +1,9 @@
 package band.effective.office.elevator.ui.employee.aboutEmployee
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +25,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -35,40 +36,40 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import band.effective.office.elevator.ExtendedThemeColors
 import band.effective.office.elevator.MainRes
-import band.effective.office.elevator.components.EffectiveOutlinedButton
 import band.effective.office.elevator.components.InfoAboutUserUIComponent
 import band.effective.office.elevator.components.LoadingIndicator
-import band.effective.office.elevator.components.ModalCalendarDateRange
-import band.effective.office.elevator.components.TitlePage
 import band.effective.office.elevator.components.generateImageLoader
+import band.effective.office.elevator.expects.setClipboardText
 import band.effective.office.elevator.textGrayColor
+import band.effective.office.elevator.theme_light_onPrimary
 import band.effective.office.elevator.ui.employee.aboutEmployee.components.BookingCardUser
-import band.effective.office.elevator.ui.employee.aboutEmployee.components.ContactUserUIComponent
+import band.effective.office.elevator.ui.employee.aboutEmployee.components.EmployeeInfoRow
 import band.effective.office.elevator.ui.employee.aboutEmployee.models.BookingsFilter
 import band.effective.office.elevator.ui.employee.aboutEmployee.store.AboutEmployeeStore
 import band.effective.office.elevator.ui.main.components.BottomDialog
-import band.effective.office.elevator.ui.main.components.CalendarTitle
-import band.effective.office.elevator.ui.main.components.FilterButton
 import band.effective.office.elevator.ui.models.ReservedSeat
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
-import kotlinx.datetime.LocalDate
+import io.github.aakira.napier.Napier
+import io.michaelrocks.libphonenumber.kotlin.NumberParseException
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil
+import io.michaelrocks.libphonenumber.kotlin.metadata.defaultMetadataLoader
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AboutEmployee(component: AboutEmployeeComponent) {
+fun AboutEmployeeScreen(component: AboutEmployeeComponent) {
     val state by component.state.collectAsState()
     var showModalCalendar by remember { mutableStateOf(false) }
     var bottomSheetState =
@@ -91,25 +92,14 @@ fun AboutEmployee(component: AboutEmployeeComponent) {
             .fillMaxSize()
     ) {
         AboutEmployeeContent(
-            isLoading = state.isLoading,
             imageUrl = state.user.imageUrl,
             userName = state.user.userName,
             post = state.user.post,
             telegram = state.user.telegram,
             email = state.user.email,
-            reservedSeatsList = state.reservedSeatsList,
-            dateFiltrationOnReserves = state.dateFiltrationOnReserves,
-            filtrationOnReserves = state.filtrationOnReserves,
-            beginDate = state.beginDate,
-            endDate = state.endDate,
-            isLoadingBooking = state.isLoadingBookings,
+            phoneNumber = state.user.phoneNumber,
             bottomSheetState = bottomSheetState,
-            onClickOpenPhone = { component.onEvent(AboutEmployeeStore.Intent.TelephoneClicked) },
-            onClickOpenTelegram = { component.onEvent(AboutEmployeeStore.Intent.TelegramClicked) },
-            onClickOpenSpb = { component.onEvent(AboutEmployeeStore.Intent.TransferMoneyClicked) },
             onClickBack = { component.onOutput(AboutEmployeeComponent.Output.OpenAllEmployee) },
-            onClickOpenCalendar = { component.onEvent(AboutEmployeeStore.Intent.OpenCalendarClicked) },
-            onClickOpenBottomDialog = { component.onEvent(AboutEmployeeStore.Intent.OpenBottomDialog) },
             onClickCloseBottomDialog = {
                 component.onEvent(
                     AboutEmployeeStore.Intent.CloseBottomDialog(
@@ -117,26 +107,12 @@ fun AboutEmployee(component: AboutEmployeeComponent) {
                     )
                 )
             },
-            onClickCopyEmail = { component.onEvent(AboutEmployeeStore.Intent.OnClickCopyEmail) },
-            onClickCopyPhone = { component.onEvent(AboutEmployeeStore.Intent.OnClickCopyPhone) },
-            onClickCopyTelegram = { component.onEvent(AboutEmployeeStore.Intent.OnClickCopyTelegram) }
+            isLoading = state.isLoading,
+            isLoadingBooking = state.isLoadingBookings,
+            reservedSeatsList = state.reservedSeatsList,
+            dateFiltrationOnReserves = state.dateFiltrationOnReserves,
+            filtrationOnReserves = state.filtrationOnReserves
         )
-
-        if (showModalCalendar) {
-            Dialog(
-                onDismissRequest = { component.onEvent(AboutEmployeeStore.Intent.CloseCalendarClicked) },
-                properties = DialogProperties(usePlatformDefaultWidth = false)
-            ) {
-                ModalCalendarDateRange(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .align(Alignment.Center),
-                    onClickCansel = { component.onEvent(AboutEmployeeStore.Intent.CloseCalendarClicked) },
-                    onClickOk = { component.onEvent(AboutEmployeeStore.Intent.OnClickApplyDate(it)) },
-                    currentDate = state.beginDate
-                )
-            }
-        }
     }
 }
 
@@ -148,27 +124,16 @@ private fun AboutEmployeeContent(
     post: String?,
     telegram: String?,
     email: String?,
+    phoneNumber: String?,
+    bottomSheetState: ModalBottomSheetState,
+    onClickBack: () -> Unit,
+    onClickCloseBottomDialog: (BookingsFilter) -> Unit,
+    isLoading: Boolean,
+    isLoadingBooking: Boolean,
     reservedSeatsList: List<ReservedSeat>,
     dateFiltrationOnReserves: Boolean,
     filtrationOnReserves: Boolean,
-    bottomSheetState: ModalBottomSheetState,
-    beginDate: LocalDate,
-    endDate: LocalDate?,
-    onClickBack: () -> Unit,
-    onClickOpenPhone: () -> Unit,
-    onClickOpenTelegram: () -> Unit,
-    onClickOpenSpb: () -> Unit,
-    onClickOpenCalendar: () -> Unit,
-    onClickOpenBottomDialog: () -> Unit,
-    onClickCloseBottomDialog: (BookingsFilter) -> Unit,
-    onClickCopyPhone: () -> Unit,
-    onClickCopyEmail: () -> Unit,
-    onClickCopyTelegram: () -> Unit,
-    isLoading: Boolean,
-    isLoadingBooking: Boolean
 ) {
-    val imageLoader = generateImageLoader()
-
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetState = bottomSheetState,
@@ -182,164 +147,213 @@ private fun AboutEmployeeContent(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier.background(Color.White).padding(top = 40.dp, bottom = 24.dp)
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(top = 40.dp, bottom = 24.dp)
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.Top,
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
+                Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    IconButton(onClick = onClickBack) {
+                    IconButton(
+                        modifier = Modifier.align(Alignment.CenterStart),
+                        onClick = onClickBack,
+                    ) {
                         Icon(
                             painter = painterResource(MainRes.images.back_button),
-                            contentDescription = null,
-                            tint = Color.Black
+                            contentDescription = stringResource(MainRes.strings.back),
+                            tint = Color.LightGray,
+                            modifier = Modifier.size(24.dp),
                         )
                     }
-                    TitlePage(
-                        title = stringResource(MainRes.strings.about_the_employee),
-                        modifier = Modifier.align(Alignment.CenterVertically).padding(start = 16.dp)
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = stringResource(MainRes.strings.about_the_employee),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight(600),
+                        color = ExtendedThemeColors.colors.blackColor,
                     )
                 }
-                when (isLoading) {
-                    true -> {
-                        LoadingIndicator()
-                    }
-
-                    false -> {
-                        val request = remember(imageUrl) {
-                            ImageRequest {
-                                data(imageUrl)
-                            }
-                        }
-                        val painter = rememberImagePainter(
-                            request = request,
-                            imageLoader = imageLoader,
-                            placeholderPainter = { painterResource(MainRes.images.logo_default) },
-                            errorPainter = { painterResource(MainRes.images.logo_default) }
-                        )
-                        Row(modifier = Modifier.padding(top = 24.dp)) {
-                            Column {
-                                InfoAboutUserUIComponent(userName, post)
-                                ContactUserUIComponent(
-                                    MainRes.images.icon_telegram,
-                                    telegram,
-                                    modifier = Modifier
-                                        .clickable(onClick = onClickCopyTelegram)
-                                        .padding(top = 18.dp)
-                                )
-                                ContactUserUIComponent(
-                                    MainRes.images.mail,
-                                    email,
-                                    modifier = Modifier
-                                        .clickable(onClick = onClickCopyEmail)
-                                        .padding(top = 10.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.weight(.1f))
-                            Surface(
-                                modifier = Modifier.size(88.dp),
-                                shape = CircleShape,
-                                color = ExtendedThemeColors.colors.purple_heart_100
-                            ) {
-                                Image(
-                                    modifier = Modifier.fillMaxSize(),
-                                    painter = painter,
-                                    contentScale = ContentScale.Crop,
-                                    contentDescription = null,
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    EffectiveOutlinedButton(
-                        MainRes.images.icon_call,
-                        text = null,
-                        onClick = onClickOpenPhone,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    EffectiveOutlinedButton(
-                        MainRes.images.icon_telegram,
-                        text = null,
-                        onClick = onClickOpenTelegram,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    EffectiveOutlinedButton(
-                        MainRes.images.spb_icon,
-                        text = MainRes.strings.transfer,
-                        onClick = onClickCopyPhone,
-                        modifier = Modifier.padding(end = 8.dp)
+                Spacer(modifier = Modifier.padding(24.dp))
+                val localUriHandler = LocalUriHandler.current
+                if (isLoading) {
+                    LoadingIndicator()
+                } else {
+                    EmployeeBlock(
+                        imageUrl = imageUrl,
+                        userName = userName,
+                        post = post,
+                        telegram = telegram,
+                        email = email,
+                        phoneNumber = phoneNumber,
+                        onOpenUri = { localUriHandler.openUri(it) },
+                        onCopyText = { value, label -> setClipboardText(value, label) }
                     )
                 }
             }
-            when (isLoadingBooking) {
-                true -> LoadingIndicator()
-                false -> {
-                    Column(
-                        modifier = Modifier.background(MaterialTheme.colors.onBackground),
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                text = stringResource(MainRes.strings.upcoming_bookings),
-                                color = ExtendedThemeColors.colors.blackColor,
-                                style = MaterialTheme.typography.body1,
-                                modifier = Modifier.padding(vertical = 24.dp).padding(end = 16.dp),
-                                fontWeight = FontWeight(500)
-                            )
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                CalendarTitle(
-                                    onClickOpenCalendar = onClickOpenCalendar,
-                                    fromMainScreen = false,
-                                    beginDate = beginDate,
-                                    endDate = endDate
-                                )
-                                FilterButton(
-                                    onClickOpenBottomSheetDialog = onClickOpenBottomDialog
-                                )
-                            }
-                        }
-                        if (reservedSeatsList.isEmpty()) {
-                            NoReservationsThisDate(
-                                noThisDayReservations = dateFiltrationOnReserves,
-                                filtration = filtrationOnReserves
-                            )
-                        } else {
-                            ReservationsOnThisDate(
-                                reservedSeatsList = reservedSeatsList,
-                            )
-                        }
-                    }
-                }
+            if (isLoadingBooking) {
+                LoadingIndicator()
+            } else {
+                BookingBlock(
+                    reservedSeatsList = reservedSeatsList,
+                    dateFiltrationOnReserves = dateFiltrationOnReserves,
+                    filtrationOnReserves = filtrationOnReserves,
+                )
             }
         }
     }
 }
 
 @Composable
-fun NoReservationsThisDate(noThisDayReservations: Boolean, filtration: Boolean) {
+private fun EmployeeBlock(
+    modifier: Modifier = Modifier,
+    imageUrl: String?,
+    userName: String?,
+    post: String?,
+    telegram: String?,
+    email: String?,
+    phoneNumber: String?,
+    onCopyText: (value: String, label: String) -> Unit,
+    onOpenUri: (uri: String) -> Unit,
+) {
+    val imageLoader = remember { generateImageLoader() }
+    val request = remember(imageUrl) {
+        ImageRequest {
+            data(imageUrl)
+        }
+    }
+    val painter = rememberImagePainter(
+        request = request,
+        imageLoader = imageLoader,
+        placeholderPainter = { painterResource(MainRes.images.logo_default) },
+        errorPainter = { painterResource(MainRes.images.logo_default) }
+    )
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier
+                .size(100.dp)
+                .border(
+                    BorderStroke(
+                        width = 2.dp,
+                        color = ExtendedThemeColors.colors.trinidad_400,
+                    ),
+                    shape = CircleShape,
+                )
+                .padding(2.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.padding(12.dp))
+        InfoAboutUserUIComponent(userName = userName, post = post)
+        Spacer(modifier = Modifier.padding(24.dp))
+        if (telegram != null) {
+            val iconTitle = stringResource(MainRes.strings.telegram)
+            EmployeeInfoRow(
+                icon = MainRes.images.ic_telegram,
+                value = telegram,
+                iconTitle = iconTitle,
+                onClick = { onOpenUri("https://t.me/$telegram") },
+                onLongClick = { onCopyText(telegram, iconTitle) },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        if (email != null) {
+            val iconTitle = stringResource(MainRes.strings.email)
+            EmployeeInfoRow(
+                icon = MainRes.images.ic_email,
+                value = email,
+                iconTitle = iconTitle,
+                onClick = { onOpenUri("mailto:$email") },
+                onLongClick = { onCopyText(email, iconTitle) },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        if (phoneNumber != null) {
+            val iconTitle = stringResource(MainRes.strings.phone_number)
+            val phoneNumberUtil = remember {
+                PhoneNumberUtil.createInstance(defaultMetadataLoader())
+            }
+            val parsedPhoneNumber = try {
+                phoneNumberUtil.parse(
+                    numberToParse = phoneNumber,
+                    defaultRegion = Locale.current.region,
+                )
+            } catch (ex: NumberParseException) {
+                Napier.e { "Could not parse phone number" }
+                null
+            }
+            if (parsedPhoneNumber != null) {
+                EmployeeInfoRow(
+                    icon = MainRes.images.ic_phone,
+                    value = phoneNumberUtil.format(
+                        parsedPhoneNumber,
+                        PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL
+                    ),
+                    iconTitle = iconTitle,
+                    onClick = { onOpenUri("tel:$phoneNumber") },
+                    onLongClick = { onCopyText(phoneNumber, iconTitle) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BookingBlock(
+    modifier: Modifier = Modifier,
+    reservedSeatsList: List<ReservedSeat>,
+    dateFiltrationOnReserves: Boolean,
+    filtrationOnReserves: Boolean,
+) {
+    Column(
+        modifier = modifier.background(theme_light_onPrimary),
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(MainRes.strings.upcoming_bookings),
+                color = ExtendedThemeColors.colors.blackColor,
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(vertical = 24.dp).padding(end = 16.dp),
+                fontWeight = FontWeight(500)
+            )
+        }
+
+        if (reservedSeatsList.isEmpty()) {
+            NoReservationsThisDate(
+                noThisDayReservations = dateFiltrationOnReserves,
+                filtration = filtrationOnReserves
+            )
+        } else {
+            ReservationsOnThisDate(
+                reservedSeatsList = reservedSeatsList,
+            )
+        }
+    }
+}
+
+@Composable
+private fun NoReservationsThisDate(
+    modifier: Modifier = Modifier,
+    noThisDayReservations: Boolean, filtration: Boolean
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(
@@ -351,18 +365,21 @@ fun NoReservationsThisDate(noThisDayReservations: Boolean, filtration: Boolean) 
                     else MainRes.strings.none_booking_seats_by_the_employee
                 }
             ),
-            fontSize = 15.sp,
+            fontSize = 16.sp,
             color = textGrayColor,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
     }
 }
 
 @Composable
-fun ReservationsOnThisDate(reservedSeatsList: List<ReservedSeat>) {
+private fun ReservationsOnThisDate(
+    modifier: Modifier = Modifier,
+    reservedSeatsList: List<ReservedSeat>
+) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp)
+        modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         items(reservedSeatsList) { seat ->
             BookingCardUser(

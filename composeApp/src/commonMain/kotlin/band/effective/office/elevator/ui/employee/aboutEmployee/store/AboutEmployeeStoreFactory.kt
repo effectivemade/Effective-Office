@@ -48,7 +48,7 @@ class AboutEmployeeStoreFactory(
         object : AboutEmployeeStore, Store<Intent, State, Label> by storeFactory.create(
             name = "AboutEmployeeStore",
             initialState = State(
-                currentUser,
+                user = currentUser,
                 reservedSeatsList = listOf(),
                 beginDate = getCurrentDate(),
                 endDate = getCurrentDate(),
@@ -124,17 +124,6 @@ class AboutEmployeeStoreFactory(
                 Intent.TelegramClicked -> pickTelegram(telegramNickParse(getState().user.telegram))
                 Intent.TelephoneClicked -> makeCall(getState().user.phoneNumber)
                 Intent.TransferMoneyClicked -> pickSBP(getState().user.phoneNumber)
-                Intent.OpenCalendarClicked -> {
-                    scope.launch {
-                        publish(Label.OpenCalendar)
-                    }
-                }
-
-                Intent.CloseCalendarClicked -> {
-                    scope.launch {
-                        publish(Label.CloseCalendar)
-                    }
-                }
 
                 is Intent.OnClickApplyDate -> {
                     scope.launch {
@@ -184,25 +173,6 @@ class AboutEmployeeStoreFactory(
                         dispatch(Msg.UpdateLoadingBookingState(false))
                     }
                 }
-
-                Intent.OnClickCopyPhone ->
-                    setClipboardText(
-                        text = getState().user.phoneNumber,
-                        label = "Phone",
-                        toastMessage = MainRes.strings.phone_clipboard
-                    )
-                Intent.OnClickCopyTelegram ->
-                    setClipboardText(
-                        text = "https://t.me/${getState().user.telegram}",
-                        label = "Telegram",
-                        toastMessage = MainRes.strings.telegram_clipboard
-                    )
-                Intent.OnClickCopyEmail ->
-                    setClipboardText(
-                        text = getState().user.email,
-                        label = "Email",
-                        toastMessage = MainRes.strings.email_clipboard
-                    )
             }
         }
 
