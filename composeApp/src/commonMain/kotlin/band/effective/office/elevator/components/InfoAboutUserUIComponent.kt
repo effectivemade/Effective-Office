@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun InfoAboutUserUIComponent(
+fun UserScreen(
     modifier: Modifier = Modifier,
     userName: String?,
     post: String?,
@@ -35,13 +35,12 @@ fun InfoAboutUserUIComponent(
                 textAlign = TextAlign.Center,
             )
         }
-        Spacer(modifier = Modifier.height(4.dp))
         post?.let {
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = it,
                 style = MaterialTheme.typography.subtitle1,
                 color = Color.Gray,
-                fontSize = 16.sp,
                 textAlign = TextAlign.Center,
             )
         }
