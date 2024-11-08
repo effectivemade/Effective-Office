@@ -40,32 +40,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import band.effective.office.elevator.ExtendedThemeColors
 import band.effective.office.elevator.MainRes
-import band.effective.office.elevator.components.InfoAboutUserUIComponent
 import band.effective.office.elevator.components.LoadingIndicator
+import band.effective.office.elevator.components.UserScreen
 import band.effective.office.elevator.components.generateImageLoader
 import band.effective.office.elevator.expects.setClipboardText
 import band.effective.office.elevator.textGrayColor
 import band.effective.office.elevator.theme_light_onPrimary
 import band.effective.office.elevator.ui.employee.aboutEmployee.components.BookingCardUser
-import band.effective.office.elevator.ui.employee.aboutEmployee.components.EmployeeInfoRow
+import band.effective.office.elevator.ui.employee.aboutEmployee.components.EmployeeInfo
 import band.effective.office.elevator.ui.employee.aboutEmployee.models.BookingsFilter
 import band.effective.office.elevator.ui.employee.aboutEmployee.store.AboutEmployeeStore
 import band.effective.office.elevator.ui.main.components.BottomDialog
 import band.effective.office.elevator.ui.models.ReservedSeat
+import band.effective.office.elevator.utils.prettifyPhoneNumber
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
-import io.github.aakira.napier.Napier
-import io.michaelrocks.libphonenumber.kotlin.NumberParseException
-import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil
-import io.michaelrocks.libphonenumber.kotlin.metadata.defaultMetadataLoader
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -252,11 +248,11 @@ private fun EmployeeBlock(
                 .clip(CircleShape)
         )
         Spacer(modifier = Modifier.padding(12.dp))
-        InfoAboutUserUIComponent(userName = userName, post = post)
+        UserScreen(userName = userName, post = post)
         Spacer(modifier = Modifier.padding(24.dp))
         if (telegram != null) {
             val iconTitle = stringResource(MainRes.strings.telegram)
-            EmployeeInfoRow(
+            EmployeeInfo(
                 icon = MainRes.images.ic_telegram,
                 value = telegram,
                 iconTitle = iconTitle,
@@ -267,7 +263,7 @@ private fun EmployeeBlock(
         }
         if (email != null) {
             val iconTitle = stringResource(MainRes.strings.email)
-            EmployeeInfoRow(
+            EmployeeInfo(
                 icon = MainRes.images.ic_email,
                 value = email,
                 iconTitle = iconTitle,
@@ -278,30 +274,13 @@ private fun EmployeeBlock(
         }
         if (phoneNumber != null) {
             val iconTitle = stringResource(MainRes.strings.phone_number)
-            val phoneNumberUtil = remember {
-                PhoneNumberUtil.createInstance(defaultMetadataLoader())
-            }
-            val parsedPhoneNumber = try {
-                phoneNumberUtil.parse(
-                    numberToParse = phoneNumber,
-                    defaultRegion = Locale.current.region,
-                )
-            } catch (ex: NumberParseException) {
-                Napier.e { "Could not parse phone number" }
-                null
-            }
-            if (parsedPhoneNumber != null) {
-                EmployeeInfoRow(
-                    icon = MainRes.images.ic_phone,
-                    value = phoneNumberUtil.format(
-                        parsedPhoneNumber,
-                        PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL
-                    ),
-                    iconTitle = iconTitle,
-                    onClick = { onOpenUri("tel:$phoneNumber") },
-                    onLongClick = { onCopyText(phoneNumber, iconTitle) },
-                )
-            }
+            EmployeeInfo(
+                icon = MainRes.images.ic_phone,
+                value = prettifyPhoneNumber(phoneNumber) ?: phoneNumber,
+                iconTitle = iconTitle,
+                onClick = { onOpenUri("tel:$phoneNumber") },
+                onLongClick = { onCopyText(phoneNumber, iconTitle) },
+            )
         }
     }
 }
