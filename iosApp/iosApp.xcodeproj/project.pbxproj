@@ -398,7 +398,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0;
+				MARKETING_VERSION = 2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = band.effective.office.elevator.iosApp;
 				PRODUCT_NAME = "Office Elevator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -432,7 +432,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0;
+				MARKETING_VERSION = 2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = band.effective.office.elevator.iosApp;
 				PRODUCT_NAME = "Office Elevator";
 				PROVISIONING_PROFILE_SPECIFIER = "";
