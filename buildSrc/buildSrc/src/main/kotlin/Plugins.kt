@@ -7,8 +7,13 @@
 object Plugins {
 
     object Android {
-        const val implementation = "com.android.tools.build:gradle:7.3.1"
+        const val implementation = "com.android.tools.build:gradle:8.1.0"
         const val plugin = "com.android.application"
+    }
+
+    object AndroidLib{
+        const val implementation = "com.android.tools.build:gradle:8.1.0"
+        const val plugin = "com.android.library"
     }
 
     object Shadow {
@@ -17,7 +22,7 @@ object Plugins {
     }
 
     object Kotlin {
-        const val implementation = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
+        const val implementation = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20"
         const val plugin = "org.jetbrains.kotlin.multiplatform"
     }
 
@@ -31,7 +36,7 @@ object Plugins {
     }
 
     object MultiplatformCompose {
-        const val implementation = "org.jetbrains.compose:compose-gradle-plugin:1.4.0"
+        const val implementation = "org.jetbrains.compose:compose-gradle-plugin:1.5.10"
         const val plugin = "org.jetbrains.compose"
     }
 
@@ -44,7 +49,7 @@ object Plugins {
     }
 
     object BuildConfig {
-        const val implementation = "com.github.gmazzo.buildconfig:plugin:4.0.4"
+        const val implementation = "com.github.gmazzo.buildconfig:plugin:4.1.2"
         const val plugin = "com.github.gmazzo.buildconfig"
     }
 
@@ -54,5 +59,20 @@ object Plugins {
     }
     object Parcelize {
         const val plugin = "org.jetbrains.kotlin.plugin.parcelize"
+    }
+
+    object Moko {
+        const val implementation = "dev.icerock.moko:resources-generator:0.24.0-beta-5"
+        const val plugin = "dev.icerock.mobile.multiplatform-resources"
+    }
+
+    object SQLDelight {
+        const val version = "2.0.0-rc02"
+        const val plugin = "app.cash.sqldelight"
+    }
+
+    object GoogleServices{
+        const val implementation = "com.google.gms:google-services:4.3.15"
+        const val plugin = "com.google.gms.google-services"
     }
 }

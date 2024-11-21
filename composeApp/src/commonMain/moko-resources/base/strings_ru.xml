@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Office Elevator</string>
+    <string name="sign_in_google">Авторизация через Google</string>
+    <string name="something_went_wrong">Что-то пошло не так. Пожалуйста попробуйте еще раз</string>
+    <string name="company_name">effective\noffice</string>
+
+    <string name="search_employee">Поиск сотрудника</string>
+    <string name="employee_in_office">В офисе</string>
+
+    <!--Auth strings-->
+    <string name="_continue">Продолжить</string>
+
+    <!--    TextField placeholders-->
+    <string name="number_hint">955-555-55-55</string>
+    <string name="profile_hint">Иван Иванов</string>
+    <string name="profile_hint_">Android-developer</string>
+    <string name="employee_hint">telegramnick</string>
+
+    <string name="input_number">Введите номер</string>
+    <string name="select_number">Укажите номер телефона, привязанный к СБП</string>
+    <string name="input_profile">Заполните профиль</string>
+    <string name="select_profile">Это необходимо для того, чтобы сотрудники смогли вас узнать</string>
+    <string name="input_employee">Укажите Telegram</string>
+    <string name="select_employee">Это необходимо для того, чтобы коллегам было удобно связаться с вами</string>
+    <string name="phone_plus_seven">+7</string>
+    <string name="telegram_symbol">@</string>
+
+    <!--Main Screen-->
+    <string name="filter">Фильтры</string>
+
+
+    <!--Elevator-->
+    <string name="elevator">Лифт</string>
+    <string name="elevator_button">Поднять</string>
+
+    <string name="by_date">По дате</string>
+    <string name="on_today">На сегодня</string>
+    <string name="show_map">Карта</string>
+    <string name="book_a_seat">Забронировать место</string>
+    <string name="nearest_bookings">Брони</string>
+    <string name="none_booking_seat">У вас пока нет бронирований</string>
+    <string name="place_booked">Место забронировано</string>
+    <string name="creating_error">Ошибка бронирования</string>
+    <string name="try_another_place">Что-то пошло не так.
+        Попробуйте забронировать другое место</string>
+    <string name="good_working_day">Хорошего рабочего дня!</string>
+    <string name="move_to_main_from_booking">На главную</string>
+    <string name="close_booking">Закрыть</string>
+    <string name="booking_period">Период бронирования</string>
+    <string name="whole_day_booking">Весь день</string>
+    <string name="confirm_booking">Подтвердить</string>
+
+    <!--Booking period-->
+    <string name="do_not_repeat">Не повторяется</string>
+    <string name="every_work_day">Каждый будний день</string>
+    <string name="every_week">Каждую неделю</string>
+    <string name="every_month">Каждый месяц</string>
+    <string name="every_year">Каждый год</string>
+    <string name="another">Другое...</string>
+    <string name="booking_repeat">Повтор брони</string>
+    <string name="booking_repeat_in">Повторяется раз в:</string>
+    <string name="when_repeat">Когда повторяется:</string>
+    <string name="book_finish">Заканчивается:</string>
+    <string name="never">Никогда</string>
+    <string name="booking_1">После</string>
+    <string name="booking_2">раза</string>
+    <string name="week">Неделя</string>
+    <string name="month">Месяц</string>
+    <string name="year">Год</string>
+
+    <string name="map">Карта</string>
+    <string name="show_map">Показать карту</string>
+    <string name="extend_booking">Продлить</string>
+    <string name="repeat_booking">Повторить</string>
+
+    <string name="period_selection">Выбор периода</string>
+
+    <string name="Monday">Пн</string>
+    <string name="Tuesday">Вт</string>
+    <string name="Wednesday">Ср</string>
+    <string name="Thursday">Чт</string>
+    <string name="Friday">Пт</string>
+
+    <string name="delete_booking">Удалить бронь?</string>
+
+    <string name="take_from">Занять с</string>
+    <string name="take_before">Занять по</string>
+
+    <string name="filter_by_category">Фильтры по категории</string>
+    <string name="reset_filter">Сбросить</string>
+
+    <string name="cansel">Отмена</string>
+    <string name="delete">Удалить</string>
+    <string name="ok">ОK</string>
+    <string name="from_date">с %s</string>
+    <string name="to_date">до %s</string>
+
+    <!--Booking-->
+    <string name="type_booking">Тип брони</string>
+    <string name="workplace">Рабочее место</string>
+    <string name="meeting_room">Переговорная</string>
+    <string name="booking_period">Период бронирования</string>
+    <string name="suitable_options">Подходящие варианты</string>
+    <string name="select_zones">Выбрать зоны</string>
+    <string name="selection_zones">Выбор зон</string>
+    <string name="selection_rooms">Выбор переговорки</string>
+    <string name="sirius_zone">Sirius</string>
+    <string name="antares_zone">Antares</string>
+    <string name="mars_zone">Mars</string>
+    <string name="cassiopeia_zone">Cassiopeia</string>
+    <string name="arrakis_zone">Arrakis</string>
+    <string name="moon_room">Moon</string>
+    <string name="sun_room">Sun</string>
+    <string name="mercury_room">Mercury</string>
+    <string name="pluto_room">Pluto</string>
+    <string name="no_repeat">Не повотряется</string>
+    <string name="every_work_day_repeat">Каждый рабочий день</string>
+    <string name="every_week_repeat">Каждую неделю</string>
+    <string name="every_month_repeat">Каждый месяц</string>
+    <string name="other_repeat">Другое</string>
+    <string name="hide_map">Скрыть карту</string>
+    <string name="booking_not_repeat">Бронирование не повторяется</string>
+    <string name="every_year">Каждый год</string>
+
+
+    <string name="employee_soon_in_office">Не был в офисе</string>
+    <string name="employee_not_soon_in_office">Нет забронированных мест</string>
+
+    <!--Tab titles-->
+    <string name="profile">Профиль</string>
+    <string name="elevator">Лифт</string>
+    <string name="main">Главная</string>
+    <string name="booking">Бронирование</string>
+    <string name="employees">Сотрудники</string>
+
+    <!-- Buttons -->
+    <string name="_continue">Продолжить</string>
+
+    <!--Error messages-->
+    <string name="you_need_to_sign_in">Для работы приложения нужно авторизоваться</string>
+    <string name="network_error">Проблема с интернет соединением</string>
+    <string name="developer_error">Кажется разработчик что-то поломал. Сообщите о проблеме</string>
+    <string name="cancelled_error">Вы отменили операцию. Попробуйте снова</string>
+    <string name="invalid_account_error">Вы используете неправильный аккаунт</string>
+    <string name="timout_error">Время вышло. Попробуйте снова</string>
+    <string name="server_error">Ошибка сервера ${code}</string>
+    <string name="profile_format_error">Заполните профиль</string>
+    <string name="number_format_error">Неверный формат номера телефона</string>
+    <string name="profile_name_format_error">Заполните имя и фамилию</string>
+    <string name="profile_post_format_error">Заполните должность</string>
+    <string name="telegram_format_error">Укажите ник в телеграмме</string>
+
+    <!-- Success messages -->
+    <string name="elevator_called_successfully">Лифт успешно вызван!</string>
+
+    <!-- Profile specifics-->
+    <string name="exit">Выйти</string>
+    <string name="phone">Телефон</string>
+    <string name="telegram">Telegram</string>
+
+    <!-- Edit Profile-->
+    <string name="profile_data">Данные профиля</string>
+    <string name="last_name_and_first_name">Фамилия и Имя</string>
+    <string name="post">Должность</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="save">Сохранить</string>
+
+    <!-- Booking title -->
+    <string name="number_with_parametr"> %s числа </string>
+    <string name="weekly">неделю(и)</string>
+    <string name="monthly">месяц(ев)</string>
+    <string name="yearly">лет</string>
+    <string name="once_per">раз в %s</string>
+    <string name="once_per_from">раз в %s с</string>
+    <string name="to_end_reccurense">по %s</string>
+    <string name="repeate_times">повторяется %s раз(а)</string>
+    <string name="no_free_place">На это время нет мест. Выберите другое время</string>
+
+    <!-- Employee -->
+    <string name="about_the_employee">О сотруднике</string>
+    <string name="upcoming_bookings">Брони</string>
+    <string name="transfer">Перевод</string>
+    <string name="none_booking_seats_by_the_employee">У этого сотрудника пока нет бронирований</string>
+    <string name="none_such_booking_seats_by_the_employee">У этого сотрудника пока нет таких бронирований</string>
+    <string name="none_booking_seats_on_this_date">У этого сотрудника нет бронирований на этот день</string>
+    <string name="none_such_booking_seats_on_this_date">У этого сотрудника нет таких бронирований на этот день</string>
+  
+    <!-- Clipboard -->
+    <string name="phone_clipboard">Номер телефона был успешно скопирован!</string>
+    <string name="email_clipboard">Почта была успешно скопирована!</string>
+    <string name="telegram_clipboard">Телеграм был успешно скопирован!</string>
+</resources>

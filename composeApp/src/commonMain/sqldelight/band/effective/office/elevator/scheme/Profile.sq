@@ -1,0 +1,46 @@
+-- Note: table should have 1 record
+-- it's only for current user
+
+CREATE TABLE profileData (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL DEFAULT '',
+    post TEXT NOT NULL DEFAULT '',
+    email TEXT NOT NULL DEFAULT '',
+    phoneNumber TEXT NOT NULL DEFAULT '',
+    telegramNick TEXT NOT NULL DEFAULT '',
+    imageUrl TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE googleIdoken(
+    idToken TEXT NOT NULL DEFAULT ''
+);
+
+CREATE INDEX idTokenIndex ON profileData(id);
+
+updateIdToken:
+INSERT OR REPLACE
+INTO googleIdoken(idToken)
+VALUES (?);
+
+getIdToken:
+SELECT *
+FROM googleIdoken
+LIMIT 1;
+
+selectUser:
+SELECT *
+FROM profileData
+LIMIT 1;
+
+updateUser:
+INSERT OR REPLACE
+INTO profileData(id, name, post, email, phoneNumber, telegramNick, imageUrl)
+VALUES (?,?,?,?,?,?, ?);
+
+deleteUser:
+DELETE FROM profileData;
+
+deleteToken:
+DELETE FROM googleIdoken;
+
+

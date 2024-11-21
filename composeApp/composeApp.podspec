@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'composeApp'
-    spec.version                  = '1.0.0'
+    spec.version                  = '2.0.2'
     spec.homepage                 = 'https://github.com/Radch-enko'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
@@ -10,6 +10,17 @@ Pod::Spec.new do |spec|
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '11.0'
     spec.dependency 'GoogleSignIn'
+                
+    if !Dir.exist?('build/cocoapods/framework/ComposeApp.framework') || Dir.empty?('build/cocoapods/framework/ComposeApp.framework')
+        raise "
+
+        Kotlin framework 'ComposeApp' doesn't exist yet, so a proper Xcode project can't be generated.
+        'pod install' should be executed after running ':generateDummyFramework' Gradle task:
+
+            ./gradlew :composeApp:generateDummyFramework
+
+        Alternatively, proper pod installation is performed during Gradle sync in the IDE (if Podfile location is set)"
+    end
                 
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':composeApp',
@@ -27,6 +38,7 @@ Pod::Spec.new do |spec|
                   exit 0
                 fi
                 set -ev
+                export LANG=en_US.UTF-8
                 REPO_ROOT="$PODS_TARGET_SRCROOT"
                 "$REPO_ROOT/../gradlew" -p "$REPO_ROOT" $KOTLIN_PROJECT_PATH:syncFramework \
                     -Pkotlin.native.cocoapods.platform=$PLATFORM_NAME \
@@ -35,7 +47,5 @@ Pod::Spec.new do |spec|
             SCRIPT
         }
     ]
-    spec.resource_bundles = {
-        'LibresComposeApp' => ['build/generated/libres/apple/resources/images/LibresComposeApp.xcassets']
-    }
+                
 end

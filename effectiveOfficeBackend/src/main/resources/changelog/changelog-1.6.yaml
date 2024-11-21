@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-api-keys-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: api_keys
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_api_keys
+              - column:
+                  name: key_value
+                  type: varchar(255)
+                  constraints:
+                    nullable: false

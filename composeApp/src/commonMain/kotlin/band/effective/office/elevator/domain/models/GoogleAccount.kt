@@ -6,3 +6,4 @@ data class GoogleAccount(
     val photoUrl: String?,
     val idToken: String?
 )
+

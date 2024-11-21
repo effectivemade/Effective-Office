@@ -1,12 +1,15 @@
+import dev.icerock.gradle.MRVisibility.Public
+
 plugins {
     id(Plugins.Kotlin.plugin)
     id(Plugins.MultiplatformCompose.plugin)
     id(Plugins.CocoaPods.plugin)
     id(Plugins.Android.plugin)
-    id(Plugins.Libres.plugin)
+    id(Plugins.SQLDelight.plugin) version Plugins.SQLDelight.version
     id(Plugins.BuildConfig.plugin)
     id(Plugins.Serialization.plugin)
     id(Plugins.Parcelize.plugin)
+    id(Plugins.Moko.plugin)
 }
 
 kotlin {
@@ -18,12 +21,12 @@ kotlin {
         }
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    val iosArm64 = iosArm64()
+    val iosX64 = iosX64()
+    val iosSimulatorArm64 = iosSimulatorArm64()
 
     cocoapods {
-        version = "1.0.0"
+        version = "2.0.2"
         summary = "Compose application framework"
         homepage = "https://github.com/Radch-enko"
         ios.deploymentTarget = "11.0"
@@ -37,14 +40,22 @@ kotlin {
         }
         pod("GoogleSignIn") {}
     }
-
+    targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>("iosX64").compilations.forEach {
+        it.kotlinOptions.freeCompilerArgs += arrayOf("-linker-options", "-lsqlite3")
+    }
+    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
+        binaries.all {
+            freeCompilerArgs += "-Xlazy-ir-for-caches=disable"
+        }
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                implementation(Dependencies.Libres.libresCompose)
+                implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
                 implementation(Dependencies.ImageLoader.imageLoader)
                 implementation(Dependencies.Napier.napier)
                 implementation(Dependencies.KotlinxCoroutines.core)
@@ -67,16 +78,29 @@ kotlin {
                 api(Dependencies.Koin.core)
 
                 api(Dependencies.Essenty.essenty)
+
+                //Moko
+                api(Dependencies.Moko.resourcesCompose)
+
+                implementation(Dependencies.Calendar.composeDatePicker)
+
+                implementation(Dependencies.SqlDelight.primitiveadaper)
+
+                implementation(project(":wheel-picker-compose"))
+                implementation(project(":modal_custom_dialog"))
+                implementation(project(":contract"))
             }
         }
 
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("dev.icerock.moko:resources-test:0.24.0-beta-5")
             }
         }
 
         val androidMain by getting {
+            dependsOn(commonMain)
             dependencies {
                 implementation(Dependencies.AndroidX.appCompat)
                 implementation(Dependencies.AndroidX.activityCompose)
@@ -85,7 +109,7 @@ kotlin {
                 api(Dependencies.Ktor.Client.Android)
                 implementation(Dependencies.Google.SignIn)
                 implementation(Dependencies.AndroidX.activityKtx)
-
+                implementation(Dependencies.SqlDelight.androidDriver)
                 // Koin
                 api(Dependencies.Koin.android)
 
@@ -93,9 +117,15 @@ kotlin {
             }
         }
 
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
+        val iosX64Main by getting {
+            resources.srcDirs("build/generated/moko/iosX64Main/src")
+        }
+        val iosArm64Main by getting {
+            resources.srcDirs("build/generated/moko/iosArm64Main/src")
+        }
+        val iosSimulatorArm64Main by getting {
+            resources.srcDirs("build/generated/moko/iosSimulatorArm64Main/src")
+        }
         val iosMain by creating {
             dependsOn(commonMain)
             iosX64Main.dependsOn(this)
@@ -104,6 +134,7 @@ kotlin {
             dependencies {
                 implementation(Dependencies.Ktor.Client.Darwin)
                 implementation(files("iosApp/GoogleAuthorization/GoogleAuthorization/Sources"))
+                implementation(Dependencies.SqlDelight.nativeDriver)
             }
         }
 
@@ -120,21 +151,21 @@ kotlin {
 }
 
 android {
+
     namespace = "band.effective.office.elevator"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
 
-        applicationId = "band.effective.office.elevator.android"
+        applicationId = "band.effective.office.elevator"
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "1.0.2"
     }
     sourceSets["main"].apply {
         manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        res.srcDirs("src/androidMain/resources")
-        res.srcDir("build/generated/libres/android/resources")
+        res.srcDirs("build/generated/moko/androidMain/src")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -142,6 +173,10 @@ android {
     }
     packagingOptions {
         resources.excludes.add("META-INF/**")
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.0"
     }
 
     signingConfigs {
@@ -166,18 +201,17 @@ android {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
             isDebuggable = false
-            isMinifyEnabled = true
+            isMinifyEnabled = false
         }
     }
 }
 
-libres {
-    // https://github.com/Skeptick/libres#setup
-    generatedClassName = "MainRes" // "Res" by default
-    generateNamedArguments = true // false by default
-    baseLocaleLanguageCode = "ru" // "en" by default
-    camelCaseNamesForAppleFramework = true // false by default
 
+multiplatformResources {
+    resourcesPackage.set("band.effective.office.elevator")
+    resourcesVisibility.set(Public)
+    resourcesClassName.set("MainRes")
+    iosBaseLocalizationRegion.set("ru") // optional, default "en"
 }
 
 buildConfig {
@@ -185,14 +219,42 @@ buildConfig {
     packageName("band.effective.office.elevator")
     useKotlinOutput()
     useKotlinOutput { internalVisibility = true }
-
     buildConfigField(
         "String",
-        "webClient", "\"726357293621-s4lju93oibotmefghoh3b3ucckalh933.apps.googleusercontent.com\""
+        "integrationPhoneId", "\"13c80c3d-4278-45cf-8d2a-e281004d3ff9\""
+    )
+    buildConfigField(
+        "String",
+        "integrationTelegramId", "\"15f1fa52-7656-4457-a1ce-42063b0f2b39\""
+    )
+    buildConfigField(
+        "String",
+        "webClient", "\"503255112190-4flfuu86ihrpismfl70nuae6u6n5gk4p.apps.googleusercontent.com\""
     )
     buildConfigField(
         "String",
         "iosClient",
-        "\"726357293621-hegk0410bsb1a5hvl3ihpc4d2bfkmlgb.apps.googleusercontent.com\""
+        "\"503255112190-a3n1441gcnl7alamoqkvk9omtv5q97tl.apps.googleusercontent.com\""
     )
+}
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("band.effective.office.elevator")
+        }
+    }
+}
+
+val podspec = tasks["podspec"] as org.jetbrains.kotlin.gradle.tasks.PodspecTask
+podspec.doLast {
+    val podspec = file("composeApp.podspec")
+    val newPodspecContent = mutableListOf<String>()
+    podspec.readLines().forEach {
+        newPodspecContent.add(it)
+        if (it.contains("set -ev")) {
+            newPodspecContent.add("                export LANG=en_US.UTF-8")
+        }
+    }
+    podspec.writeText(newPodspecContent.joinToString(separator = "\n"))
 }

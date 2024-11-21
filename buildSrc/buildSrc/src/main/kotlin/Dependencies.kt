@@ -9,11 +9,12 @@ object Dependencies {
         const val androidxActivityCompose = "1.7.2"
         const val composeUiTooling = "1.4.3"
         const val libres = "1.1.8"
-        const val composeImageLoader = "1.3.1"
+        const val composeImageLoader = "1.6.0"
         const val napier = "2.6.1"
         const val buildConfig = "3.1.0"
         const val kotlinxCoroutines = "1.7.1"
-        const val ktor = "2.3.1"
+        const val kotlinCorutinesMultiplatform = "1.6.1-native-mt"
+        const val ktor = "2.3.2"
         const val composeIcons = "1.1.0"
         const val kotlinxSerialization = "1.5.1"
         const val kotlinxDatetime = "0.4.0"
@@ -24,6 +25,9 @@ object Dependencies {
         const val essenty = "1.1.0"
         const val logback = "1.2.11"
         const val shadow = "7.1.2"
+        const val moko = "0.24.0-beta-5"
+        const val calendar = "1.0.5"
+        const val sqlDelight = "2.0.0-rc02"
     }
 
     object Ktor {
@@ -37,6 +41,10 @@ object Dependencies {
             const val CIO = "io.ktor:ktor-client-cio:$ktorVersion"
             const val Android = "io.ktor:ktor-client-android:${Versions.ktor}"
             const val Darwin = "io.ktor:ktor-client-darwin:${Versions.ktor}"
+            const val Auth = "io.ktor:ktor-client-auth:$ktorVersion"
+            const val negotiation = "io.ktor:ktor-client-content-negotiation:$ktorVersion"
+            const val jsonSerialization = "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion"
+            const val logging = "io.ktor:ktor-client-logging:$ktorVersion"
         }
 
         object Server {
@@ -121,5 +129,22 @@ object Dependencies {
 
     object Essenty {
         const val essenty = "com.arkivanov.essenty:lifecycle:${Versions.essenty}"
+    }
+
+    object Moko{
+        const val resourcesCompose = "dev.icerock.moko:resources-compose:${Versions.moko}"
+    }
+
+    object Calendar{
+        const val composeBasic = "io.github.epicarchitect:calendar-compose-basis:${Versions.calendar}"
+        const val composeRanges = "io.github.epicarchitect:calendar-compose-ranges:${Versions.calendar}"
+        const val composePager = "io.github.epicarchitect:calendar-compose-pager:${Versions.calendar}"
+        const val composeDatePicker = "io.github.epicarchitect:calendar-compose-datepicker:${Versions.calendar}"
+    }
+
+    object SqlDelight {
+        const val nativeDriver = "app.cash.sqldelight:native-driver:${Versions.sqlDelight}"
+        const val androidDriver = "app.cash.sqldelight:android-driver:${Versions.sqlDelight}"
+        const val primitiveadaper = "app.cash.sqldelight:primitive-adapters:${Versions.sqlDelight}"
     }
 }

@@ -1,0 +1,22 @@
+databaseChangeLog:
+    - changeSet:
+        id: create-email-domain
+        author: zavyalov-daniil
+        changes:
+          - sql: >
+                CREATE DOMAIN email_domain AS VARCHAR(255)
+                  CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+
+    - changeSet:
+        id: create-user-email-column
+        author: zavyalov-daniil
+        changes:
+          - addColumn:
+              tableName: users
+              columns:
+                - column:
+                    name: email
+                    type: email_domain
+                    constraints:
+                      nullable: false
+                      unique: true

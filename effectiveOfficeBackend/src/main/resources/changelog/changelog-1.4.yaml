@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-workspace-meeting-tag
+      author: zavyalov-daniil
+      changes:
+        - insert:
+            tableName: workspace_tags
+            columns:
+              - column:
+                  name: id
+                  value: 88c12f1a-e91e-4088-9378-c03333f39cc8
+              - column:
+                  name: name
+                  value: meeting
+  - changeSet:
+      id: insert-workspace-regular-tag
+      author: zavyalov-daniil
+      changes:
+        - insert:
+            tableName: workspace_tags
+            columns:
+              - column:
+                  name: id
+                  value: 451fff7d-c388-45d1-8454-4eaefaec81cc
+              - column:
+                  name: name
+                  value: regular

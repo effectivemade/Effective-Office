@@ -5,7 +5,10 @@ import band.effective.office.elevator.data.ApiResponse
 import band.effective.office.elevator.domain.models.GoogleAccount
 import band.effective.office.elevator.ui.uiViewController
 import cocoapods.GoogleSignIn.GIDConfiguration
+import cocoapods.GoogleSignIn.GIDGoogleUser
 import cocoapods.GoogleSignIn.GIDSignIn
+import dev.icerock.moko.resources.desc.desc
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,6 +17,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.round
 
+@OptIn(ExperimentalForeignApi::class)
 class GoogleSignInImpl(gidClientId: String, serverClientId: String) : GoogleSignIn {
 
     private val scope = CoroutineScope(Dispatchers.Main)
@@ -30,16 +34,10 @@ class GoogleSignInImpl(gidClientId: String, serverClientId: String) : GoogleSign
         return suspendCoroutine { continuation ->
             GIDSignIn.sharedInstance.restorePreviousSignInWithCompletion { result, _ ->
                 scope.launch {
-                    result?.profile?.let { profileData ->
-                        val dimension = round(100 * UIScreen.mainScreen.scale)
+                    result?.profile?.let {
                         continuation.resume(
                             ApiResponse.Success(
-                                GoogleAccount(
-                                    email = profileData.email,
-                                    name = profileData.name,
-                                    photoUrl = profileData.imageURLWithDimension(dimension = dimension.toULong())?.absoluteString,
-                                    idToken = result.idToken?.tokenString
-                                )
+                                result.toGoogleAccount()
                             )
                         )
                     } ?: continuation.resume(ApiResponse.Error.UnknownError)
@@ -50,12 +48,27 @@ class GoogleSignInImpl(gidClientId: String, serverClientId: String) : GoogleSign
 
     override fun signIn(callback: SignInResultCallback) {
         GIDSignIn.sharedInstance.signInWithPresentingViewController(uiViewController) { result, error ->
-            if (result == null) callback.onFailure(MainRes.string.something_went_wrong)
-            else callback.onSuccess()
+            if (result == null) callback.onFailure(MainRes.strings.something_went_wrong.desc().localized())
+            else {
+                val account = result.user
+                account.profile?.let {
+                    callback.onSuccess(account.toGoogleAccount())
+                } ?: callback.onFailure("")
+            }
         }
     }
 
     override fun signOut() {
         GIDSignIn.sharedInstance.signOut()
+    }
+
+    private fun GIDGoogleUser.toGoogleAccount(): GoogleAccount{
+        val dimension = round(100 * UIScreen.mainScreen.scale)
+        return GoogleAccount(
+            email = profile!!.email,
+            name = profile!!.name,
+            photoUrl = profile!!.imageURLWithDimension(dimension = dimension.toULong())?.absoluteString,
+            idToken = idToken?.tokenString
+        )
     }
 }

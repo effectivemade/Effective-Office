@@ -1,0 +1,105 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-utilities-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: utilities
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_utilities
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: icon_url
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+
+  - changeSet:
+      id: create-workspace-tags-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: workspace_tags
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_workspace_tags
+              - column:
+                  name: name
+                  type: varchar(255)
+                  remarks: "Meeting, Regular, etc."
+                  constraints:
+                    unique: true
+                    nullable: false
+
+  - changeSet:
+      id: create-workspace-zones-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: workspace_zones
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_workspace_zones
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  - changeSet:
+      id: create-workspaces-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: workspaces
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_workspaces
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: zone_id
+                  type: uuid
+        - addForeignKeyConstraint:
+            baseTableName: workspaces
+            baseColumnNames: tag_id
+            referencedTableName: workspace_tags
+            referencedColumnNames: id
+            constraintName: fk_workspaces_tag_id
+        - addForeignKeyConstraint:
+            baseTableName: workspaces
+            baseColumnNames: zone_id
+            referencedTableName: workspace_zones
+            referencedColumnNames: id
+            constraintName: fk_workspaces_zone_id

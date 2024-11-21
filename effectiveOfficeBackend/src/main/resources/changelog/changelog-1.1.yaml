@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-uint-domain
+      author: zavyalov-daniil
+      changes:
+        - sql: CREATE DOMAIN uint_domain AS int CHECK(VALUE >= 0);
+
+  - changeSet:
+      id: create-workspace-utilities-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: workspace_utilities
+            columns:
+              - column:
+                  name: utility_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: workspace_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: count
+                  type: uint_domain
+                  remarks: "> 0"
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: workspace_utilities
+            columnNames: utility_id, workspace_id
+            constraintName: pk_workspace_utilities
+        - addForeignKeyConstraint:
+            baseTableName: workspace_utilities
+            baseColumnNames: utility_id
+            referencedTableName: utilities
+            referencedColumnNames: id
+            constraintName: fk_workspace_utility_id
+        - addForeignKeyConstraint:
+            baseTableName: workspace_utilities
+            baseColumnNames: workspace_id
+            referencedTableName: workspaces
+            referencedColumnNames: id
+            constraintName: fk_utility_workspace_id

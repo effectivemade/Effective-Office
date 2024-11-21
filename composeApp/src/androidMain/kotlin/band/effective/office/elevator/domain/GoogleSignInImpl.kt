@@ -17,20 +17,16 @@ class GoogleSignInImpl : GoogleSignIn {
 
     override suspend fun retrieveAuthorizedUser(): ApiResponse<GoogleAccount, Error> {
         return suspendCoroutine { continuation ->
-            val account: GoogleSignInAccount? =
-                GoogleAuthorization.getLastSignedInAccount(AndroidApp.INSTANCE)
-            continuation.resume(
-                if (account == null) {
-                    ApiResponse.Error.UnknownError
-                } else {
-                    ApiResponse.Success(
-                        GoogleAccount(
-                            email = account.email!!,
-                            name = account.displayName!!,
-                            photoUrl = account.photoUrl.toString(),
-                            idToken = account.idToken
-                        )
-                    )
+            activity.appActivityLifecycleObserver.retrieveAuthorizedUser(
+                object: SignInResultCallback {
+                    override fun onSuccess(googleAccount: GoogleAccount) {
+                        continuation.resume(ApiResponse.Success(googleAccount))
+                    }
+
+                    override fun onFailure(message: String) {
+                        continuation.resume(ApiResponse.Error.UnknownError)
+                    }
+
                 }
             )
         }

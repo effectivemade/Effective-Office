@@ -9,6 +9,8 @@ import androidx.lifecycle.LifecycleOwner
 import band.effective.office.elevator.AppActivity
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.OfficeElevatorConfig
+import band.effective.office.elevator.domain.models.GoogleAccount
+import band.effective.office.elevator.utils.getStringResource
 import com.google.android.gms.auth.api.proxy.AuthApiStatusCodes
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -31,6 +33,7 @@ class AppActivityLifecycleObserver(
         .build()
 
     private val signInClient = GoogleSignIn.getClient(activity, gso)
+    private val context = activity.applicationContext
 
     private lateinit var launcher: ActivityResultLauncher<Intent>
 
@@ -54,7 +57,8 @@ class AppActivityLifecycleObserver(
         try {
             val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
             Napier.d { "ID_TOKEN = ${account.idToken}" }
-            callback.onSuccess()
+
+            callback.onSuccess(account.toGoogleAccount())
         } catch (e: ApiException) {
             Napier.e(
                 "signInResult:failed code=" + e.statusCode + " | description: ${
@@ -62,13 +66,13 @@ class AppActivityLifecycleObserver(
                 }"
             )
             val errorMessage = when (e.statusCode) {
-                AuthApiStatusCodes.NETWORK_ERROR -> MainRes.string.network_error
-                AuthApiStatusCodes.DEVELOPER_ERROR -> MainRes.string.developer_error
-                AuthApiStatusCodes.CANCELED -> MainRes.string.cancelled_error
-                AuthApiStatusCodes.INVALID_ACCOUNT -> MainRes.string.invalid_account_error
-                AuthApiStatusCodes.TIMEOUT -> MainRes.string.timout_error
-                SIGN_IN_CANCELLED -> MainRes.string.you_need_to_sign_in
-                else -> MainRes.string.something_went_wrong
+                AuthApiStatusCodes.NETWORK_ERROR -> getStringResource(MainRes.strings.network_error, context)
+                AuthApiStatusCodes.DEVELOPER_ERROR -> getStringResource(MainRes.strings.developer_error, context)
+                AuthApiStatusCodes.CANCELED -> getStringResource(MainRes.strings.cancelled_error, context)
+                AuthApiStatusCodes.INVALID_ACCOUNT -> getStringResource(MainRes.strings.invalid_account_error, context)
+                AuthApiStatusCodes.TIMEOUT -> getStringResource(MainRes.strings.timout_error, context)
+                SIGN_IN_CANCELLED -> getStringResource(MainRes.strings.you_need_to_sign_in, context)
+                else -> getStringResource(MainRes.strings.something_went_wrong, context)
             }
             callback.onFailure(errorMessage)
         }
@@ -78,8 +82,33 @@ class AppActivityLifecycleObserver(
         this.callback = callback
         launcher.launch(signInClient.signInIntent)
     }
-
     fun signOut() {
         signInClient.signOut()
     }
+
+    fun retrieveAuthorizedUser(callback: SignInResultCallback) {
+        val task = signInClient.silentSignIn()
+        if (task.isSuccessful) {
+            // There's immediate result available.
+            val signInAccount = task.result
+            callback.onSuccess(signInAccount.toGoogleAccount())
+        } else {
+            task.addOnCompleteListener { task ->
+                try {
+                    val signInAccount = task.getResult(ApiException::class.java)
+                    callback.onSuccess(signInAccount.toGoogleAccount())
+                } catch (apiException: ApiException) {
+                    callback.onFailure(apiException.message.orEmpty())
+                }
+            }
+        }
+    }
+
+    private fun GoogleSignInAccount.toGoogleAccount() =
+        GoogleAccount(
+            email = email!!,
+            name = displayName!!,
+            photoUrl = photoUrl.toString(),
+            idToken = idToken
+        )
 }

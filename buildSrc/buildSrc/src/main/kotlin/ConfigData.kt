@@ -10,7 +10,7 @@ object ConfigData {
         const val minSdkVersion = 21
         const val targetSdkVersion = compileSdkVersion
         const val versionCode = 1
-        const val kotlinCompilerExtensionVersion = "1.4.1"
+        const val kotlinCompilerExtensionVersion = "1.5.0-beta01"
     }
 
     object IOS {

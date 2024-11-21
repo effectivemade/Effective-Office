@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
 import band.effective.office.elevator.AppTheme
+import band.effective.office.elevator.data.database.di.databaseModule
 import band.effective.office.elevator.di.appModuleDI
 import band.effective.office.elevator.di.iosModuleDI
 import band.effective.office.elevator.ui.helper.LocalSafeArea
@@ -27,7 +28,7 @@ fun MainViewController(
     bottomSafeArea: Float
 ): UIViewController {
     startKoin {
-        modules(appModuleDI + iosModuleDI)
+        modules(appModuleDI + iosModuleDI + databaseModule)
     }
 
     val rootComponent =

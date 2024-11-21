@@ -1,0 +1,26 @@
+databaseChangeLog:
+    - changeSet:
+        id: create-calendar-ids-table
+        author: zavyalov-daniil
+        changes:
+          - createTable:
+              tableName: calendar_ids
+              columns:
+                - column:
+                    name: workspace_id
+                    type: uuid
+                    constraints:
+                      primaryKey: true
+                      primaryKeyName: pk_calendar_ids
+                - column:
+                    name: calendar_id
+                    type: varchar(255)
+                    constraints:
+                      nullable: false
+                      unique: true
+          - addForeignKeyConstraint:
+              baseTableName: calendar_ids
+              baseColumnNames: workspace_id
+              referencedTableName: workspaces
+              referencedColumnNames: id
+              constraintName: fk_calendar_workspaces_id

@@ -1,10 +1,11 @@
 package band.effective.office.elevator.ui.root
 
 import band.effective.office.elevator.ui.authorization.AuthorizationComponent
-import band.effective.office.elevator.ui.main.MainComponent
+import band.effective.office.elevator.ui.content.ContentComponent
 import band.effective.office.elevator.ui.root.store.RootStore
 import band.effective.office.elevator.ui.root.store.RootStoreImplFactory
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
@@ -22,8 +23,8 @@ import kotlinx.coroutines.flow.Flow
 class RootComponent internal constructor(
     componentContext: ComponentContext,
     private val storeFactory: DefaultStoreFactory,
-    private val authorization: (ComponentContext, (AuthorizationComponent.Output) -> Unit) -> AuthorizationComponent,
-    private val main: (ComponentContext, () -> Unit) -> MainComponent,
+    private val authorization: (ComponentContext, () -> Unit) -> AuthorizationComponent,
+    private val content: (ComponentContext, () -> Unit) -> ContentComponent,
 ) : ComponentContext by componentContext {
 
     init {
@@ -34,9 +35,8 @@ class RootComponent internal constructor(
 
     private val stack = childStack(
         source = navigation,
-        initialStack = { listOf(Config.Undefined) },
-        handleBackButton = true,
-        childFactory = ::child
+        childFactory = ::child,
+        initialConfiguration = Config.Undefined
     )
 
     val childStack: Value<ChildStack<*, Child>> = stack
@@ -54,55 +54,51 @@ class RootComponent internal constructor(
         componentContext,
         storeFactory,
         authorization = { childContext, output ->
-            AuthorizationComponent(childContext, storeFactory, output)
+            AuthorizationComponent(
+                childContext,
+                storeFactory,
+                openContentFlow = output
+            )
         },
-        main = { childContext, onSignOut ->
-            MainComponent(
+        content = { childContext, onSignOut ->
+            ContentComponent(
                 childContext,
                 storeFactory,
                 openAuthorizationFlow = onSignOut
             )
-        })
+        },
+    )
 
     private fun child(config: Config, componentContext: ComponentContext): Child =
         when (config) {
-            is Config.Authorization -> Child.AuthorizationChild(
-                authorization(
-                    componentContext,
-                    ::onAuthorizationOutput
-                )
-            )
+            is Config.Authorization -> Child.AuthorizationChild(authorization(componentContext){
+                navigation.replaceAll(Config.Content)
+            })
 
-            is Config.Main -> Child.MainChild(main(componentContext) {
+            is Config.Content -> Child.ContentChild(content(componentContext) {
                 navigation.replaceAll(Config.Authorization)
             })
 
             Config.Undefined -> Child.Undefined
         }
 
-
-    private fun onAuthorizationOutput(output: AuthorizationComponent.Output) {
-        when (output) {
-            AuthorizationComponent.Output.OpenMainScreen -> navigation.replaceAll(Config.Main)
-        }
-    }
-
     fun onOutput(output: Output) {
+        println("Output")
         when (output) {
-            Output.OpenMainScreen -> navigation.replaceAll(Config.Main)
+            Output.OpenContent -> navigation.replaceAll(Config.Content, onComplete = { println("navigation compli") })
             Output.OpenAuthorizationFlow -> navigation.replaceAll(Config.Authorization)
         }
     }
 
     sealed interface Output {
-        object OpenMainScreen : Output
+        object OpenContent : Output
         object OpenAuthorizationFlow : Output
     }
 
     sealed class Child {
         object Undefined : Child()
         class AuthorizationChild(val component: AuthorizationComponent) : Child()
-        class MainChild(val component: MainComponent) : Child()
+        class ContentChild(val component: ContentComponent) : Child()
     }
 
     sealed class Config : Parcelable {
@@ -113,6 +109,6 @@ class RootComponent internal constructor(
         object Authorization : Config()
 
         @Parcelize
-        object Main : Config()
+        object Content : Config()
     }
 }

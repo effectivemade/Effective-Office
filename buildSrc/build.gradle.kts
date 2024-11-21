@@ -7,6 +7,7 @@ repositories {
     mavenCentral()
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
     maven("https://jitpack.io")
+    maven(url = "https://dl.bintray.com/icerockdev/moko")
     jcenter()
     google()
     gradlePluginPortal()
@@ -20,9 +21,11 @@ dependencies {
     implementation(Plugins.Ktor.implementation)
     implementation(Plugins.ApacheCompress.implementation) // NOTE(radchenko): needs for `ktor` to `docker`
     implementation(Plugins.MultiplatformCompose.implementation)
-    implementation(Plugins.Libres.implementation)
     implementation(Plugins.BuildConfig.implementation)
     implementation(Plugins.Serialization.implementation)
+    implementation(Plugins.Moko.implementation)
+    implementation(Plugins.Libres.implementation)
+    implementation(Plugins.GoogleServices.implementation) //NOTE(Maksim Mishenko): need for firebase message
 }
 
 val rootDirProject = file("../")

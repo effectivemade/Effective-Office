@@ -1,5 +1,9 @@
 import io.ktgp.Closeable
-import io.ktgp.gpio.*
+import io.ktgp.gpio.Bias
+import io.ktgp.gpio.Gpio
+import io.ktgp.gpio.Input
+import io.ktgp.gpio.Output
+import io.ktgp.gpio.PinState
 import io.ktgp.util.sleep
 
 /**

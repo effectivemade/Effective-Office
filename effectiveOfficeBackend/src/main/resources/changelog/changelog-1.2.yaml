@@ -1,0 +1,128 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-users-tags-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: users_tags
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_users_tags
+              - column:
+                  name: name
+                  type: varchar(255)
+                  remarks: "Student, Worker, etc."
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create-users-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_users
+              - column:
+                  name: full_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(255)
+                  remarks: "I. e. Android-developer"
+              - column:
+                  name: avatar_url
+                  type: varchar(255)
+        - addForeignKeyConstraint:
+            baseTableName: users
+            baseColumnNames: tag_id
+            referencedTableName: users_tags
+            referencedColumnNames: id
+            constraintName: fk_users_tag_id
+
+  - changeSet:
+      id: create-integrations-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: integrations
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_integrations
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: icon_url
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create-users-integrations-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: users_integrations
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: integration_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: varchar(255)
+                  remarks: "For telegram is, for example, user tag @user"
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: users_integrations
+            columnNames: integration_id, user_id
+            constraintName: pk_users_integrations
+        - addForeignKeyConstraint:
+            baseTableName: users_integrations
+            baseColumnNames: integration_id
+            referencedTableName: integrations
+            referencedColumnNames: id
+            constraintName: fk_user_integration_id
+        - addForeignKeyConstraint:
+            baseTableName: users_integrations
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_integration_user_id

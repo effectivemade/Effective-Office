@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Office Elevator</string>
+    <string name="sign_in_google">Sign in with google</string>
+    <string name="something_went_wrong">Something went wrong. Please try again</string>
+    <string name="company_name">effective\noffice</string>
+
+    <string name="search_employee">Search employee</string>
+    <string name="employee_in_office">In office</string>
+    <string name="employee_soon_in_office">Will be today</string>
+    <string name="employee_not_soon_in_office">No reservations</string>
+
+
+    <!--Auth strings-->
+    <string name="_continue">Continue</string>
+    <string name="input_number">Enter number</string>
+    <string name="select_number">Enter the phone number associated with the SBP</string>
+    <string name="number_hint">955-555-55-55</string>
+    <string name="input_profile">Fill in your profile</string>
+    <string name="select_profile">This is necessary for employees to recognize you</string>
+    <string name="profile_hint">Ivan Ivanov</string>
+    <string name="profile_hint_">Android-developer</string>
+    <string name="input_employee">Specify Telegram</string>
+    <string name="select_employee">This is necessary for colleagues to be able to contact you conveniently</string>
+    <string name="employee_hint">telegramnick</string>
+
+    <string name="period_selection">Period selection</string>
+
+    <string name="by_date"> By date </string>
+    <string name="on_today">On today</string>
+    <string name="show_map">Show on map</string>
+    <string name="book_a_seat">Book a seat</string>
+    <string name="nearest_bookings">Bookings</string>
+    <string name="none_booking_seat">You dont have any bookings yet</string>
+
+    <string name="filter_by_category">Filter by category</string>
+    <string name="reset_filter">Reset</string>
+
+    <string name="cansel">Cansel</string>
+    <string name="delete">Delete</string>
+    <string name="ok">OK</string>
+    <!--Booking-->
+    <string name="type_booking">Type booking</string>
+    <string name="workplace">Working place</string>
+    <string name="meeting_room">Meeting room</string>
+    <string name="booking_period">Booking period</string>
+    <string name="suitable_options">Suitable options</string>
+    <string name="select_zones">Select zones</string>
+    <string name="selection_zones">Selection zones</string>
+    <string name="selection_rooms">Selection meeting rooms</string>
+    <string name="no_repeat">No repeats</string>
+    <string name="every_work_day_repeat">Every working day</string>
+    <string name="every_week_repeat">Every week</string>
+    <string name="every_month_repeat">Every month</string>
+    <string name="other_repeat">Other</string>
+    <string name="hide_map">Hide map</string>
+
+    <!--Booking period-->
+    <string name="place_booked">Place reserved</string>
+    <string name="good_working_day">Have a good working day!</string>
+    <string name="move_to_main_from_booking">Go to main</string>
+    <string name="close_booking">Close</string>
+    <string name="booking_period">Booking period</string>
+    <string name="whole_day_booking">Whole day</string>
+    <string name="creating_error">Seat reservation error</string>
+    <string name="try_another_place">Something went wrong. Try to book another place</string>
+    <string name="confirm_booking">Confirm</string>
+    <string name="do_not_repeat">Do not repeat</string>
+    <string name="every_work_day">Every work day</string>
+    <string name="every_week">Every week</string>
+    <string name="every_month">Every month</string>
+    <string name="every_year">Every year</string>
+    <string name="another">Other...</string>
+    <string name="booking_repeat">Repeat booking</string>
+    <string name="booking_repeat_in">Repeats every:</string>
+    <string name="when_repeat">When it repeats:</string>
+    <string name="book_finish">Finish:</string>
+    <string name="never">Never</string>
+    <string name="booking_1">After</string>
+    <string name="booking_2">time</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
+
+    <string name="map">Map</string>
+    <string name="show_map">Show map</string>
+    <string name="extend_booking">Extend</string>
+    <string name="repeat_booking">Repeat</string>
+
+    <string name="Monday">Mon</string>
+    <string name="Tuesday">Tue</string>
+    <string name="Wednesday">Wed</string>
+    <string name="Thursday">Thu</string>
+    <string name="Friday">Fri</string>
+
+    <string name="delete_booking">Delete booked room?</string>
+
+    <string name="take_from">Take from</string>
+    <string name="take_before">Take by</string>
+
+    <string name="booking_not_repeat">Booking not repeatable</string>
+    <string name="every_year">Every year</string>
+
+    <!--Main Screen-->
+    <string name="filter">Filters</string>
+
+    <!-- Buttons -->
+    <string name="_continue">Continue</string>
+
+    <!--Tab titles-->
+    <string name="profile">Profile</string>
+    <string name="main">Main</string>
+    <string name="booking">Booking</string>
+    <string name="employees">Employees</string>
+
+    <string name="elevator">Elevator</string>
+    <string name="elevator_button" >Lift</string>
+
+    <!--Error messages-->
+    <string name="you_need_to_sign_in">You need to sign in for the app to work</string>
+    <string name="network_error">Network connection error</string>
+    <string name="developer_error">The developer seems to have broken something. Report the problem</string>
+    <string name="cancelled_error">You canceled the operation. Try again</string>
+    <string name="invalid_account_error">You are using the wrong account</string>
+    <string name="timout_error">Request time is up. Try again</string>
+    <string name="server_error">Server error ${code}</string>
+    <string name="number_format_error">Invalid phone number format</string>
+    <string name="profile_format_error">Fill out the profile</string>
+    <string name="profile_name_format_error">Fill in the first and last name</string>
+    <string name="profile_post_format_error">Fill out the position</string>
+    <string name="telegram_format_error">Specify nickname in telegram</string>
+    <string name="phone_plus_seven">+7</string>
+    <string name="telegram_symbol">@</string>
+
+
+    <string name="from_date">from %s</string>
+    <string name="to_date">to %s</string>
+
+    <!-- Success messages -->
+    <string name="elevator_called_successfully">Successfully!</string>
+
+    <!-- Profile specifics-->
+    <string name="exit">Exit</string>
+    <string name="phone">Phone number</string>
+    <string name="telegram">Telegram</string>
+
+    <!-- Booking title -->
+    <string name="number_with_parametr">%sth</string>
+    <string name="weekly">week(s)</string>
+    <string name="monthly">month(s)</string>
+    <string name="yearly">years</string>
+    <string name="once_per">once per %s</string>
+    <string name="once_per_from">once in %s from</string>
+    <string name="to_end_reccurense">by %s</string>
+    <string name="repeate_times">repeated %s times</string>
+    <string name="no_free_place">There are no places for this time. Choose another time</string>
+
+    <!-- Edit Profile-->
+    <string name="profile_data">Profile Data</string>
+    <string name="last_name_and_first_name">Last name and First name</string>
+    <string name="post">Post</string>
+    <string name="phone_number">Telephone number</string>
+    <string name="save">Save</string>
+
+    <!-- Employee -->
+    <string name="about_the_employee">About the employee</string>
+    <string name="upcoming_bookings">Employee reservations</string>
+    <string name="transfer">Transfer</string>
+    <string name="none_booking_seats_by_the_employee">This employee dont have any bookings yet</string>
+    <string name="none_such_booking_seats_by_the_employee">This employee dont have such bookings yet</string>
+    <string name="none_booking_seats_on_this_date">This employee dont have bookings on this date</string>
+    <string name="none_such_booking_seats_on_this_date">This employee dont have such bookings on this date</string>
+
+    <!-- Clipboard -->
+    <string name="phone_clipboard">Phone number was successfully copied!</string>
+    <string name="email_clipboard">Email was successfully copied!</string>
+    <string name="telegram_clipboard">Telegram was successfully copied!</string>
+</resources>

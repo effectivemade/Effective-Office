@@ -1,44 +1,82 @@
 package band.effective.office.elevator.ui.profile
 
-import band.effective.office.elevator.ui.profile.store.ProfileStore
-import band.effective.office.elevator.ui.profile.store.ProfileStoreFactory
+import band.effective.office.elevator.ui.profile.editProfile.ProfileEditComponent
+import band.effective.office.elevator.ui.profile.mainProfile.MainProfileComponent
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.mvikotlin.core.instancekeeper.getStore
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.bringToFront
+import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.replaceAll
+import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.parcelable.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelize
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.arkivanov.mvikotlin.extensions.coroutines.labels
-import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 class ProfileComponent(
     componentContext: ComponentContext,
-    storeFactory: StoreFactory,
-    private val output: (Output) -> Unit
-) :
+    private val storeFactory: StoreFactory,
+
+    private val openAuthorizationFlow: () -> Unit) :
     ComponentContext by componentContext {
 
-    private val profileStore = instanceKeeper.getStore {
-        ProfileStoreFactory(
-            storeFactory = storeFactory
-        ).create()
+    private val navigation = StackNavigation<Config>()
+
+    private val stack = childStack(
+        source = navigation,
+        initialConfiguration = Config.MainProfile,
+        childFactory = ::child,
+        handleBackButton = true
+    )
+
+    val childStack: Value<ChildStack<*,Child>> = stack
+
+    private fun child(config: Config, componentContext: ComponentContext):Child {
+        return when(config){
+            is Config.MainProfile -> Child.MainProfileChild(
+                MainProfileComponent(
+                    componentContext,
+                    storeFactory,
+                    output = ::mainProfileOutput,
+                )
+            )
+
+            is Config.EditProfile -> Child.EditProfileChild(
+                ProfileEditComponent(
+                    componentContext,
+                    storeFactory,
+                    ::editProfileOutput,
+                    config.user
+                )
+            )
+        }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val state: StateFlow<ProfileStore.State> = profileStore.stateFlow
-
-    val label: Flow<ProfileStore.Label> = profileStore.labels
-
-    fun onEvent(event: ProfileStore.Intent) {
-        profileStore.accept(event)
+    private fun editProfileOutput(output: ProfileEditComponent.Output) {
+        when(output){
+           is ProfileEditComponent.Output.NavigationBack -> navigation.pop()
+        }
     }
 
-    fun onOutput(output: Output) {
-        output(output)
+    private fun mainProfileOutput(output: MainProfileComponent.Output) {
+        when(output){
+            is MainProfileComponent.Output.OpenAuthorizationFlow -> openAuthorizationFlow()
+            is MainProfileComponent.Output.NavigateToEdit -> navigation.bringToFront(Config.EditProfile(output.userEdit))
+        }
     }
 
-    sealed interface Output {
-        object OpenAuthorizationFlow : Output
+    sealed class Child{
+        class MainProfileChild(val component: MainProfileComponent) : Child()
+        class EditProfileChild(val component: ProfileEditComponent): Child()
     }
 
+    sealed class Config: Parcelable{
+        @Parcelize
+        object MainProfile: Config()
+
+        @Parcelize
+        data class EditProfile(val user: String): Config()
+    }
 }

@@ -1,0 +1,11 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="material-symbols:edit" clip-path="url(#clip0_274_3492)">
+<circle id="Ellipse 3" cx="12" cy="12" r="12" fill="#C0430E"/>
+<path id="Vector" d="M16.7025 10.0603L13.912 7.29863L14.8312 6.37808C15.0829 6.12603 15.3922 6 15.759 6C16.1258 6 16.4349 6.12603 16.6861 6.37808L17.6054 7.29863C17.8571 7.55068 17.9884 7.8549 17.9993 8.21129C18.0103 8.56767 17.8899 8.87167 17.6382 9.12329L16.7025 10.0603ZM15.7505 11.0301L8.79054 18H6V15.2055L12.9599 8.23562L15.7505 11.0301Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_274_3492">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>

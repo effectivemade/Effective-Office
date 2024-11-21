@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: unique-integration-name-constraint
+      author: zavyalov-daniil
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            tableName: integrations
+  - changeSet:
+      id: unique-utility-name-constraint
+      author: zavyalov-daniil
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            tableName: utilities

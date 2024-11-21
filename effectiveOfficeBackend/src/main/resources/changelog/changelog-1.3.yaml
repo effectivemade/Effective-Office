@@ -1,0 +1,82 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-workspace-booking-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: workspace_booking
+            columns:
+              - column:
+                  name: owner_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: workspace_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: "Using to refer existing booking without additional business logic"
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_workspace_booking
+              - column:
+                  name: begin_booking
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_booking
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: workspace_booking
+            baseColumnNames: owner_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_workspace_booking_owner
+        - addForeignKeyConstraint:
+            baseTableName: workspace_booking
+            baseColumnNames: workspace_id
+            referencedTableName: workspaces
+            referencedColumnNames: id
+            constraintName: fk_booking_workspace_id
+        - sql: ALTER TABLE workspace_booking ADD CONSTRAINT check_booking_end_gt_begin CHECK (end_booking > begin_booking);
+
+  - changeSet:
+      id: create-booking_participants-table
+      author: zavyalov-daniil
+      changes:
+        - createTable:
+            tableName: booking_participants
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: booking_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: booking_participants
+            columnNames: user_id, booking_id
+            constraintName: pk_booking_participants
+        - addForeignKeyConstraint:
+            baseTableName: booking_participants
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_booking_participant_id
+        - addForeignKeyConstraint:
+            baseTableName: booking_participants
+            baseColumnNames: booking_id
+            referencedTableName: workspace_booking
+            referencedColumnNames: id
+            constraintName: fk_participants_workspace_booking_id

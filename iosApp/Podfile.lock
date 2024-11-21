@@ -5,7 +5,7 @@ PODS:
   - AppAuth/Core (1.6.2)
   - AppAuth/ExternalUserAgent (1.6.2):
     - AppAuth/Core
-  - composeApp (1.0.0):
+  - composeApp (2.0.2):
     - GoogleSignIn
   - GoogleSignIn (7.0.0):
     - AppAuth (~> 1.5)
@@ -15,9 +15,13 @@ PODS:
     - AppAuth/Core (~> 1.6)
     - GTMSessionFetcher/Core (< 4.0, >= 1.5)
   - GTMSessionFetcher/Core (3.1.1)
+  - sqlite3 (3.42.0):
+    - sqlite3/common (= 3.42.0)
+  - sqlite3/common (3.42.0)
 
 DEPENDENCIES:
   - composeApp (from `../composeApp`)
+  - sqlite3 (~> 3.42.0)
 
 SPEC REPOS:
   trunk:
@@ -25,6 +29,7 @@ SPEC REPOS:
     - GoogleSignIn
     - GTMAppAuth
     - GTMSessionFetcher
+    - sqlite3
 
 EXTERNAL SOURCES:
   composeApp:
@@ -32,11 +37,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AppAuth: 3bb1d1cd9340bd09f5ed189fb00b1cc28e1e8570
-  composeApp: fb58dac014f3021b1102fccf6f946ac8f27ae369
+  composeApp: 2058e74bac17ec8d3f40b2422c4eb5f2287a55e7
   GoogleSignIn: b232380cf495a429b8095d3178a8d5855b42e842
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
   GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
+  sqlite3: f163dbbb7aa3339ad8fc622782c2d9d7b72f7e9c
 
-PODFILE CHECKSUM: f592d416ef402cdced75a4fe13ce5677c60a6fa0
+PODFILE CHECKSUM: 0bb21bcfb7edee5cb3371fca3787b0ccbf0240e4
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.15.2
