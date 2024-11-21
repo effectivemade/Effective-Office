@@ -31,6 +31,8 @@
 	</dict>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
