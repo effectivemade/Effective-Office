@@ -9,6 +9,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
@@ -52,7 +53,11 @@ class BookAcceptStoreFactory(
 
                 is BookAcceptStore.Intent.CloseModal -> {
                     dispatch(Message.CloseModal)
-                    if (intent.withSheet) close()
+                    if (intent.withSheet) {
+                        MainScope().launch {
+                            close()
+                        }
+                    }
                 }
 
                 BookAcceptStore.Intent.SwitchOnMain -> {
