@@ -8,6 +8,8 @@
     <string name="search_employee">Поиск сотрудника</string>
     <string name="employee_in_office">В офисе</string>
 
+    <string name="back">Назад</string>
+
     <!--Auth strings-->
     <string name="_continue">Продолжить</string>
 
@@ -185,6 +187,10 @@
     <string name="none_such_booking_seats_by_the_employee">У этого сотрудника пока нет таких бронирований</string>
     <string name="none_booking_seats_on_this_date">У этого сотрудника нет бронирований на этот день</string>
     <string name="none_such_booking_seats_on_this_date">У этого сотрудника нет таких бронирований на этот день</string>
+    <string name="clear_text_field">Очистить текстовое поле</string>
+    <string name="telegram">Телеграм</string>
+    <string name="email">Почта</string>
+    <string name="phone_number">Телефон</string>
   
     <!-- Clipboard -->
     <string name="phone_clipboard">Номер телефона был успешно скопирован!</string>

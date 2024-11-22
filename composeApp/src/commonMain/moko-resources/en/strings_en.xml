@@ -9,6 +9,7 @@
     <string name="employee_in_office">In office</string>
     <string name="employee_soon_in_office">Will be today</string>
     <string name="employee_not_soon_in_office">No reservations</string>
+    <string name="back">Back</string>
 
 
     <!--Auth strings-->
@@ -170,6 +171,10 @@
     <string name="none_such_booking_seats_by_the_employee">This employee dont have such bookings yet</string>
     <string name="none_booking_seats_on_this_date">This employee dont have bookings on this date</string>
     <string name="none_such_booking_seats_on_this_date">This employee dont have such bookings on this date</string>
+    <string name="clear_text_field">Clear text field</string>
+    <string name="telegram">Telegram</string>
+    <string name="email">Email</string>
+    <string name="phone_number">Phone number</string>
 
     <!-- Clipboard -->
     <string name="phone_clipboard">Phone number was successfully copied!</string>

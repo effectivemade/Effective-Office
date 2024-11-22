@@ -41,5 +41,4 @@ class AboutEmployeeComponent(
     sealed interface Output {
         object OpenAllEmployee : Output
     }
-
 }

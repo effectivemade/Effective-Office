@@ -8,11 +8,10 @@ import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.desc.desc
 
 
-actual fun setClipboardText(text: String, label: String, toastMessage: StringResource) {
+actual fun setClipboardText(text: String, label: String) {
     val context = AndroidApp.INSTANCE
 
     val clip = ClipData.newPlainText(label, text)
     val clipboardService =  context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     clipboardService.setPrimaryClip(clip)
-    showToast(toastMessage.desc().toString(context))
 }

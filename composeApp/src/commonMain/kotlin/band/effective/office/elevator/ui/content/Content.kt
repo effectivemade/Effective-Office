@@ -5,15 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.BottomNavigation
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.components.TabNavigationItem
 import band.effective.office.elevator.navigation.BookingTab
 import band.effective.office.elevator.navigation.EmployeesTab

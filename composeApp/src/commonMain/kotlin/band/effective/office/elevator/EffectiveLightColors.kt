@@ -1,5 +1,7 @@
 package band.effective.office.elevator
 
+import androidx.compose.ui.graphics.Color
+
 val EffectiveLightColors = EffectiveThemeColors(
     background = EffectiveThemeColors.Background(
         primary = neutral15,
