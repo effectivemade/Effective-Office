@@ -225,9 +225,9 @@ fun ExtendedTheme(
 
     )
     val colors = if (!useDarkTheme) {
-        EffectiveLightColors
+        LightColors
     } else {
-        EffectiveDarkColors
+        DarkColors
     }
 
     MaterialTheme(
