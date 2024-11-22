@@ -9,7 +9,7 @@ val EffectiveDarkColors = EffectiveThemeColors(
     ),
 
     text = EffectiveThemeColors.Text(
-        primary =neutral10 ,
+        primary = neutral10,
         secondary = neutral50,
         tertiary = orange30,
         accent = orange50,
@@ -102,7 +102,7 @@ val EffectiveDarkColors = EffectiveThemeColors(
         lockFill = neutral90,
         lockDisable = neutral95,
         searchNormal = neutral95,
-        searchPress = neutral90 ,
+        searchPress = neutral90,
         searchTyping = neutral95,
         searchFill = neutral95,
     ),

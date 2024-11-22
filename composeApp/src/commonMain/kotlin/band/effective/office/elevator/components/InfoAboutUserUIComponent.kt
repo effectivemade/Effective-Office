@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import band.effective.office.elevator.EffectiveTheme
 
 @Composable
 fun UserScreen(
@@ -28,9 +29,8 @@ fun UserScreen(
         userName?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.subtitle1,
-                color = Color.Black,
-                fontSize = 18.sp,
+                style = EffectiveTheme.typography.mMedium,
+                color = EffectiveTheme.colors.text.primary,
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
             )
@@ -39,8 +39,8 @@ fun UserScreen(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = it,
-                style = MaterialTheme.typography.subtitle1,
-                color = Color.Gray,
+                style = EffectiveTheme.typography.sMedium,
+                color = EffectiveTheme.colors.text.secondary,
                 textAlign = TextAlign.Center,
             )
         }

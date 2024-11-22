@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
@@ -37,20 +36,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import band.effective.office.elevator.ExtendedThemeColors
+import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.LoadingIndicator
 import band.effective.office.elevator.components.UserScreen
 import band.effective.office.elevator.components.generateImageLoader
 import band.effective.office.elevator.expects.setClipboardText
-import band.effective.office.elevator.textGrayColor
-import band.effective.office.elevator.theme_light_onPrimary
 import band.effective.office.elevator.ui.employee.aboutEmployee.components.BookingCardUser
 import band.effective.office.elevator.ui.employee.aboutEmployee.components.EmployeeInfo
 import band.effective.office.elevator.ui.employee.aboutEmployee.models.BookingsFilter
@@ -79,12 +74,11 @@ fun AboutEmployeeScreen(component: AboutEmployeeComponent) {
                 AboutEmployeeStore.Label.OpenBottomDialog -> bottomSheetState.show()
                 AboutEmployeeStore.Label.CloseBottomDialog -> bottomSheetState.hide()
             }
-
         }
     }
     Box(
         modifier = Modifier
-            .background(Color.White)
+            .background(EffectiveTheme.colors.background.primary)
             .fillMaxSize()
     ) {
         AboutEmployeeContent(
@@ -144,7 +138,7 @@ private fun AboutEmployeeContent(
         Column(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .background(Color.White)
+                    .background(EffectiveTheme.colors.background.tertiary)
                     .padding(top = 40.dp, bottom = 24.dp)
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -160,17 +154,17 @@ private fun AboutEmployeeContent(
                         Icon(
                             painter = painterResource(MainRes.images.back_button),
                             contentDescription = stringResource(MainRes.strings.back),
-                            tint = Color.LightGray,
+                            tint = EffectiveTheme.colors.icon.secondary,
                             modifier = Modifier.size(24.dp),
                         )
                     }
                     Text(
                         modifier = Modifier.align(Alignment.Center),
                         text = stringResource(MainRes.strings.about_the_employee),
-                        fontSize = 18.sp,
+                        style = EffectiveTheme.typography.mMedium,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight(600),
-                        color = ExtendedThemeColors.colors.blackColor,
+                        color = EffectiveTheme.colors.text.primary,
                     )
                 }
                 Spacer(modifier = Modifier.padding(24.dp))
@@ -240,7 +234,7 @@ private fun EmployeeBlock(
                 .border(
                     BorderStroke(
                         width = 2.dp,
-                        color = ExtendedThemeColors.colors.trinidad_400,
+                        color = EffectiveTheme.colors.stroke.accent,
                     ),
                     shape = CircleShape,
                 )
@@ -293,7 +287,7 @@ private fun BookingBlock(
     filtrationOnReserves: Boolean,
 ) {
     Column(
-        modifier = modifier.background(theme_light_onPrimary),
+        modifier = modifier.background(EffectiveTheme.colors.background.tertiary),
     ) {
         Row(
             modifier = Modifier
@@ -304,8 +298,8 @@ private fun BookingBlock(
         ) {
             Text(
                 text = stringResource(MainRes.strings.upcoming_bookings),
-                color = ExtendedThemeColors.colors.blackColor,
-                style = MaterialTheme.typography.body1,
+                color = EffectiveTheme.colors.text.primary,
+                style = EffectiveTheme.typography.lMedium,
                 modifier = Modifier.padding(vertical = 24.dp).padding(end = 16.dp),
                 fontWeight = FontWeight(500)
             )
@@ -344,8 +338,8 @@ private fun NoReservationsThisDate(
                     else MainRes.strings.none_booking_seats_by_the_employee
                 }
             ),
-            fontSize = 16.sp,
-            color = textGrayColor,
+            style = EffectiveTheme.typography.mMedium,
+            color = EffectiveTheme.colors.text.secondary,
             textAlign = TextAlign.Center,
         )
     }

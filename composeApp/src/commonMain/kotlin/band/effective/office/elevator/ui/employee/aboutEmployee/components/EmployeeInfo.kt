@@ -22,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import band.effective.office.elevator.EffectiveTheme
+import band.effective.office.elevator.EffectiveThemeColors
 import band.effective.office.elevator.ExtendedThemeColors
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.compose.painterResource
@@ -40,7 +42,7 @@ fun EmployeeInfo(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = Color.LightGray.copy(alpha = 0.1f),
+                color = EffectiveTheme.colors.background.secondary,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(12.dp)
@@ -61,11 +63,14 @@ fun EmployeeInfo(
                     .border(
                         border = BorderStroke(
                             width = 1.dp,
-                            color = Color.LightGray.copy(alpha = 0.5f)
+                            color = EffectiveTheme.colors.stroke.primary,
                         ),
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .background(color = Color.White, shape = RoundedCornerShape(8.dp)),
+                    .background(
+                        color = EffectiveTheme.colors.background.primary,
+                        shape = RoundedCornerShape(8.dp)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -74,7 +79,7 @@ fun EmployeeInfo(
                     modifier = Modifier
                         .size(24.dp)
                         .padding(4.dp),
-                    tint = ExtendedThemeColors.colors.trinidad_400,
+                    tint = EffectiveTheme.colors.icon.accent,
                 )
 
             }
@@ -84,14 +89,14 @@ fun EmployeeInfo(
             ) {
                 Text(
                     text = iconTitle,
-                    style = TextStyle(color = Color.Gray, fontSize = 16.sp),
+                    style = EffectiveTheme.typography.sMedium,
+                    color = EffectiveTheme.colors.text.secondary,
                 )
                 value?.let {
                     Text(
                         text = it,
-                        style = MaterialTheme.typography.caption,
-                        fontSize = 16.sp,
-                        color = Color.Gray,
+                        style = EffectiveTheme.typography.sMedium,
+                        color = EffectiveTheme.colors.text.secondary,
                     )
                 }
             }
