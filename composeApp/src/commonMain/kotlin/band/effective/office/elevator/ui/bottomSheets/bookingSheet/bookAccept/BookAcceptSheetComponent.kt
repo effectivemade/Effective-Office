@@ -10,13 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import band.effective.office.elevator.domain.models.BookingInfo
 import band.effective.office.elevator.ui.booking.components.modals.BookAccept
 import band.effective.office.elevator.ui.booking.components.modals.BookingResult
 import band.effective.office.elevator.ui.bottomSheets.BottomSheet
 import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookAccept.store.BookAcceptStore
 import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookAccept.store.BookAcceptStoreFactory
-import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookPeriod.BookPeriodSheetComponent
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -32,15 +30,13 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 class BookAcceptSheetComponent(
     componentContext: ComponentContext,
     initState: BookAcceptStore.State,
-    close: () -> Unit,
-    onMainScreen: () -> Unit
+    private val close: () -> Unit,
+    private val onMainScreen: () -> Unit
 ) : BottomSheet, ComponentContext by componentContext {
 
     private val store = BookAcceptStoreFactory(
         storeFactory = DefaultStoreFactory(),
         initState = initState,
-        close = close,
-        onMainScreen = onMainScreen
     ).create()
 
     private val navigation = StackNavigation<Child>()
@@ -58,6 +54,7 @@ class BookAcceptSheetComponent(
         BookAccept(
             onClickCloseBookAccept = {
                 store.accept(BookAcceptStore.Intent.OnClose)
+                close()
             },
             confirmBooking = {
                 store.accept(BookAcceptStore.Intent.OnAccept)
@@ -85,13 +82,13 @@ class BookAcceptSheetComponent(
                                 BookingResult(
                                     onMain = {
                                         store.accept(BookAcceptStore.Intent.OnClose)
-                                        store.accept(BookAcceptStore.Intent.SwitchOnMain)
-                                   },
+                                        close()
+                                        onMainScreen()
+                                    },
                                     close = {
-                                        store.accept(
-                                            BookAcceptStore.Intent.CloseModal(true)
-                                        )
+                                        store.accept(BookAcceptStore.Intent.OnClose)
                                         navigation.pop()
+                                        close()
                                     },
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                         .align(Alignment.Center),
@@ -101,11 +98,7 @@ class BookAcceptSheetComponent(
                             },
                             properties = DialogProperties(usePlatformDefaultWidth = false),
                             onDismissRequest = {
-                                store.accept(
-                                    BookAcceptStore.Intent.CloseModal(
-                                        false
-                                    )
-                                )
+                                store.accept(BookAcceptStore.Intent.OnClose)
                             }
                         )
                     }
