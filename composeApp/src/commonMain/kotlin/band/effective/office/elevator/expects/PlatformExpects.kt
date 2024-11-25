@@ -18,4 +18,4 @@ internal expect fun ComponentRegistryBuilder.setupDefaultComponents()
 
 internal expect fun getImageCacheDirectoryPath(): Path
 
-expect fun setClipboardText(text: String, label: String, toastMessage: StringResource)
+expect fun setClipboardText(text: String, label: String)
