@@ -9,7 +9,6 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
@@ -18,8 +17,6 @@ import org.koin.core.component.inject
 class BookAcceptStoreFactory(
     private val storeFactory: StoreFactory,
     private val initState: BookAcceptStore.State,
-    private val close: () -> Unit,
-    private val onMainScreen: () -> Unit
 ) : KoinComponent {
 
     private val bookingInteract: BookingInteract by inject()
@@ -48,21 +45,8 @@ class BookAcceptStoreFactory(
                     dispatch(Message.StartBooking)
                     accept(getState())
                 }
-
-                BookAcceptStore.Intent.OnClose -> close()
-
-                is BookAcceptStore.Intent.CloseModal -> {
+                BookAcceptStore.Intent.OnClose -> {
                     dispatch(Message.CloseModal)
-                    if (intent.withSheet) {
-                        MainScope().launch {
-                            close()
-                        }
-                    }
-                }
-
-                BookAcceptStore.Intent.SwitchOnMain -> {
-                    dispatch(Message.CloseModal)
-                    onMainScreen()
                 }
             }
         }

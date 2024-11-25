@@ -11,8 +11,6 @@ interface BookAcceptStore :
     sealed interface Intent {
         object OnClose : Intent
         object OnAccept : Intent
-        object SwitchOnMain : Intent
-        data class CloseModal(val withSheet: Boolean) : Intent
     }
 
     enum class ModalState {
