@@ -13,10 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,7 +71,7 @@ fun ModalCalendarDateRange(
         modifier = modifier
             .background(Color.White, shape = RoundedCornerShape(16.dp))
             .padding(horizontal = 16.dp, vertical = 24.dp)
-    ){
+    ) {
         Calendar(state = state)
         Spacer(modifier = Modifier.height(16.dp))
         SwitchedDateRange(
@@ -92,15 +92,16 @@ fun ModalCalendarDateRange(
             )
             Spacer(modifier = Modifier.width(16.dp))
             EffectiveButton(
-                buttonText =  stringResource(MainRes.strings.ok),
-                modifier =  Modifier.weight(.1f),
-                onClick = { onClickOk(state.selectedDates)},
+                buttonText = stringResource(MainRes.strings.ok),
+                modifier = Modifier.weight(.1f),
+                onClick = { onClickOk(state.selectedDates) },
                 roundedCorner = 8.dp,
                 contentPadding = 12.dp
             )
         }
     }
 }
+
 @Composable
 private fun SwitchedDateRange(
     isSelectRange: Boolean,

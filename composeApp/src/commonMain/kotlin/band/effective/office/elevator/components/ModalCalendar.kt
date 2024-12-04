@@ -51,7 +51,7 @@ fun ModalCalendar(
         modifier = modifier
             .background(Color.White, shape = RoundedCornerShape(16.dp))
             .padding(horizontal = 16.dp, vertical = 24.dp)
-    ){
+    ) {
         Calendar(state = state)
         Spacer(modifier = Modifier.height(32.dp))
         Row(
@@ -67,9 +67,9 @@ fun ModalCalendar(
             )
             Spacer(modifier = Modifier.width(16.dp))
             EffectiveButton(
-                buttonText =  stringResource(MainRes.strings.ok),
-                modifier =  Modifier.weight(.1f),
-                onClick = { onClickOk(state.selectedDates.firstOrNull())},
+                buttonText = stringResource(MainRes.strings.ok),
+                modifier = Modifier.weight(.1f),
+                onClick = { onClickOk(state.selectedDates.firstOrNull()) },
                 roundedCorner = 8.dp,
                 contentPadding = 12.dp
             )

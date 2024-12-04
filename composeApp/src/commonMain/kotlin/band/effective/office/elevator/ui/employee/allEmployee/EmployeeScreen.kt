@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.LoadingIndicator
+import band.effective.office.elevator.components.TitlePage
 import band.effective.office.elevator.components.generateImageLoader
 import band.effective.office.elevator.ui.employee.allEmployee.models.mappers.EmployeeCard
 import band.effective.office.elevator.ui.employee.allEmployee.store.EmployeeStore
@@ -103,7 +104,6 @@ fun EmployeeScreenContent(
                 text = stringResource(MainRes.strings.employees),
                 style = EffectiveTheme.typography.mMedium,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight(600),//?
                 color = EffectiveTheme.colors.text.primary,
                 modifier = Modifier
                     .fillMaxWidth()

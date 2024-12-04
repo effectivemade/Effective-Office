@@ -12,7 +12,7 @@ class UpdateUserUseCase (private val profileRepository: ProfileRepository) {
             imageUrl = user.imageUrl,
             userName = user.userName,
             post = user.post,
-            phoneNumber = "+7" + user.phoneNumber.replace("-", ""),
+            phoneNumber = user.phoneNumber,
             telegram = user.telegram,
             email = user.email,
         )
