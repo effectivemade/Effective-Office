@@ -33,7 +33,7 @@ import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.LoadingIndicator
 import band.effective.office.elevator.components.TitlePage
-import band.effective.office.elevator.components.UserScreen
+import band.effective.office.elevator.components.UserDetails
 import band.effective.office.elevator.components.generateImageLoader
 import band.effective.office.elevator.expects.setClipboardText
 import band.effective.office.elevator.ui.employee.aboutEmployee.components.EmployeeInfo
@@ -64,20 +64,17 @@ fun ProfileScreen(component: MainProfileComponent) {
         email = user.user.email,
         isLoading = user.isLoading,
         phoneNumber = user.user.phoneNumber,
-//        id = user.user.id,
         onSignOut = { component.onEvent(ProfileStore.Intent.SignOutClicked) },
-//        onEditProfile = { id ->
-//            component.onOutput(
-//                MainProfileComponent.Output.NavigateToEdit(
-//                    userEdit = id
-//                )
-//            )
-//        }
+        onEditProfile = {
+            component.onOutput(
+                MainProfileComponent.Output.NavigateToEdit(userEdit = user.user.id)
+            )
+        }
     )
 }
 
 @Composable
-internal fun ProfileScreenContent(
+private fun ProfileScreenContent(
     modifier: Modifier = Modifier,
     imageUrl: String,
     userName: String,
@@ -86,8 +83,7 @@ internal fun ProfileScreenContent(
     phoneNumber: String,
     email: String?,
     onSignOut: () -> Unit,
-    // onEditProfile: (id: String) -> Unit,
-    // id: String,
+    onEditProfile: () -> Unit,
     isLoading: Boolean,
 ) {
     Column(
@@ -140,7 +136,7 @@ internal fun ProfileScreenContent(
             text = "Редактировать профиль",
             style = EffectiveTheme.typography.mMedium,
             color = EffectiveTheme.colors.text.secondary,
-            modifier = Modifier.clickable(onClick = {}),
+            modifier = Modifier.clickable(onClick = { onEditProfile() }),
             textAlign = TextAlign.Center,
         )
     }
@@ -188,7 +184,7 @@ private fun UserInfoBlock(
                 .align(Alignment.CenterHorizontally),
         )
         Spacer(modifier = Modifier.padding(12.dp))
-        UserScreen(userName = userName, post = userPost)
+        UserDetails(userName = userName, post = userPost)
         Spacer(modifier = Modifier.padding(24.dp))
         if (telegram != null) {
             val iconTitle = stringResource(MainRes.strings.telegram)

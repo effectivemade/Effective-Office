@@ -70,9 +70,9 @@ fun EmployeeBlock(
                 .clip(CircleShape)
         )
         Spacer(modifier = Modifier.padding(12.dp))
-        UserScreen(userName = userName, post = post)
+        UserDetails(userName = userName, post = post)
         Spacer(modifier = Modifier.padding(24.dp))
-        if (telegram != null) {
+        telegram?.let {
             val iconTitle = stringResource(MainRes.strings.telegram)
             EmployeeInfo(
                 icon = MainRes.images.ic_telegram,
@@ -83,7 +83,7 @@ fun EmployeeBlock(
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
-        if (email != null) {
+        email?.let {
             val iconTitle = stringResource(MainRes.strings.email)
             EmployeeInfo(
                 icon = MainRes.images.ic_email,
@@ -94,7 +94,7 @@ fun EmployeeBlock(
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
-        if (phoneNumber != null) {
+        phoneNumber?.let {
             val iconTitle = stringResource(MainRes.strings.phone_number)
             EmployeeInfo(
                 icon = MainRes.images.ic_phone,

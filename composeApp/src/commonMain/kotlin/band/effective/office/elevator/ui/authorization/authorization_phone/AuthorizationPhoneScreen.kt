@@ -39,7 +39,7 @@ import band.effective.office.elevator.ui.authorization.components.AuthTabRow
 import band.effective.office.elevator.ui.authorization.components.AuthTitle
 import band.effective.office.elevator.ui.models.PhoneMaskTransformation
 import band.effective.office.elevator.ui.models.UserDataTextFieldType
-import band.effective.office.elevator.ui.models.validator.UserInfoValidator
+import band.effective.office.elevator.domain.validator.UserInfoValidator
 import dev.icerock.moko.resources.compose.stringResource
 
 @Composable

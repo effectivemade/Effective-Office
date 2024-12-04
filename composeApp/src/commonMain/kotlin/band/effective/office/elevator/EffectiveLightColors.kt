@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 val EffectiveLightColors = EffectiveThemeColors(
     background = EffectiveThemeColors.Background(
-        primary = neutral15,
+        primary = neutral10,
         secondary = neutral20,
         tertiary = neutral15.copy(alpha = 0.8f),
         additional = neutral25,

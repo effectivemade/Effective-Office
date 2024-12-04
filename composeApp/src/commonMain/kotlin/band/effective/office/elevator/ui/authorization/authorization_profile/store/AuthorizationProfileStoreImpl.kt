@@ -1,6 +1,6 @@
 package band.effective.office.elevator.ui.authorization.authorization_profile.store
 
-import band.effective.office.elevator.ui.models.validator.UserInfoValidator
+import band.effective.office.elevator.domain.validator.UserInfoValidator
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store

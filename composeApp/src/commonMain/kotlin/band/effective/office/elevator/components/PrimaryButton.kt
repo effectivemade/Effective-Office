@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,17 +12,20 @@ import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 
 @Composable
-fun EffectiveButton(
+fun PrimaryButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     buttonText: String,
 ) {
     Button(
-        onClick = onClick,
         modifier = modifier
-            .padding(16.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(16.dp),
+        onClick = onClick,
         shape = RoundedCornerShape(32.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = EffectiveTheme.colors.button.primaryNormal,
+        ),
     ) {
         Text(
             text = buttonText,
