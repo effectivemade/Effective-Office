@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Office Elevator</string>
-    <string name="sign_in_google">Sign in with google</string>
+    <string name="sign_in_google">Sign in with Google</string>
     <string name="something_went_wrong">Something went wrong. Please try again</string>
-    <string name="company_name">effective\noffice</string>
+    <string name="company_title_name">effective</string>
+    <string name="company_subtitle_name">OFFICE</string>
 
     <string name="search_employee">Search employee</string>
     <string name="employee_in_office">In office</string>
