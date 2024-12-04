@@ -9,6 +9,7 @@
     <string name="employee_in_office">В офисе</string>
 
     <string name="back">Назад</string>
+    <string name="close">Закрыть</string>
 
     <!--Auth strings-->
     <string name="_continue">Продолжить</string>
@@ -152,9 +153,14 @@
     <string name="profile_name_format_error">Заполните имя и фамилию</string>
     <string name="profile_post_format_error">Заполните должность</string>
     <string name="telegram_format_error">Укажите ник в телеграмме</string>
+    <string name="error_empty_field">Поле должно быть заполнено</string>
+    <string name="error_name_must_consist_of_latin_letters">Имя должно быть написано на латинице</string>
+    <string name="error_telegram_must_contain_at_symbol">Ник должен начинаться с @</string>
+    <string name="error_phone_format">Неверный номер</string>
 
     <!-- Success messages -->
     <string name="elevator_called_successfully">Лифт успешно вызван!</string>
+    <string name="profile_changes_saved">Вы изменили личные данные</string>
 
     <!-- Profile specifics-->
     <string name="exit">Выйти</string>

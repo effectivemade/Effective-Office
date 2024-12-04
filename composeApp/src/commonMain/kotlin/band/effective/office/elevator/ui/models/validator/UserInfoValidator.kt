@@ -12,6 +12,6 @@ open class UserInfoValidator : ValidatorMethods {
         telegramNick.isNotEmpty() && !telegramNick.contains(char = '@', ignoreCase = true)
 
     companion object {
-       const val phoneNumberSize = 10
+        const val phoneNumberSize = 10
     }
 }

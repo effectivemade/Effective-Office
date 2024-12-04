@@ -64,20 +64,17 @@ fun ProfileScreen(component: MainProfileComponent) {
         email = user.user.email,
         isLoading = user.isLoading,
         phoneNumber = user.user.phoneNumber,
-//        id = user.user.id,
         onSignOut = { component.onEvent(ProfileStore.Intent.SignOutClicked) },
-//        onEditProfile = { id ->
-//            component.onOutput(
-//                MainProfileComponent.Output.NavigateToEdit(
-//                    userEdit = id
-//                )
-//            )
-//        }
+        onEditProfile = {
+            component.onOutput(
+                MainProfileComponent.Output.NavigateToEdit(userEdit = user.user.id)
+            )
+        }
     )
 }
 
 @Composable
-internal fun ProfileScreenContent(
+private fun ProfileScreenContent(
     modifier: Modifier = Modifier,
     imageUrl: String,
     userName: String,
@@ -86,8 +83,7 @@ internal fun ProfileScreenContent(
     phoneNumber: String,
     email: String?,
     onSignOut: () -> Unit,
-    // onEditProfile: (id: String) -> Unit,
-    // id: String,
+    onEditProfile: () -> Unit,
     isLoading: Boolean,
 ) {
     Column(
@@ -140,7 +136,7 @@ internal fun ProfileScreenContent(
             text = "Редактировать профиль",
             style = EffectiveTheme.typography.mMedium,
             color = EffectiveTheme.colors.text.secondary,
-            modifier = Modifier.clickable(onClick = {}),
+            modifier = Modifier.clickable(onClick = { onEditProfile() }),
             textAlign = TextAlign.Center,
         )
     }
