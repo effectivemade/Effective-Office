@@ -4,7 +4,7 @@ import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.domain.models.User
 import band.effective.office.elevator.domain.useCase.GetUserUseCase
 import band.effective.office.elevator.domain.useCase.UpdateUserUseCase
-import band.effective.office.elevator.ui.models.validator.UserInfoValidator
+import band.effective.office.elevator.domain.validator.ExtendedUserInfoValidator
 import band.effective.office.elevator.ui.profile.editProfile.store.ProfileEditStore.*
 import band.effective.office.network.model.Either
 import com.arkivanov.mvikotlin.core.store.Reducer
@@ -13,6 +13,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.core.utils.ExperimentalMviKotlinApi
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
+import dev.icerock.moko.resources.StringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
@@ -26,170 +27,139 @@ internal class ProfileEditStoreFactory(
 
     private val getUserUseCase: GetUserUseCase by inject()
     private val updateUserUseCase: UpdateUserUseCase by inject()
-    private val validator: UserInfoValidator = UserInfoValidator()
+    private val validator: ExtendedUserInfoValidator by inject()
 
     @OptIn(ExperimentalMviKotlinApi::class)
     fun create(): ProfileEditStore =
-        object : ProfileEditStore,
-            Store<Intent, State, Label>
-            by storeFactory.create(
-                name = "ProfileEditStore",
-                initialState = State(user = User.defaultUser),
-                bootstrapper = coroutineBootstrapper {
-                    dispatch(Action.FetchUserInfo)
-                },
-                executorFactory = ::ExecutorImpl,
-                reducer = ReducerImpl
-            ) {}
+        object : ProfileEditStore, Store<Intent, State, Label> by storeFactory.create(
+            name = "ProfileEditStore",
+            initialState = State.Loading,
+            bootstrapper = coroutineBootstrapper {
+                dispatch(Action.FetchUserInfo)
+            },
+            executorFactory = ::ExecutorImpl,
+            reducer = ReducerImpl,
+        ) {}
 
 
     private sealed interface Action {
-        object FetchUserInfo : Action
+        data object FetchUserInfo : Action
     }
 
     private sealed interface Msg {
         data class ProfileData(val user: User) : Msg
-        data class ErrorPhone(
-            val errorPhone: Boolean
-        ) : Msg
 
-        data class ErrorName(
-            val isNameError: Boolean
-        ) : Msg
+        data class PhoneError(val message: StringResource) : Msg
+        data class NameError(val message: StringResource) : Msg
+        data class PostError(val message: StringResource) : Msg
+        data class TelegramError(val message: StringResource) : Msg
 
-        data class ErrorPost(
-            val isPostError: Boolean
-        ) : Msg
-
-        data class ErrorTelegram(
-            val isTelegramError: Boolean
-        ) : Msg
+        data object ValidPhone: Msg
+        data object ValidName: Msg
+        data object ValidPost: Msg
+        data object ValidTelegram: Msg
     }
 
     private inner class ExecutorImpl :
         CoroutineExecutor<Intent, Action, State, Msg, Label>() {
+
         override fun executeIntent(intent: Intent, getState: () -> State) {
+            val state = getState()
+
             when (intent) {
-                Intent.BackInProfileClicked -> doReturnProfile()
-                is Intent.SaveChangeClicked -> doSaveChange(getState(), intent)
+                Intent.BackInProfileClicked -> returnToProfile()
+                is Intent.SaveChangesClicked -> {
+                    when (state) {
+                        State.Loading -> return
+                        is State.Data -> saveChanges(state, intent)
+                    }
+                }
             }
         }
 
-        private fun doSaveChange(user: State, intent: Intent.SaveChangeClicked) {
-            scope.launch  {
-                val uptUser = User(
-                    id = user.user.id,
-                    imageUrl = user.user.imageUrl,
-                    userName = intent.userName, post = intent.post,
+        private fun saveChanges(data: State.Data, intent: Intent.SaveChangesClicked) {
+            scope.launch {
+                val updatedUser = data.user.copy(
+                    userName = intent.userName,
+                    post = intent.post,
                     phoneNumber = intent.phoneNumber,
                     telegram = intent.telegram,
-                    email = user.user.email,
                 )
-                dispatch(Msg.ProfileData(user = uptUser))
-                if (checkPhoneNumber(intent.phoneNumber)
-                    && checkUserdata(userName = intent.userName)
-                    && checkPost(
-                        intent.post) && checkTelegram(intent.telegram)
-                ) {
-                    updateUserUseCase.execute(uptUser).collect{ user ->
-                            withContext(Dispatchers.Main) {
-                                when (user) {
-                                    is Either.Success -> {
-                                        dispatch(Msg.ProfileData(user = user.data))
-                                        publish(Label.SavedChange)
-                                    }
+                dispatch(Msg.ProfileData(user = updatedUser))
+                val isPhoneNumberValid = checkPhoneNumber(intent.phoneNumber)
+                val isUserValid = checkUserdata(intent.userName)
+                val isPostValid = checkPost(intent.post)
+                val isTelegramValid = checkTelegram(intent.telegram)
 
-                                    is Either.Error -> {
-                                      publish(Label.Error(MainRes.strings.server_error))
-                                    }
+                if (isPhoneNumberValid && isUserValid && isPostValid && isTelegramValid) {
+                    withContext(Dispatchers.Main) {
+                        updateUserUseCase.execute(updatedUser).collect { user ->
+                            when (user) {
+                                is Either.Success -> {
+                                    dispatch(Msg.ProfileData(user = updatedUser))
+                                    publish(Label.SavedChange)
                                 }
-
+                                is Either.Error -> {
+                                    publish(Label.ServerError)
+                                }
                             }
-
+                        }
                     }
-
                 }
             }
-
         }
 
         private fun checkTelegram(telegram: String): Boolean {
-            return if (validator.checkTelegramNick(telegram)) {
-                dispatch(
-                    Msg.ErrorTelegram(
-                        isTelegramError = false
-                    )
-                )
-                true
-            } else {
-                dispatch(
-                    Msg.ErrorTelegram(
-                        isTelegramError = true
-                    )
-                )
-                publish(Label.Error(MainRes.strings.telegram_format_error))
-                false
+            return when (val result = validator.checkTelegramNick(telegram)) {
+                is ExtendedUserInfoValidator.Result.Invalid -> {
+                    dispatch(Msg.TelegramError(result.message))
+                    false
+                }
+                ExtendedUserInfoValidator.Result.Valid -> {
+                    dispatch(Msg.ValidTelegram)
+                    true
+                }
             }
         }
 
         private fun checkPost(post: String): Boolean {
-            return if (validator.checkPost(post)) {
-                dispatch(
-                    Msg.ErrorPost(
-                        isPostError = false
-                    )
-                )
-                true
-            } else {
-                dispatch(
-                    Msg.ErrorPost(
-                        isPostError = true
-                    )
-                )
-                publish(Label.Error(MainRes.strings.profile_post_format_error))
-                false
+            return when (val result = validator.checkPost(post)) {
+                is ExtendedUserInfoValidator.Result.Invalid -> {
+                    dispatch(Msg.PostError(result.message))
+                    false
+                }
+                ExtendedUserInfoValidator.Result.Valid -> {
+                    dispatch(Msg.ValidPost)
+                    true
+                }
             }
         }
 
         private fun checkUserdata(userName: String): Boolean {
-            return if (validator.checkName(userName)) {
-                dispatch(
-                    Msg.ErrorName(
-                        isNameError = false
-                    )
-                )
-                true
-            } else {
-                dispatch(
-                    Msg.ErrorName(
-                        isNameError = true
-                    )
-                )
-                publish(Label.Error(MainRes.strings.profile_name_format_error))
-                false
+            return when (val result = validator.checkName(userName)) {
+                is ExtendedUserInfoValidator.Result.Invalid -> {
+                    dispatch(Msg.NameError(result.message))
+                    false
+                }
+                ExtendedUserInfoValidator.Result.Valid -> {
+                    dispatch(Msg.ValidName)
+                    true
+                }
             }
         }
 
         private fun checkPhoneNumber(phone: String): Boolean {
-            return if (validator.checkPhone(phone)) {
-                dispatch(
-                    Msg.ErrorPhone(
-                        errorPhone = false
-                    )
-                )
-                true
-            } else {
-                dispatch(
-                    Msg.ErrorPhone(
-                        errorPhone = true
-                    )
-                )
-                publish(Label.Error(MainRes.strings.number_format_error))
-                false
+            return when (val result = validator.checkPhone(phone)) {
+                is ExtendedUserInfoValidator.Result.Invalid -> {
+                    dispatch(Msg.PhoneError(result.message))
+                    false
+                }
+                ExtendedUserInfoValidator.Result.Valid -> {
+                    dispatch(Msg.ValidPhone)
+                    true
+                }
             }
-
         }
-
 
         override fun executeAction(action: Action, getState: () -> State) {
             when (action) {
@@ -219,28 +189,34 @@ internal class ProfileEditStoreFactory(
             }
         }
 
-        private fun doReturnProfile() {
+        private fun returnToProfile() {
             publish(Label.ReturnedInProfile)
         }
     }
 
     private object ReducerImpl : Reducer<State, Msg> {
-        override fun State.reduce(message: Msg): State =
-            when (message) {
-                is Msg.ProfileData -> {
-                    copy(
-                        isData = true,
-                        isLoading = false,
-                        user = message.user
-                    )
+        override fun State.reduce(msg: Msg): State {
+            return when (this) {
+                State.Loading -> {
+                    when(msg) {
+                        is Msg.ProfileData -> State.Data(user = msg.user)
+                        else -> this
+                    }
                 }
-
-                is Msg.ErrorPhone ->
-                    copy(isErrorPhone = message.errorPhone)
-
-                is Msg.ErrorName -> copy(isErrorName = message.isNameError)
-                is Msg.ErrorPost -> copy(isErrorPost = message.isPostError)
-                is Msg.ErrorTelegram -> copy(isErrorTelegram = message.isTelegramError)
+                is State.Data -> {
+                    when (msg) {
+                        is Msg.ProfileData -> State.Data(user = msg.user)
+                        is Msg.NameError -> copy(nameError = msg.message)
+                        is Msg.PhoneError -> copy(phoneNumberError = msg.message)
+                        is Msg.PostError -> copy(postError = msg.message)
+                        is Msg.TelegramError -> copy(telegramError = msg.message)
+                        Msg.ValidName -> copy(nameError = null)
+                        Msg.ValidPhone -> copy(phoneNumberError = null)
+                        Msg.ValidPost -> copy(postError = null)
+                        Msg.ValidTelegram -> copy(telegramError = null)
+                    }
+                }
             }
+        }
     }
 }

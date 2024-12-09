@@ -1,9 +1,6 @@
 package band.effective.office.elevator.ui.employee.aboutEmployee
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,12 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -35,26 +30,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
+import band.effective.office.elevator.components.EmployeeBlock
 import band.effective.office.elevator.components.LoadingIndicator
-import band.effective.office.elevator.components.UserScreen
-import band.effective.office.elevator.components.generateImageLoader
+import band.effective.office.elevator.components.TitlePage
 import band.effective.office.elevator.expects.setClipboardText
 import band.effective.office.elevator.ui.employee.aboutEmployee.components.BookingCardUser
-import band.effective.office.elevator.ui.employee.aboutEmployee.components.EmployeeInfo
 import band.effective.office.elevator.ui.employee.aboutEmployee.models.BookingsFilter
 import band.effective.office.elevator.ui.employee.aboutEmployee.store.AboutEmployeeStore
 import band.effective.office.elevator.ui.main.components.BottomDialog
 import band.effective.office.elevator.ui.models.ReservedSeat
-import band.effective.office.elevator.utils.prettifyPhoneNumber
-import com.seiko.imageloader.model.ImageRequest
-import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 
@@ -158,13 +148,9 @@ private fun AboutEmployeeContent(
                             modifier = Modifier.size(24.dp),
                         )
                     }
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(MainRes.strings.about_the_employee),
-                        style = EffectiveTheme.typography.mMedium,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight(600),
-                        color = EffectiveTheme.colors.text.primary,
+                    TitlePage(
+                        title = stringResource(MainRes.strings.about_the_employee),
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
                 Spacer(modifier = Modifier.padding(24.dp))
@@ -193,88 +179,6 @@ private fun AboutEmployeeContent(
                     filtrationOnReserves = filtrationOnReserves,
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun EmployeeBlock(
-    modifier: Modifier = Modifier,
-    imageUrl: String?,
-    userName: String?,
-    post: String?,
-    telegram: String?,
-    email: String?,
-    phoneNumber: String?,
-    onCopyText: (value: String, label: String) -> Unit,
-    onOpenUri: (uri: String) -> Unit,
-) {
-    val imageLoader = remember { generateImageLoader() }
-    val request = remember(imageUrl) {
-        ImageRequest {
-            data(imageUrl)
-        }
-    }
-    val painter = rememberImagePainter(
-        request = request,
-        imageLoader = imageLoader,
-        placeholderPainter = { painterResource(MainRes.images.logo_default) },
-        errorPainter = { painterResource(MainRes.images.logo_default) }
-    )
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            painter = painter,
-            contentDescription = null,
-            modifier = Modifier
-                .size(100.dp)
-                .border(
-                    BorderStroke(
-                        width = 2.dp,
-                        color = EffectiveTheme.colors.stroke.accent,
-                    ),
-                    shape = CircleShape,
-                )
-                .padding(2.dp)
-                .clip(CircleShape)
-        )
-        Spacer(modifier = Modifier.padding(12.dp))
-        UserScreen(userName = userName, post = post)
-        Spacer(modifier = Modifier.padding(24.dp))
-        if (telegram != null) {
-            val iconTitle = stringResource(MainRes.strings.telegram)
-            EmployeeInfo(
-                icon = MainRes.images.ic_telegram,
-                value = telegram,
-                iconTitle = iconTitle,
-                onClick = { onOpenUri("https://t.me/$telegram") },
-                onLongClick = { onCopyText(telegram, iconTitle) },
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        if (email != null) {
-            val iconTitle = stringResource(MainRes.strings.email)
-            EmployeeInfo(
-                icon = MainRes.images.ic_email,
-                value = email,
-                iconTitle = iconTitle,
-                onClick = { onOpenUri("mailto:$email") },
-                onLongClick = { onCopyText(email, iconTitle) },
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        if (phoneNumber != null) {
-            val iconTitle = stringResource(MainRes.strings.phone_number)
-            EmployeeInfo(
-                icon = MainRes.images.ic_phone,
-                value = prettifyPhoneNumber(phoneNumber) ?: phoneNumber,
-                iconTitle = iconTitle,
-                onClick = { onOpenUri("tel:$phoneNumber") },
-                onLongClick = { onCopyText(phoneNumber, iconTitle) },
-            )
         }
     }
 }
