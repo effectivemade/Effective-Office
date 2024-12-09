@@ -159,7 +159,7 @@ android {
         minSdk = 26
         targetSdk = 34
 
-        applicationId = "band.effective.office.elevator"
+        applicationId = "band.effective.office.mobile"
         versionCode = 1
         versionName = "1.0.2"
     }
@@ -188,7 +188,7 @@ android {
         create("release") {
             keyAlias = System.getenv()["OFFICE_ELEVATOR_RELEASE_ALIAS"]
             keyPassword = System.getenv()["OFFICE_ELEVATOR_RELEASE_KEY_PASSWORD"]
-            storeFile = file("${rootDir}/keystore/main.keystore")
+            storeFile = file("${rootDir}/keystore/effective-office.jks")
             storePassword = System.getenv()["OFFICE_ELEVATOR_RELEASE_STORE_PASSWORD"]
         }
     }
