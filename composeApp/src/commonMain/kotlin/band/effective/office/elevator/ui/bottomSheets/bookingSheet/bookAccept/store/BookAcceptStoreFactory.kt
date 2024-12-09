@@ -17,8 +17,6 @@ import org.koin.core.component.inject
 class BookAcceptStoreFactory(
     private val storeFactory: StoreFactory,
     private val initState: BookAcceptStore.State,
-    private val close: () -> Unit,
-    private val onMainScreen: () -> Unit
 ) : KoinComponent {
 
     private val bookingInteract: BookingInteract by inject()
@@ -47,17 +45,8 @@ class BookAcceptStoreFactory(
                     dispatch(Message.StartBooking)
                     accept(getState())
                 }
-
-                BookAcceptStore.Intent.OnClose -> close()
-
-                is BookAcceptStore.Intent.CloseModal -> {
+                BookAcceptStore.Intent.OnClose -> {
                     dispatch(Message.CloseModal)
-                    if (intent.withSheet) close()
-                }
-
-                BookAcceptStore.Intent.SwitchOnMain -> {
-                    dispatch(Message.CloseModal)
-                    onMainScreen()
                 }
             }
         }
