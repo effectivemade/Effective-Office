@@ -10,14 +10,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.navigation.Tab
-import band.effective.office.elevator.textGrayColor
+import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 
 @Composable
@@ -26,8 +26,8 @@ internal fun RowScope.TabNavigationItem(
     selected: Boolean,
     onSelect: () -> Unit,
 ) {
-    val selectedColor = MaterialTheme.colors.primary
-    val unselectedColor = textGrayColor
+    val selectedColor = EffectiveTheme.colors.icon.accent
+    val unselectedColor = EffectiveTheme.colors.icon.primary
     BottomNavigationItem(
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
         selected = selected,
@@ -40,16 +40,15 @@ internal fun RowScope.TabNavigationItem(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(height = 8.dp))
                 Icon(
                     modifier = Modifier.size(size = 24.dp),
-                    imageVector = tab.icon,
+                    painter = painterResource(tab.icon),
                     contentDescription = stringResource(tab.title)
                 )
                 Spacer(modifier = Modifier.height(height = 4.dp))
                 Text(
                     text = stringResource(tab.title),
-                    style = MaterialTheme.typography.caption.copy(
+                    style = EffectiveTheme.typography.xsRegular.copy(
                         color = if (selected) selectedColor else unselectedColor
                     ),
                     maxLines = 1

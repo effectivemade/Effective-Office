@@ -6,5 +6,5 @@ import band.effective.office.elevator.MainRes
 
 object MainTab : Tab {
     override val title = MainRes.strings.main
-    override val icon = Icons.Default.Home
+    override val icon = MainRes.images.ic_profile // delete later
 }

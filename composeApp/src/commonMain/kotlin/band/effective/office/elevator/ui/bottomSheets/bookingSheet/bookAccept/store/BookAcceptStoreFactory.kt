@@ -18,7 +18,6 @@ class BookAcceptStoreFactory(
     private val storeFactory: StoreFactory,
     private val initState: BookAcceptStore.State,
     private val close: () -> Unit,
-    private val onMainScreen: () -> Unit
 ) : KoinComponent {
 
     private val bookingInteract: BookingInteract by inject()
@@ -53,11 +52,6 @@ class BookAcceptStoreFactory(
                 is BookAcceptStore.Intent.CloseModal -> {
                     dispatch(Message.CloseModal)
                     if (intent.withSheet) close()
-                }
-
-                BookAcceptStore.Intent.SwitchOnMain -> {
-                    dispatch(Message.CloseModal)
-                    onMainScreen()
                 }
             }
         }
