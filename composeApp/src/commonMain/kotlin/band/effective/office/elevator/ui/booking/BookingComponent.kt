@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.StateFlow
 class BookingComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
-    private val output: (Output) -> Unit
 ) :
     ComponentContext by componentContext {
 
@@ -44,7 +43,6 @@ class BookingComponent(
                     componentContext = componentContext,
                     initState = state.value.toBookAcceptState(),
                     close = { closeSheet() },
-                    onMainScreen = { onOutput(Output.OpenMainTab) }
                 )
 
                 SheetConfig.BookPeriod -> BookPeriodSheetComponent(
@@ -88,14 +86,6 @@ class BookingComponent(
     val label: Flow<BookingStore.Label> = bookingStore.labels
     fun onEvent(event: BookingStore.Intent) {
         bookingStore.accept(event)
-    }
-
-    fun onOutput(output: Output) {
-        output(output)
-    }
-
-    sealed class Output {
-        data object OpenMainTab : Output()
     }
 
     fun openSheet(config: SheetConfig) {
