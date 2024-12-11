@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Office Elevator</string>
+    <string name="app_name">Effective Office</string>
     <string name="sign_in_google">Авторизация через Google</string>
     <string name="something_went_wrong">Что-то пошло не так. Пожалуйста попробуйте еще раз</string>
     <string name="company_name">effective\noffice</string>

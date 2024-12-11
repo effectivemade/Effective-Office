@@ -33,3 +33,9 @@ val rootDirProject = file("../")
 kotlin {
     sourceSets.getByName("main").kotlin.srcDir("buildSrc/src/main/kotlin")
 }
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}

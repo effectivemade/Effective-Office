@@ -11,7 +11,7 @@
     <application
         android:name=".AndroidApp"
         android:icon="@mipmap/ic_launcher"
-        android:label="Office Elevator"
+        android:label="Effective Office"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
         android:usesCleartextTraffic="true">
         <activity
