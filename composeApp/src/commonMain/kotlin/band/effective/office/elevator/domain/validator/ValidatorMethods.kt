@@ -1,4 +1,4 @@
-package band.effective.office.elevator.ui.models.validator
+package band.effective.office.elevator.domain.validator
 
 interface ValidatorMethods {
     fun checkPhone(phoneNumber : String) : Boolean

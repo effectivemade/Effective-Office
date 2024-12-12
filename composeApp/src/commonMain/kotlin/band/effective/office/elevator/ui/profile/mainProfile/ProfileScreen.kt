@@ -3,52 +3,46 @@ package band.effective.office.elevator.ui.profile.mainProfile
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import band.effective.office.elevator.ExtendedThemeColors
+import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.LoadingIndicator
 import band.effective.office.elevator.components.TitlePage
+import band.effective.office.elevator.components.UserDetails
 import band.effective.office.elevator.components.generateImageLoader
-import band.effective.office.elevator.textGrayColor
-import band.effective.office.elevator.ui.models.UserData
-import band.effective.office.elevator.ui.models.getAllUserDataProfile
+import band.effective.office.elevator.expects.setClipboardText
+import band.effective.office.elevator.ui.employee.aboutEmployee.components.EmployeeInfo
 import band.effective.office.elevator.ui.profile.mainProfile.store.ProfileStore
+import band.effective.office.elevator.utils.prettifyPhoneNumber
 import com.seiko.imageloader.model.ImageRequest
-import com.seiko.imageloader.rememberAsyncImagePainter
 import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
-import io.github.aakira.napier.Napier
 
 
 @Composable
@@ -62,197 +56,167 @@ fun ProfileScreen(component: MainProfileComponent) {
             }
         }
     }
-
     ProfileScreenContent(
         imageUrl = user.user.imageUrl,
         userName = user.user.userName,
         post = user.user.post,
         telegram = user.user.telegram,
+        email = user.user.email,
         isLoading = user.isLoading,
         phoneNumber = user.user.phoneNumber,
-        id = user.user.id,
         onSignOut = { component.onEvent(ProfileStore.Intent.SignOutClicked) },
-        onEditProfile = { id ->
+        onEditProfile = {
             component.onOutput(
-                MainProfileComponent.Output.NavigateToEdit(
-                    userEdit = id
-                )
+                MainProfileComponent.Output.NavigateToEdit(userEdit = user.user.id)
             )
         }
     )
 }
 
-
 @Composable
-internal fun ProfileScreenContent(
+private fun ProfileScreenContent(
+    modifier: Modifier = Modifier,
     imageUrl: String,
     userName: String,
     post: String,
     telegram: String,
     phoneNumber: String,
+    email: String?,
     onSignOut: () -> Unit,
-    onEditProfile: (id: String) -> Unit,
-    id: String,
-    isLoading: Boolean
+    onEditProfile: () -> Unit,
+    isLoading: Boolean,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.White),
+        modifier = modifier
+            .fillMaxSize()
+            .background(EffectiveTheme.colors.background.primary)
+            .padding(horizontal = 16.dp)
+            .padding(top = 40.dp, bottom = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Top,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                .padding(horizontal = 16.dp).fillMaxWidth().padding(top = 40.dp)
+        Box(
+            modifier = modifier.fillMaxWidth()
         ) {
             TitlePage(
-                stringResource(MainRes.strings.profile)
+                title = stringResource(MainRes.strings.profile),
+                modifier = Modifier.align(Alignment.Center)
             )
-            Spacer(modifier = Modifier.weight(.1f))
-            OutlinedButton(
+            IconButton(
                 onClick = onSignOut,
-                shape = RoundedCornerShape(size = 8.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colors.secondary),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.align(Alignment.CenterEnd),
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(MainRes.images.exit),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.secondary
-                    )
-                    Text(
-                        stringResource(MainRes.strings.exit),
-                        style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
+                Icon(
+                    painter = painterResource(MainRes.images.ic_sing_out),
+                    contentDescription = stringResource(MainRes.strings.exit),
+                    modifier = Modifier.size(18.dp),
+                    tint = EffectiveTheme.colors.icon.error,
+                )
             }
         }
+        Spacer(modifier = Modifier.padding(24.dp))
+        val localUriHandler = LocalUriHandler.current
         when (isLoading) {
             true -> LoadingIndicator()
             false -> {
-                ProfileInfoAboutUser(imageUrl, userName, post, { onEditProfile(id) }, id)
-
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 24.dp))
-                {
-                    items(getAllUserDataProfile()) { item ->
-                        FieldsItemStyle(
-                            item = item,
-                            { onEditProfile(id) },
-                            id = id,
-                            telegram = telegram,
-                            phoneNumber = phoneNumber
-                        )
-                    }
-                }
+                UserInfoBlock(
+                    imageUrl = imageUrl,
+                    userName = userName,
+                    userPost = post,
+                    telegram = telegram,
+                    email = email,
+                    phoneNumber = phoneNumber,
+                    onOpenUri = { localUriHandler.openUri(it) },
+                    onCopyText = { value, label -> setClipboardText(value, label) },
+                )
             }
         }
+        Spacer(modifier = Modifier.padding(24.dp))
+        Text(
+            text = "Редактировать профиль",
+            style = EffectiveTheme.typography.mMedium,
+            color = EffectiveTheme.colors.text.secondary,
+            modifier = Modifier.clickable(onClick = { onEditProfile() }),
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
 @Composable
-fun ProfileInfoAboutUser(
+private fun UserInfoBlock(
     imageUrl: String,
     userName: String,
-    post: String,
-    onEditProfile: (id: String) -> Unit,
-    id: String
+    userPost: String,
+    telegram: String?,
+    email: String?,
+    phoneNumber: String?,
+    onOpenUri: (uri: String) -> Unit,
+    onCopyText: (value: String, label: String) -> Unit,
 ) {
-    val imageLoader = remember { generateImageLoader() }
-
-    val request = remember(imageUrl) {
-        ImageRequest {
-            data(imageUrl)
+    Column {
+        val imageLoader = remember { generateImageLoader() }
+        val request = remember(imageUrl) {
+            ImageRequest {
+                data(imageUrl)
+            }
         }
-    }
+        val painter = rememberImagePainter(
+            request = request,
+            imageLoader = imageLoader,
+            placeholderPainter = { painterResource(MainRes.images.logo_default) },
+            errorPainter = { painterResource(MainRes.images.logo_default) }
+        )
 
-    val painter = rememberImagePainter(
-        request = request,
-        imageLoader = imageLoader,
-        placeholderPainter = { painterResource(MainRes.images.logo_default) },
-        errorPainter = { painterResource(MainRes.images.logo_default) }
-    )
-
-    Box {
-        Surface(
-            modifier = Modifier.size(88.dp).align(Alignment.Center),
-            shape = CircleShape,
-            color = ExtendedThemeColors.colors.purple_heart_100
-        ) {
-            Image(
-                modifier = Modifier.fillMaxSize().align(Alignment.Center),
-                painter = painter,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-            )
-        }
-        IconButton(
-            onClick = { onEditProfile(id) },
-            modifier = Modifier.size(24.dp).align(Alignment.TopEnd)
-        ) {
-            Image(
-                painter = painterResource(MainRes.images.edit_profile_image),
-                contentDescription = null,
-                contentScale = ContentScale.Fit
-            )
-        }
-    }
-
-    Text(
-        userName,
-        style = MaterialTheme.typography.subtitle1,
-        color = Color.Black,
-        modifier = Modifier.padding(top = 12.dp)
-    )
-    Text(
-        post,
-        style = MaterialTheme.typography.subtitle1,
-        color = textGrayColor,
-        modifier = Modifier.padding(top = 8.dp)
-    )
-}
-
-
-@Composable
-private fun FieldsItemStyle(
-    item: UserData,
-    onEditProfile: (id: String) -> Unit,
-    id: String,
-    phoneNumber: String,
-    telegram: String
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-            .padding(horizontal = 16.dp).fillMaxWidth()
-    ) {
-        Icon(
-            painter = painterResource(item.icon),
+        Image(
+            painter = painter,
             contentDescription = null,
-            tint = textGrayColor
+            modifier = Modifier
+                .size(100.dp)
+                .border(
+                    BorderStroke(
+                        width = 2.dp,
+                        color = EffectiveTheme.colors.stroke.accent,
+                    ),
+                    shape = CircleShape,
+                )
+                .padding(2.dp)
+                .clip(CircleShape)
+                .align(Alignment.CenterHorizontally),
         )
-        Text(
-            stringResource(item.title),
-            style = MaterialTheme.typography.subtitle1,
-            color = textGrayColor,
-            modifier = Modifier.padding(start = 12.dp)
-        )
-        Spacer(modifier = Modifier.weight(.1f))
-        var text = when (item) {
-            UserData.Phone -> phoneNumber
-            UserData.Telegram -> telegram
+        Spacer(modifier = Modifier.padding(12.dp))
+        UserDetails(userName = userName, post = userPost)
+        Spacer(modifier = Modifier.padding(24.dp))
+        if (telegram != null) {
+            val iconTitle = stringResource(MainRes.strings.telegram)
+            EmployeeInfo(
+                icon = MainRes.images.ic_telegram,
+                value = telegram,
+                iconTitle = iconTitle,
+                onClick = { onOpenUri("https://t.me/$telegram") },
+                onLongClick = { onCopyText(telegram, iconTitle) },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
         }
-        Text(
-            text = text,
-            style = MaterialTheme.typography.subtitle1,
-            color = ExtendedThemeColors.colors.blackColor
-        )
-        IconButton(onClick = { onEditProfile(id) }) {
-            Icon(
-                painter = painterResource(MainRes.images.next),
-                contentDescription = null,
-                tint = ExtendedThemeColors.colors.purple_heart_700
+        if (email != null) {
+            val iconTitle = stringResource(MainRes.strings.email)
+            EmployeeInfo(
+                icon = MainRes.images.ic_email,
+                value = email,
+                iconTitle = iconTitle,
+                onClick = { onOpenUri("mailto:$email") },
+                onLongClick = { onCopyText(email, iconTitle) },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        if (phoneNumber != null) {
+            val iconTitle = stringResource(MainRes.strings.phone_number)
+            EmployeeInfo(
+                icon = MainRes.images.ic_phone,
+                value = prettifyPhoneNumber(phoneNumber) ?: phoneNumber,
+                iconTitle = iconTitle,
+                onClick = { onOpenUri("tel:$phoneNumber") },
+                onLongClick = { onCopyText(phoneNumber, iconTitle) },
             )
         }
     }
-    Divider(color = textGrayColor, thickness = 1.dp)
 }

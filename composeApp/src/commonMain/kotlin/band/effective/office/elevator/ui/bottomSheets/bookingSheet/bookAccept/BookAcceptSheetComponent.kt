@@ -10,13 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import band.effective.office.elevator.domain.models.BookingInfo
 import band.effective.office.elevator.ui.booking.components.modals.BookAccept
 import band.effective.office.elevator.ui.booking.components.modals.BookingResult
 import band.effective.office.elevator.ui.bottomSheets.BottomSheet
 import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookAccept.store.BookAcceptStore
 import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookAccept.store.BookAcceptStoreFactory
-import band.effective.office.elevator.ui.bottomSheets.bookingSheet.bookPeriod.BookPeriodSheetComponent
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -33,14 +31,12 @@ class BookAcceptSheetComponent(
     componentContext: ComponentContext,
     initState: BookAcceptStore.State,
     close: () -> Unit,
-    onMainScreen: () -> Unit
 ) : BottomSheet, ComponentContext by componentContext {
 
     private val store = BookAcceptStoreFactory(
         storeFactory = DefaultStoreFactory(),
         initState = initState,
         close = close,
-        onMainScreen = onMainScreen
     ).create()
 
     private val navigation = StackNavigation<Child>()
@@ -85,7 +81,6 @@ class BookAcceptSheetComponent(
                                 BookingResult(
                                     onMain = {
                                         store.accept(BookAcceptStore.Intent.OnClose)
-                                        store.accept(BookAcceptStore.Intent.SwitchOnMain)
                                    },
                                     close = {
                                         store.accept(

@@ -1,7 +1,7 @@
 package band.effective.office.elevator.ui.authorization.authorization_phone.store
 
 import band.effective.office.elevator.ui.authorization.authorization_phone.store.AuthorizationPhoneStore.*
-import band.effective.office.elevator.ui.models.validator.UserInfoValidator
+import band.effective.office.elevator.domain.validator.UserInfoValidator
 import com.arkivanov.mvikotlin.core.store.Bootstrapper
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper

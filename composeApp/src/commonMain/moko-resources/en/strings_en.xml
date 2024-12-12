@@ -11,6 +11,7 @@
     <string name="employee_soon_in_office">Will be today</string>
     <string name="employee_not_soon_in_office">No reservations</string>
     <string name="back">Back</string>
+    <string name="close">Close</string>
 
 
     <!--Auth strings-->
@@ -133,13 +134,17 @@
     <string name="telegram_format_error">Specify nickname in telegram</string>
     <string name="phone_plus_seven">+7</string>
     <string name="telegram_symbol">@</string>
-
+    <string name="error_empty_field">Field must be not empty</string>
+    <string name="error_name_must_consist_of_latin_letters">Name must consist of latin letters</string>
+    <string name="error_telegram_must_contain_at_symbol">Nickname must begin with @</string>
+    <string name="error_phone_format">Invalid phone format</string>
 
     <string name="from_date">from %s</string>
     <string name="to_date">to %s</string>
 
     <!-- Success messages -->
     <string name="elevator_called_successfully">Successfully!</string>
+    <string name="profile_changes_saved">Changes saved successfully</string>
 
     <!-- Profile specifics-->
     <string name="exit">Exit</string>

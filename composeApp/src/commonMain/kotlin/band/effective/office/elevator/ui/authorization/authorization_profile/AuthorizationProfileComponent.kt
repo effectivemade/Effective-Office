@@ -2,7 +2,7 @@ package band.effective.office.elevator.ui.authorization.authorization_profile
 
 import band.effective.office.elevator.ui.authorization.authorization_profile.store.AuthorizationProfileStore
 import band.effective.office.elevator.ui.authorization.authorization_profile.store.AuthorizationProfileStoreFactory
-import band.effective.office.elevator.ui.models.validator.UserInfoValidator
+import band.effective.office.elevator.domain.validator.UserInfoValidator
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory

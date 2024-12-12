@@ -1,4 +1,4 @@
-package band.effective.office.elevator.ui.models.validator
+package band.effective.office.elevator.domain.validator
 
 open class UserInfoValidator : ValidatorMethods {
 
@@ -12,6 +12,6 @@ open class UserInfoValidator : ValidatorMethods {
         telegramNick.isNotEmpty() && !telegramNick.contains(char = '@', ignoreCase = true)
 
     companion object {
-       const val phoneNumberSize = 10
+        const val phoneNumberSize = 10
     }
 }

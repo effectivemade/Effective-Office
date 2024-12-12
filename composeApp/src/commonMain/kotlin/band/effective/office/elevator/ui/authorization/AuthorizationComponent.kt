@@ -8,7 +8,7 @@ import band.effective.office.elevator.ui.authorization.authorization_profile.Aut
 import band.effective.office.elevator.ui.authorization.authorization_telegram.AuthorizationTelegramComponent
 import band.effective.office.elevator.ui.authorization.store.AuthorizationStore
 import band.effective.office.elevator.ui.authorization.store.AuthorizationStoreFactory
-import band.effective.office.elevator.ui.models.validator.UserInfoValidator
+import band.effective.office.elevator.domain.validator.UserInfoValidator
 import band.effective.office.network.model.Either
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack

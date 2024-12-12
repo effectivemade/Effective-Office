@@ -48,7 +48,6 @@ class ProfileComponent(
                     componentContext,
                     storeFactory,
                     ::editProfileOutput,
-                    config.user
                 )
             )
         }
