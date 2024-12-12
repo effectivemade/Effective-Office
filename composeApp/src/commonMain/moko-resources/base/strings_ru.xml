@@ -134,8 +134,8 @@
     <string name="profile">Профиль</string>
     <string name="elevator">Лифт</string>
     <string name="main">Главная</string>
-    <string name="booking">Бронирование</string>
-    <string name="employees">Сотрудники</string>
+    <string name="booking">Брони</string>
+    <string name="employees">Коллеги</string>
 
     <!-- Buttons -->
     <string name="_continue">Продолжить</string>
