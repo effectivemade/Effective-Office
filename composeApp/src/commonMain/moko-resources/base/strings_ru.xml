@@ -13,6 +13,13 @@
 
     <!--Auth strings-->
     <string name="_continue">Продолжить</string>
+    <string name="go_book">Вперед бронировать!</string>
+    <string name="book_table">Забронировать рабочее место</string>
+    <string name="no_occupied_tables_title">У вас пока нет занятых мест</string>
+    <string name="no_occupied_tables_description">Забронировать рабочее место можно по кнопке ниже</string>
+    <string name="finish_registration_title">Это вы!</string>
+    <string name="finish_registration_description">Теперь у вас есть профиль</string>
+
 
     <!--    TextField placeholders-->
     <string name="number_hint">955-555-55-55</string>
