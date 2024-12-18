@@ -1,0 +1,32 @@
+{
+    "list": [
+        {
+            "id": "83bcb145-6cb3-48e7-9a19-294f560c0cff",
+            "isBusy": false
+        },
+        {
+            "id": "f646ae2b-d4e6-4bc0-bf08-0958adb196d6",
+            "isBusy": true
+        },
+        {
+            "id": "946d91c5-5b74-4dcd-a3a3-d11c67b34b8e",
+            "isBusy": false
+        },
+        {
+            "id": "f8dcf0e6-5fbb-45b6-87b8-3db9bafe1f1b",
+            "isBusy": true
+        },
+        {
+            "id": "31019ebc-5aa3-42ac-8317-94ca25eaa272",
+            "isBusy": false
+        },
+        {
+            "id": "9b53b230-08e9-4459-b31c-a64ac2152a3c",
+            "isBusy": false
+        },
+        {
+            "id": "276a2799-c871-40c1-acc0-2ed4191d7079",
+            "isBusy": false
+        }
+    ]
+}
