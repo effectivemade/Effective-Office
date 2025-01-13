@@ -6,7 +6,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import band.effective.office.elevator.EffectiveTheme
+import band.effective.office.elevator.EffectiveThemeTypography
 import band.effective.office.elevator.ExtendedThemeColors
+import band.effective.office.elevator.orange60
 
 @Composable
 fun AuthTitle(
@@ -19,8 +22,8 @@ fun AuthTitle(
         modifier = Modifier
             .wrapContentSize()
             .then(modifier),
-        style = MaterialTheme.typography.h5,
-        color = ExtendedThemeColors.colors.purple_heart_800,
+        style = EffectiveTheme.typography.lMedium,
+        color = orange60,
         textAlign = textAlign,
     )
 }

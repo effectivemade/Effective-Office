@@ -1,9 +1,11 @@
 package band.effective.office.elevator.ui.authorization.authorization_profile
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,7 +35,9 @@ import band.effective.office.elevator.components.EffectiveButton
 import band.effective.office.elevator.components.UserInfoTextField
 import band.effective.office.elevator.expects.showToast
 import band.effective.office.elevator.textGrayColor
+import band.effective.office.elevator.ui.authorization.authorization_phone.store.AuthorizationPhoneStore
 import band.effective.office.elevator.ui.authorization.authorization_profile.store.AuthorizationProfileStore
+import band.effective.office.elevator.ui.authorization.components.AuthSubTitle
 import band.effective.office.elevator.ui.authorization.components.AuthTabRow
 import band.effective.office.elevator.ui.authorization.components.AuthTitle
 import band.effective.office.elevator.ui.models.UserDataTextFieldType
@@ -89,17 +93,12 @@ fun AuthorizationProfileComponent(
     var personName by remember { mutableStateOf(state.name) }
     var personPost by remember { mutableStateOf(state.post) }
 
-    Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top,
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(
-                horizontal = 16.dp,
-                vertical = 48.dp
-            ),
-    ) {
+            .fillMaxSize(),
+
+
+        ) {
         IconButton(
             modifier = Modifier.size(size = 48.dp),
             onClick = {
@@ -107,30 +106,46 @@ fun AuthorizationProfileComponent(
             }) {
             Icon(
                 imageVector = Icons.Rounded.ArrowBack,
-                tint = Color.Black,
-                contentDescription = "image_back"
+                tint = ExtendedThemeColors.colors.blackColor,
+                contentDescription = "back screen arrow"
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.padding(bottom = 20.dp))
 
-        AuthTabRow(1)
+
 
         Column(
-            verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+
         ) {
 
             AuthTitle(
+                modifier = Modifier.padding(top = 16.dp, bottom = 20.dp),
                 text = stringResource(MainRes.strings.input_profile),
-                modifier = Modifier.padding(bottom = 7.dp),
-                textAlign = TextAlign.Start
+                textAlign = TextAlign.Center
             )
-
+            AuthSubTitle(
+                modifier = Modifier.padding(bottom = 24.dp),
+                text = stringResource(MainRes.strings.select_number),
+                textAlign = TextAlign.Center
+            )
 //            Person name
             UserInfoTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            borderColor1.value = ExtendedThemeColors.colors.trinidad_400
+                        } else {
+                            borderColor1.value = textGrayColor
+                            leadingColor1.value = textGrayColor
+                        }
+                    },
                 text = personName,
                 item = UserDataTextFieldType.Person,
                 error = state.isErrorName,
@@ -148,23 +163,24 @@ fun AuthorizationProfileComponent(
                     personName = it
                     onEvent(AuthorizationProfileStore.Intent.NameChanged(name = it))
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            borderColor1.value = ExtendedThemeColors.colors.trinidad_400
-                        } else {
-                            borderColor1.value = textGrayColor
-                            leadingColor1.value = textGrayColor
-                        }
-                    }
-            )
+
+                )
 
             Spacer(modifier = Modifier.height(16.dp))
 
 //            POST
             UserInfoTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            borderColor2.value = ExtendedThemeColors.colors.trinidad_400
+                        } else {
+                            borderColor2.value = textGrayColor
+                            leadingColor2.value = textGrayColor
+                        }
+                    },
                 text = personPost,
                 item = UserDataTextFieldType.Post,
                 error = state.isErrorPost,
@@ -183,28 +199,35 @@ fun AuthorizationProfileComponent(
 
                     onEvent(AuthorizationProfileStore.Intent.PostChanged(post = it))
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            borderColor2.value = ExtendedThemeColors.colors.trinidad_400
-                        } else {
-                            borderColor2.value = textGrayColor
-                            leadingColor2.value = textGrayColor
-                        }
+
+                )
+
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+
+                AuthSubTitle(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 72.dp),
+                    text = stringResource(MainRes.strings.button_title),
+                    textAlign = TextAlign.Center
+                )
+
+
+                EffectiveButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 20.dp),
+                    buttonText = stringResource(MainRes.strings._continue),
+                    onClick = {
+                        onEvent(AuthorizationProfileStore.Intent.ContinueButtonClicked)
                     }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            EffectiveButton(
-                buttonText = stringResource(MainRes.strings._continue),
-                onClick = {
-                    onEvent(AuthorizationProfileStore.Intent.ContinueButtonClicked)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+                )
+            }
         }
     }
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.ExtendedThemeColors
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.ui.models.UserDataTextFieldType
@@ -49,44 +50,18 @@ fun UserInfoTextField(
     var textValue by remember { mutableStateOf(text) }
 
     OutlinedTextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         value = textValue,
-        modifier = modifier.fillMaxWidth(),
         onValueChange = {
             textValue = it
             onValueChange(it)
         },
         shape = RoundedCornerShape(12.dp),
         singleLine = true,
-        textStyle = TextStyle(fontSize = 16.sp),
-        leadingIcon = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-                Icon(
-                    painter = painterResource(item.icon),
-                    contentDescription = null,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Divider(
-                    modifier = Modifier.height(28.dp).width(2.dp).clip(RoundedCornerShape(4.dp))
-                )
-            }
-        },
-        trailingIcon = {
-            IconButton(
-                onClick = {
-                    textValue = ""
-                    onValueChange("")
-                }
-            ) {
-                Icon(
-                    painter = painterResource(MainRes.images.clear_icon),
-                    contentDescription = null,
-                )
-            }
-        },
+        textStyle = EffectiveTheme.typography.sMedium,
+
         colors = OutlinedTextColorsSetup(),
         isError = error,
         visualTransformation = visualTransformation,
@@ -97,5 +72,6 @@ fun UserInfoTextField(
               )
         },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Done)
+        
     )
 }

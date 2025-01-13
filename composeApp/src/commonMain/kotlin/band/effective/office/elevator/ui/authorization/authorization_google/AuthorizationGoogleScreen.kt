@@ -2,6 +2,7 @@ package band.effective.office.elevator.ui.authorization.authorization_google
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
+import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.companyTitleColor
 import band.effective.office.elevator.components.GoogleSignInButton
@@ -56,6 +58,7 @@ private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.
         modifier = Modifier
             .fillMaxSize()
             .blur(radius = 200.dp)
+            .background(EffectiveTheme.colors.divider.primary)
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val radius = size.minDimension / 4

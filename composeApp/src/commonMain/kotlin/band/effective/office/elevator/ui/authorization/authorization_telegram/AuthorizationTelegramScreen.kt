@@ -1,9 +1,11 @@
 package band.effective.office.elevator.ui.authorization.authorization_telegram
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,7 +35,9 @@ import band.effective.office.elevator.components.EffectiveButton
 import band.effective.office.elevator.components.UserInfoTextField
 import band.effective.office.elevator.expects.showToast
 import band.effective.office.elevator.textGrayColor
+import band.effective.office.elevator.ui.authorization.authorization_phone.store.AuthorizationPhoneStore
 import band.effective.office.elevator.ui.authorization.authorization_telegram.store.AuthorizationTelegramStore
+import band.effective.office.elevator.ui.authorization.components.AuthSubTitle
 import band.effective.office.elevator.ui.authorization.components.AuthTabRow
 import band.effective.office.elevator.ui.authorization.components.AuthTitle
 import band.effective.office.elevator.ui.models.UserDataTextFieldType
@@ -80,17 +84,12 @@ private fun AuthorizationTelegramComponent(
     val leadingColor = remember { mutableStateOf(textGrayColor) }
     var telegram by remember { mutableStateOf(state.nick) }
 
-    Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top,
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(
-                horizontal = 16.dp,
-                vertical = 48.dp
-            ),
-    ) {
+            .fillMaxSize(),
+
+
+        ) {
         IconButton(
             modifier = Modifier.size(size = 48.dp),
             onClick = {
@@ -103,23 +102,39 @@ private fun AuthorizationTelegramComponent(
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
 
-        AuthTabRow(2)
+        Spacer(modifier = Modifier.padding(bottom = 20.dp))
+
 
         Column(
-            verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AuthTitle(
+                modifier = Modifier.padding(top = 16.dp,bottom = 20.dp),
                 text = stringResource(MainRes.strings.input_employee),
-                modifier = Modifier.padding(bottom = 7.dp),
-                textAlign = TextAlign.Start
+                textAlign = TextAlign.Center
+            )
+            AuthSubTitle(
+                modifier = Modifier.padding(bottom = 24.dp),
+                text = stringResource(MainRes.strings.select_number),
+                textAlign = TextAlign.Center
             )
 
             UserInfoTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            borderColor.value = ExtendedThemeColors.colors.trinidad_400
+                        } else {
+                            borderColor.value = textGrayColor
+                            leadingColor.value = textGrayColor
+                        }
+                    },
                 text = telegram,
                 item = UserDataTextFieldType.Telegram,
                 error = state.isErrorNick,
@@ -137,28 +152,36 @@ private fun AuthorizationTelegramComponent(
                     telegram = it
                     onEvent(AuthorizationTelegramStore.Intent.NickChanged(name = it))
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            borderColor.value = ExtendedThemeColors.colors.trinidad_400
-                        } else {
-                            borderColor.value = textGrayColor
-                            leadingColor.value = textGrayColor
-                        }
-                    }
+
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            EffectiveButton(
-                buttonText = stringResource(MainRes.strings._continue),
-                onClick =  {
-                    onEvent(AuthorizationTelegramStore.Intent.ContinueButtonClicked)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+
+                AuthSubTitle(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 72.dp),
+                    text = stringResource(MainRes.strings.button_title),
+                    textAlign = TextAlign.Center
+                )
+
+
+                EffectiveButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 20.dp),
+                    buttonText = stringResource(MainRes.strings._continue),
+                    onClick = {
+                        onEvent(AuthorizationTelegramStore.Intent.ContinueButtonClicked)
+                    }
+                )
+            }
         }
     }
 }

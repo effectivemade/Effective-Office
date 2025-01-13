@@ -16,19 +16,21 @@
     <string name="_continue">Продолжить</string>
 
     <!--    TextField placeholders-->
-    <string name="number_hint">955-555-55-55</string>
-    <string name="profile_hint">Иван Иванов</string>
-    <string name="profile_hint_">Android-developer</string>
-    <string name="employee_hint">telegramnick</string>
+    <string name="number_hint">Номер телефона</string>
+    <string name="profile_hint">Имя фамилия</string>
+    <string name="profile_hint_">Должность</string>
+    <string name="employee_hint">Ник в телеграме</string>
 
-    <string name="input_number">Введите номер</string>
-    <string name="select_number">Укажите номер телефона, привязанный к СБП</string>
-    <string name="input_profile">Заполните профиль</string>
-    <string name="select_profile">Это необходимо для того, чтобы сотрудники смогли вас узнать</string>
-    <string name="input_employee">Укажите Telegram</string>
-    <string name="select_employee">Это необходимо для того, чтобы коллегам было удобно связаться с вами</string>
+    <string name="input_number">Введите номер телефона</string>
+    <string name="select_number">Чтобы коллеги смогли переводить \nвам деньги</string>
+    <string name="input_profile">Расскажите как вас зовут \nи кем вы работаете</string>
+    <string name="select_profile">Чтобы коллеги смогли вас узнать</string>
+    <string name="input_employee">Поделитесь вашим ником \nв телеграме</string>
+    <string name="select_employee">Чтобы коллеги смогли написать вам</string>
     <string name="phone_plus_seven">+7</string>
     <string name="telegram_symbol">@</string>
+
+    <string name="button_title">Всю информацию можно будет изменить в профиле</string>
 
     <!--Main Screen-->
     <string name="filter">Фильтры</string>

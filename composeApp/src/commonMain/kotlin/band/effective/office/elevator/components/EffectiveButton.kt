@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import band.effective.office.elevator.EffectiveTheme
 
 
 @Composable
@@ -22,23 +23,23 @@ fun EffectiveButton(
     contentPadding: Dp = 14.dp,
     roundedCorner: Dp = 40.dp,
     buttonColors: ButtonColors = ButtonDefaults.buttonColors(
-       backgroundColor = MaterialTheme.colors.primary,
-       contentColor = MaterialTheme.colors.background
+       backgroundColor = EffectiveTheme.colors.button.primaryNormal,
+       contentColor = EffectiveTheme.colors.text.caption
    ),
     border: BorderStroke? = null
 ) {
     Button(
+        modifier = modifier,
         onClick = onClick,
         colors = buttonColors,
         contentPadding = PaddingValues(contentPadding),
         elevation = Elevation(),
         shape = RoundedCornerShape(roundedCorner),
-        modifier = modifier,
         border = border
     ) {
         Text(
             text = buttonText,
-            style = MaterialTheme.typography.button,
+            style = EffectiveTheme.typography.mMedium,
         )
     }
 }
