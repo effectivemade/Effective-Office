@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         runKioskMode()
         super.onCreate(savedInstanceState)
+        initializeSentry()
         SharedPref.sharedPref.init(this)
         setContent {
             App(defaultComponentContext(), DefaultStoreFactory())

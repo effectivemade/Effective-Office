@@ -6,7 +6,7 @@ import band.effective.office.network.model.ErrorResponse
 import effective_office.contract.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -21,8 +21,9 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
-import io.ktor.http.HttpHeaders
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import io.sentry.kotlin.multiplatform.Sentry
 
 object KtorEtherClient {
     /**token for authorization*/
@@ -56,6 +57,18 @@ object KtorEtherClient {
                 logger = Logger.DEFAULT
                 level = LogLevel.ALL
             }
+            install(HttpRequestRetry) {
+                maxRetries = 3
+                retryIf { _, response ->
+                    !response.status.isSuccess()
+                }
+                retryOnExceptionIf { _, _ ->
+                    true
+                }
+                delayMillis { retry ->
+                    retry * 3000L
+                }
+            }
         }
     }
 
@@ -80,6 +93,7 @@ object KtorEtherClient {
                 RestMethod.Put -> client.put(urlString, block)
             }.body()
         } catch (e: Exception) {
+            Sentry.captureException(e)
             Either.Error(ErrorResponse(code = 0, description = e.message ?: "Error"))
         }
 }
