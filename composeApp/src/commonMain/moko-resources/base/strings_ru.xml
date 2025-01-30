@@ -165,6 +165,11 @@
     <string name="error_telegram_must_contain_at_symbol">Ник должен начинаться с @</string>
     <string name="error_phone_format">Неверный номер</string>
 
+    <string name="connection_error_title">Нет интернета</string>
+    <string name="connection_error_description">Проверьте подключение к интернету и повторите попытку</string>
+    <string name="try_again">Повторить попытку</string>
+    <string name="no_booking">Не бронировать стол</string>
+
     <!-- Success messages -->
     <string name="elevator_called_successfully">Лифт успешно вызван!</string>
     <string name="profile_changes_saved">Вы изменили личные данные</string>
