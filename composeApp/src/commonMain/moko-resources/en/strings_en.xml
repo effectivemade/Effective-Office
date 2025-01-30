@@ -42,6 +42,14 @@
     <string name="cansel">Cansel</string>
     <string name="delete">Delete</string>
     <string name="ok">OK</string>
+
+    <string name="go_book">Go ahead to book!</string>
+    <string name="book_table">Book a work place</string>
+    <string name="no_occupied_tables_title">You don't have any occupied places yet</string>
+    <string name="no_occupied_tables_description">You can book a work place by clicking the button below</string>
+    <string name="finish_registration_title">It's you!</string>
+    <string name="finish_registration_description">Now you have a profile</string>
+
     <!--Booking-->
     <string name="type_booking">Type booking</string>
     <string name="workplace">Working place</string>
@@ -138,6 +146,11 @@
     <string name="error_name_must_consist_of_latin_letters">Name must consist of latin letters</string>
     <string name="error_telegram_must_contain_at_symbol">Nickname must begin with @</string>
     <string name="error_phone_format">Invalid phone format</string>
+
+    <string name="connection_error_title">No Internet</string>
+    <string name="connection_error_description">Please check your internet connection and try again</string>
+    <string name="try_again">Try Again</string>
+    <string name="no_booking">Do not book a table</string>
 
     <string name="from_date">from %s</string>
     <string name="to_date">to %s</string>

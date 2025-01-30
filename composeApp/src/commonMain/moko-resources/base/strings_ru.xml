@@ -14,6 +14,13 @@
 
     <!--Auth strings-->
     <string name="_continue">Продолжить</string>
+    <string name="go_book">Вперед бронировать!</string>
+    <string name="book_table">Забронировать рабочее место</string>
+    <string name="no_occupied_tables_title">У вас пока нет занятых мест</string>
+    <string name="no_occupied_tables_description">Забронировать рабочее место можно по кнопке ниже</string>
+    <string name="finish_registration_title">Это вы!</string>
+    <string name="finish_registration_description">Теперь у вас есть профиль</string>
+
 
     <!--    TextField placeholders-->
     <string name="number_hint">Номер телефона</string>
@@ -160,6 +167,11 @@
     <string name="error_name_must_consist_of_latin_letters">Имя должно быть написано на латинице</string>
     <string name="error_telegram_must_contain_at_symbol">Ник должен начинаться с @</string>
     <string name="error_phone_format">Неверный номер</string>
+
+    <string name="connection_error_title">Нет интернета</string>
+    <string name="connection_error_description">Проверьте подключение к интернету и повторите попытку</string>
+    <string name="try_again">Повторить попытку</string>
+    <string name="no_booking">Не бронировать стол</string>
 
     <!-- Success messages -->
     <string name="elevator_called_successfully">Лифт успешно вызван!</string>
