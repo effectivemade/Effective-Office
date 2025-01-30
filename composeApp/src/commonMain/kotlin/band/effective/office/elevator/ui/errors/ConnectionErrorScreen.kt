@@ -12,12 +12,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
@@ -44,7 +41,7 @@ fun ConnectionErrorScreen(
                 painter = painterResource(MainRes.images.ic_wifi),
                 contentDescription = null,
                 modifier = Modifier.size(48.dp),
-                tint = EffectiveTheme.colors.graph.violet,
+                tint = Color.Unspecified,
             )
             Spacer(modifier = Modifier.padding(16.dp))
             Text(
