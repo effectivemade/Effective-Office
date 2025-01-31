@@ -141,8 +141,12 @@ class BookingWorkspaceRepository(
             .execute().items
         logger.trace("[findAllByWorkspaceId] request to Google Calendar completed")
 
-        return eventsWithWorkspace.map { event ->
-            googleCalendarConverter.toWorkspaceBooking(event)
+        return eventsWithWorkspace.mapNotNull { event ->
+            if (event.status != "cancelled") {
+                googleCalendarConverter.toWorkspaceBooking(event)
+            } else {
+                null
+            }
         }
     }
 
