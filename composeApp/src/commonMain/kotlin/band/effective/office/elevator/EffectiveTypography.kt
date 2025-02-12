@@ -5,6 +5,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 val effectiveTypography = EffectiveThemeTypography(
+    xlMedium = TextStyle(
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Medium,
+    ),
     lMedium = TextStyle(
         fontSize = 16.sp,
         fontWeight = FontWeight.Medium,

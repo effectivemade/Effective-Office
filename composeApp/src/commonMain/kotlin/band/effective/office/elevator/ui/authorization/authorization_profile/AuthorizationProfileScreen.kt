@@ -1,10 +1,10 @@
 package band.effective.office.elevator.ui.authorization.authorization_profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,18 +27,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.ExtendedThemeColors
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.EffectiveButton
 import band.effective.office.elevator.components.UserInfoTextField
 import band.effective.office.elevator.expects.showToast
 import band.effective.office.elevator.textGrayColor
-import band.effective.office.elevator.ui.authorization.authorization_phone.store.AuthorizationPhoneStore
 import band.effective.office.elevator.ui.authorization.authorization_profile.store.AuthorizationProfileStore
 import band.effective.office.elevator.ui.authorization.components.AuthSubTitle
-import band.effective.office.elevator.ui.authorization.components.AuthTabRow
 import band.effective.office.elevator.ui.authorization.components.AuthTitle
 import band.effective.office.elevator.ui.models.UserDataTextFieldType
+import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 
 @Composable
@@ -95,36 +93,30 @@ fun AuthorizationProfileComponent(
 
     Box(
         modifier = Modifier
-            .fillMaxSize(),
-
-
-        ) {
+            .fillMaxSize()
+            .background(EffectiveTheme.colors.background.primary),
+    ) {
         IconButton(
             modifier = Modifier.size(size = 48.dp),
             onClick = {
                 onEvent(AuthorizationProfileStore.Intent.BackButtonClicked)
-            }) {
+            }
+        ) {
             Icon(
-                imageVector = Icons.Rounded.ArrowBack,
-                tint = ExtendedThemeColors.colors.blackColor,
-                contentDescription = "back screen arrow"
+                painter = painterResource(MainRes.images.back_button),
+                contentDescription = "back screen arrow",
+                modifier = Modifier.size(size = 24.dp),
+                tint = EffectiveTheme.colors.icon.secondary
             )
         }
-
-        Spacer(modifier = Modifier.padding(bottom = 20.dp))
-
-
-
         Column(
             modifier = Modifier
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
-
             AuthTitle(
-                modifier = Modifier.padding(top = 16.dp, bottom = 20.dp),
+                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
                 text = stringResource(MainRes.strings.input_profile),
                 textAlign = TextAlign.Center
             )
@@ -133,6 +125,7 @@ fun AuthorizationProfileComponent(
                 text = stringResource(MainRes.strings.select_number),
                 textAlign = TextAlign.Center
             )
+            // TODO() Colors theme
 //            Person name
             UserInfoTextField(
                 modifier = Modifier
@@ -162,9 +155,8 @@ fun AuthorizationProfileComponent(
                     }
                     personName = it
                     onEvent(AuthorizationProfileStore.Intent.NameChanged(name = it))
-                },
-
-                )
+                }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -196,32 +188,26 @@ fun AuthorizationProfileComponent(
                         leadingColor2.value = textGrayColor
                         personPost = it
                     }
-
                     onEvent(AuthorizationProfileStore.Intent.PostChanged(post = it))
-                },
+                }
+            )
 
-                )
-
-
-            Box(
-                modifier = Modifier.fillMaxSize()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 56.dp),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 AuthSubTitle(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 72.dp),
+                    modifier = Modifier.padding(bottom = 20.dp),
                     text = stringResource(MainRes.strings.button_title),
                     textAlign = TextAlign.Center
                 )
-
-
                 EffectiveButton(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 20.dp),
+                        .padding(horizontal = 16.dp),
                     buttonText = stringResource(MainRes.strings._continue),
                     onClick = {
                         onEvent(AuthorizationProfileStore.Intent.ContinueButtonClicked)

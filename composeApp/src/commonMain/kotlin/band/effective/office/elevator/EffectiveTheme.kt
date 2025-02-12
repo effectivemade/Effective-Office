@@ -137,6 +137,7 @@ data class EffectiveThemeColors(
 }
 
 data class EffectiveThemeTypography(
+    val xlMedium: TextStyle,
     val lMedium: TextStyle,
     val mMedium: TextStyle,
     val sMedium: TextStyle,
