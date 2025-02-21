@@ -54,7 +54,7 @@ fun AuthorizationTelegramScreen(component: AuthorizationTelegramComponent) {
                 is AuthorizationTelegramStore.Label.AuthorizationTelegramSuccess -> {
                     component.changeTG(state.nick)
                     component.onOutput(
-                        AuthorizationTelegramComponent.Output.OpenContentFlow
+                        AuthorizationTelegramComponent.Output.OpenFinishScreen
                     )
                 }
 

@@ -7,8 +7,6 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.core.utils.ExperimentalMviKotlinApi
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
-import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
-import kotlinx.coroutines.launch
 
 class AuthorizationProfileStoreFactory(
     private val storeFactory: StoreFactory,

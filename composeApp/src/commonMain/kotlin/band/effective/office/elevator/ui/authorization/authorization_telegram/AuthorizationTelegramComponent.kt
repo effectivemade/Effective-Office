@@ -46,7 +46,7 @@ class AuthorizationTelegramComponent(
     fun changeTG(telegramNick: String) = changeTelegramNick(telegramNick)
 
     sealed class Output {
-        object OpenContentFlow : Output()
+        object OpenFinishScreen : Output()
 
         object OpenProfileScreen : Output()
     }

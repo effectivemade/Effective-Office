@@ -23,13 +23,13 @@ fun OutlinedTextColorsSetup() = TextFieldDefaults.outlinedTextFieldColors(
 //                    endregion
 
 //                    region::Leading icon
-    disabledLeadingIconColor = textGrayColor,
+    disabledLeadingIconColor = EffectiveTheme.colors.text.additional,
 //                    endregion
 
 //                    region::Cursor colors
-    cursorColor = ExtendedThemeColors.colors.trinidad_400,
-    errorCursorColor = ExtendedThemeColors.colors.error,
+    cursorColor = EffectiveTheme.colors.text.primary,
+    errorCursorColor = EffectiveTheme.colors.text.error,
 //                    endregion
-    textColor = Color.Black,
-    disabledTextColor = Color.Black
+    textColor = EffectiveTheme.colors.text.primary,
+    disabledTextColor = EffectiveTheme.colors.text.additional,
 )

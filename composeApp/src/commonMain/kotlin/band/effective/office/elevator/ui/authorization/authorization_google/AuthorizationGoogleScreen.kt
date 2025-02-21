@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
+import band.effective.office.elevator.components.EffectiveGradient
 import band.effective.office.elevator.components.GoogleSignInButton
 import band.effective.office.elevator.expects.showToast
 import band.effective.office.elevator.orange60
@@ -53,27 +54,7 @@ fun AuthorizationGoogleScreen(component: AuthorizationGoogleComponent) {
 
 @Composable
 private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.Intent) -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .blur(radius = 200.dp)
-            .background(EffectiveTheme.colors.divider.primary)
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val radius = size.minDimension / 4
-            val topMargin = size.height / 5
-            drawCircle(
-                color = purple60,
-                radius = radius,
-                center = Offset(x = size.width / 2, y = topMargin)
-            )
-            drawCircle(
-                color = orange60,
-                radius = radius,
-                center = Offset(x = size.width / 2, y = topMargin + radius * 2)
-            )
-        }
-    }
+    EffectiveGradient()
     Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Column(
             modifier = Modifier.fillMaxSize(),

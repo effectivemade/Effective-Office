@@ -22,13 +22,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
-import band.effective.office.elevator.ExtendedThemeColors
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.EffectiveButton
 import band.effective.office.elevator.components.UserInfoTextField
@@ -125,7 +122,6 @@ fun AuthorizationProfileComponent(
                 text = stringResource(MainRes.strings.select_number),
                 textAlign = TextAlign.Center
             )
-            // TODO() Colors theme
 //            Person name
             UserInfoTextField(
                 modifier = Modifier

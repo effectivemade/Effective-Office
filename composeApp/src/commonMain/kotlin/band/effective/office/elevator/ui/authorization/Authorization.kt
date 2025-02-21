@@ -2,10 +2,12 @@ package band.effective.office.elevator.ui.authorization
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import band.effective.office.elevator.ui.authorization.authorization_finish.AuthorizationFinishScreen
 import band.effective.office.elevator.ui.authorization.authorization_google.AuthorizationGoogleScreen
 import band.effective.office.elevator.ui.authorization.authorization_phone.AuthorizationPhoneScreen
 import band.effective.office.elevator.ui.authorization.authorization_profile.AuthorizationProfileScreen
 import band.effective.office.elevator.ui.authorization.authorization_telegram.AuthorizationTelegramScreen
+import band.effective.office.elevator.ui.authorization.no_booking.NoBookingContent
 import band.effective.office.elevator.ui.authorization.store.AuthorizationStore
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
@@ -33,6 +35,8 @@ fun AuthorizationScreen(component: AuthorizationComponent) {
             is AuthorizationComponent.Child.PhoneAuthChild -> AuthorizationPhoneScreen(child.component)
             is AuthorizationComponent.Child.ProfileAuthChild -> AuthorizationProfileScreen(child.component)
             is AuthorizationComponent.Child.TelegramAuthChild -> AuthorizationTelegramScreen(child.component)
+            is AuthorizationComponent.Child.FinishAuthChild -> AuthorizationFinishScreen(child.component)
+            is AuthorizationComponent.Child.NoBookingChild -> NoBookingContent(child.component)
         }
     }
 }

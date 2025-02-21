@@ -40,8 +40,12 @@ class ProfileRepositoryImpl(
     override suspend fun updateUser(user: User): Flow<Either<ErrorWithData<User>, User>> = flow {
         println("User for auth: ${user}")
         val requestResult =
-            api.updateUser(user.toUserDTO(idPhoneNumber = idPhoneNumber,
-                idTelegram = idTelegram )).convert(this@ProfileRepositoryImpl.lastResponse.value)
+            api.updateUser(
+                user.toUserDTO(
+                    idPhoneNumber = idPhoneNumber,
+                    idTelegram = idTelegram,
+                )
+            ).convert(this@ProfileRepositoryImpl.lastResponse.value)
         val newUser = requestResult.getData()
         val cashedUser = bdSource.getCurrentUserInfo()
         if (newUser != null && newUser != cashedUser) {
@@ -57,12 +61,15 @@ class ProfileRepositoryImpl(
 
         val cashedUser = bdSource.getCurrentUserInfo()
         if (cashedUser == null) {
-            emit(Either.Error(ErrorWithData(
-                error = ErrorResponse(code = 404, description = "you don`t login"),
-                saveData = null
-            )))
-        }
-        else {
+            emit(
+                Either.Error(
+                    ErrorWithData(
+                        error = ErrorResponse(code = 404, description = "you don`t login"),
+                        saveData = null
+                    )
+                )
+            )
+        } else {
             val requestResult = api.getUser(cashedUser.id).convert(lastResponse.value)
             val userFromApi = requestResult.getData()
             if (userFromApi != null && userFromApi != cashedUser) {
@@ -83,7 +90,7 @@ class ProfileRepositoryImpl(
 
     private fun User?.packageEither(apiResponse: Either<ErrorWithData<User>, User>) =
         when (apiResponse) {
-            is Either.Success -> Either.Success(this?:apiResponse.data)
+            is Either.Success -> Either.Success(this ?: apiResponse.data)
             is Either.Error -> Either.Error(
                 ErrorWithData(
                     error = apiResponse.error.error,
