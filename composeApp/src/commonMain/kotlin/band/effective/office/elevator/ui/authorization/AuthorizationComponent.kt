@@ -88,8 +88,22 @@ class AuthorizationComponent(
     private fun child(
         config: AuthorizationComponent.Config,
         componentContext: ComponentContext
-    ): AuthorizationComponent.Child =
-        when (config) {
+    ): AuthorizationComponent.Child {
+        // TODO Get it back
+        return Child.ProfileAuthChild(
+            AuthorizationProfileComponent(
+                componentContext,
+                storeFactory,
+                validator,
+                userData.userName,
+                userData.post,
+                ::profileAuthOutput,
+                ::changeName,
+                ::changePost
+            )
+        )
+
+        return when (config) {
             is Config.GoogleAuth -> Child.GoogleAuthChild(
                 AuthorizationGoogleComponent(
                     componentContext,
@@ -133,6 +147,7 @@ class AuthorizationComponent(
                 )
             )
         }
+    }
 
     private fun googleAuthOutput(output: AuthorizationGoogleComponent.Output) {
         when (output) {

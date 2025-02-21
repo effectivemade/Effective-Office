@@ -3,6 +3,7 @@ package band.effective.office.elevator.ui.authorization.authorization_google
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -82,12 +84,26 @@ private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                // TODO() color icon
-                Image(
-                    painter = painterResource(MainRes.images.effective_logo),
-                    contentDescription = "Effective logo",
-                    modifier = Modifier.size(90.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = EffectiveTheme.colors.background.primary.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(20.dp)
+                    )
+                        .border(
+                            width = 1.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            color = EffectiveTheme.colors.stroke.primary
+                        )
+                        .padding(20.dp)
+                ) {
+                    Image(
+                        painter = painterResource(MainRes.images.ic_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(90.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(MainRes.strings.company_title_name),

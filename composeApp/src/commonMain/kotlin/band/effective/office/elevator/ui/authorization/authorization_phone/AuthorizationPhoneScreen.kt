@@ -101,7 +101,7 @@ private fun AuthorizationPhoneComponent(
         ) {
             Icon(
                 painter = painterResource(MainRes.images.back_button),
-                contentDescription = "back screen arrow",
+                contentDescription = stringResource(MainRes.strings.back),
                 modifier = Modifier.size(size = 24.dp),
                 tint = EffectiveTheme.colors.icon.secondary
             )
@@ -123,35 +123,16 @@ private fun AuthorizationPhoneComponent(
                 textAlign = TextAlign.Center,
             )
 
-            // TODO() Colors theme
             UserInfoTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            borderColor.value = ExtendedThemeColors.colors.trinidad_400
-                        } else {
-                            borderColor.value = textGrayColor
-                            leadingColor.value = textGrayColor
-                        }
-                    },
-
+                    .wrapContentHeight(),
                 item = UserDataTextFieldType.Phone,
                 error = state.isErrorPhoneNumber,
                 visualTransformation = PhoneMaskTransformation,
                 text = phoneNumber,
                 keyboardType = KeyboardType.Phone,
                 onValueChange = {
-                    if (it.isNotEmpty()) {
-                        closeIcon.value = true
-                        leadingColor.value = Color.Black
-                        borderColor.value = ExtendedThemeColors.colors.trinidad_400
-                    } else {
-                        borderColor.value = textGrayColor
-                        closeIcon.value = false
-                        leadingColor.value = textGrayColor
-                    }
                     phoneNumber = it
                     onEvent(
                         AuthorizationPhoneStore.Intent.PhoneNumberChanged(phoneNumber = it)

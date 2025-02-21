@@ -22,18 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
-import band.effective.office.elevator.ExtendedThemeColors
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.EffectiveButton
 import band.effective.office.elevator.components.UserInfoTextField
 import band.effective.office.elevator.expects.showToast
-import band.effective.office.elevator.textGrayColor
 import band.effective.office.elevator.ui.authorization.authorization_telegram.store.AuthorizationTelegramStore
 import band.effective.office.elevator.ui.authorization.components.AuthSubTitle
 import band.effective.office.elevator.ui.authorization.components.AuthTitle
@@ -77,9 +73,10 @@ private fun AuthorizationTelegramComponent(
     onEvent: (AuthorizationTelegramStore.Intent) -> Unit,
     state: AuthorizationTelegramStore.State
 ) {
+    val colors = EffectiveTheme.colors
     val closeIcon = remember { mutableStateOf(false) }
-    val borderColor = remember { mutableStateOf(textGrayColor) }
-    val leadingColor = remember { mutableStateOf(textGrayColor) }
+    val borderColor = remember { mutableStateOf(colors.input.freeNormal) }
+    val leadingColor = remember { mutableStateOf(colors.text.additional) }
     var telegram by remember { mutableStateOf(state.nick) }
 
     Box(
@@ -94,7 +91,7 @@ private fun AuthorizationTelegramComponent(
             }) {
             Icon(
                 painter = painterResource(MainRes.images.back_button),
-                contentDescription = "back screen arrow",
+                contentDescription = stringResource(MainRes.strings.back),
                 modifier = Modifier.size(size = 24.dp),
                 tint = EffectiveTheme.colors.icon.secondary
             )
@@ -115,39 +112,19 @@ private fun AuthorizationTelegramComponent(
                 text = stringResource(MainRes.strings.select_number),
                 textAlign = TextAlign.Center
             )
-
-            // TODO() Colors theme
             UserInfoTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            borderColor.value = ExtendedThemeColors.colors.trinidad_400
-                        } else {
-                            borderColor.value = textGrayColor
-                            leadingColor.value = textGrayColor
-                        }
-                    },
+                    .wrapContentHeight(),
                 text = telegram,
                 item = UserDataTextFieldType.Telegram,
                 error = state.isErrorNick,
                 keyboardType = KeyboardType.Text,
                 onValueChange = {
-                    if (it.isNotEmpty()) {
-                        closeIcon.value = true
-                        leadingColor.value = Color.Black
-                        borderColor.value = ExtendedThemeColors.colors.trinidad_400
-                    } else {
-                        borderColor.value = textGrayColor
-                        closeIcon.value = false
-                        leadingColor.value = textGrayColor
-                    }
                     telegram = it
                     onEvent(AuthorizationTelegramStore.Intent.NickChanged(name = it))
                 },
-
-                )
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 

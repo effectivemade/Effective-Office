@@ -104,7 +104,7 @@ fun AuthorizationProfileComponent(
         ) {
             Icon(
                 painter = painterResource(MainRes.images.back_button),
-                contentDescription = "back screen arrow",
+                contentDescription = stringResource(MainRes.strings.back),
                 modifier = Modifier.size(size = 24.dp),
                 tint = EffectiveTheme.colors.icon.secondary
             )
@@ -130,29 +130,12 @@ fun AuthorizationProfileComponent(
             UserInfoTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            borderColor1.value = ExtendedThemeColors.colors.trinidad_400
-                        } else {
-                            borderColor1.value = textGrayColor
-                            leadingColor1.value = textGrayColor
-                        }
-                    },
+                    .wrapContentHeight(),
                 text = personName,
                 item = UserDataTextFieldType.Person,
                 error = state.isErrorName,
                 keyboardType = KeyboardType.Text,
                 onValueChange = {
-                    if (it.isNotEmpty()) {
-                        closeIcon1.value = true
-                        leadingColor1.value = Color.Black
-                        borderColor1.value = ExtendedThemeColors.colors.trinidad_400
-                    } else {
-                        borderColor1.value = textGrayColor
-                        closeIcon1.value = false
-                        leadingColor1.value = textGrayColor
-                    }
                     personName = it
                     onEvent(AuthorizationProfileStore.Intent.NameChanged(name = it))
                 }
@@ -164,30 +147,13 @@ fun AuthorizationProfileComponent(
             UserInfoTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            borderColor2.value = ExtendedThemeColors.colors.trinidad_400
-                        } else {
-                            borderColor2.value = textGrayColor
-                            leadingColor2.value = textGrayColor
-                        }
-                    },
+                    .wrapContentHeight(),
                 text = personPost,
                 item = UserDataTextFieldType.Post,
                 error = state.isErrorPost,
                 keyboardType = KeyboardType.Text,
                 onValueChange = {
-                    if (it.isNotEmpty()) {
-                        closeIcon2.value = true
-                        leadingColor2.value = ExtendedThemeColors.colors.blackColor
-                        borderColor2.value = ExtendedThemeColors.colors.trinidad_400
-                    } else {
-                        borderColor2.value = textGrayColor
-                        closeIcon2.value = false
-                        leadingColor2.value = textGrayColor
-                        personPost = it
-                    }
+                    personPost = it
                     onEvent(AuthorizationProfileStore.Intent.PostChanged(post = it))
                 }
             )
