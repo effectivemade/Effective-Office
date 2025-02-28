@@ -1,4 +1,4 @@
-package band.effective.office.elevator.ui.authorization.authorization_profile
+package band.effective.office.elevator.ui.authorization.authorization_finish
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
+import band.effective.office.elevator.components.EffectiveGradient
 import band.effective.office.elevator.components.PrimaryButton
 import band.effective.office.elevator.components.generateImageLoader
 import com.seiko.imageloader.model.ImageRequest
@@ -33,7 +36,21 @@ import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 
 @Composable
-fun AuthorizationFinishContent(
+fun AuthorizationFinishScreen(component: AuthorizationFinishComponent) {
+    val state by component.user.collectAsState()
+
+    AuthorizationFinishContent(
+        modifier = Modifier
+            .fillMaxSize(),
+        name = state.name,
+        post = state.post,
+        avatarUrl = state.avatarUrl,
+        onButtonClick = { component.onOutput(AuthorizationFinishComponent.Output.OpenNoBookingScreen) }
+    )
+}
+
+@Composable
+private fun AuthorizationFinishContent(
     modifier: Modifier = Modifier,
     name: String,
     post: String,
@@ -53,12 +70,14 @@ fun AuthorizationFinishContent(
             errorPainter = { painterResource(MainRes.images.logo_default) }
         )
     }
-
+    EffectiveGradient()
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center,
     ) {
+        EffectiveGradient()
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,11 +98,14 @@ fun AuthorizationFinishContent(
                 style = EffectiveTheme.typography.sMedium,
                 textAlign = TextAlign.Center,
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = EffectiveTheme.colors.background.tertiary)
+                    .background(
+                        color = EffectiveTheme.colors.background.tertiary,
+                        shape = RoundedCornerShape(32.dp)
+                    )
                     .border(
                         width = 1.dp,
                         color = EffectiveTheme.colors.stroke.primary,

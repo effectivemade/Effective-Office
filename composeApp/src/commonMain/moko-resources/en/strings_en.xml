@@ -21,11 +21,11 @@
     <string name="number_hint">955-555-55-55</string>
     <string name="input_profile">Fill in your profile</string>
     <string name="select_profile">This is necessary for employees to recognize you</string>
-    <string name="profile_hint">Ivan Ivanov</string>
-    <string name="profile_hint_">Android-developer</string>
+    <string name="profile_hint">Name Surname</string>
+    <string name="profile_hint_">Post</string>
     <string name="input_employee">Specify Telegram</string>
     <string name="select_employee">This is necessary for colleagues to be able to contact you conveniently</string>
-    <string name="employee_hint">telegramnick</string>
+    <string name="employee_hint">Telegram</string>
 
     <string name="period_selection">Period selection</string>
 
@@ -118,6 +118,7 @@
     <!-- Buttons -->
     <string name="_continue">Continue</string>
 
+    <string name="button_title">Information can be changed in the profile screen</string>
     <!--Tab titles-->
     <string name="profile">Profile</string>
     <string name="main">Main</string>

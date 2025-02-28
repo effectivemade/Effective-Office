@@ -22,7 +22,7 @@
     <string name="finish_registration_description">Теперь у вас есть профиль</string>
 
 
-    <!--    TextField placeholders-->
+    <!--TextField placeholders-->
     <string name="number_hint">Номер телефона</string>
     <string name="profile_hint">Имя фамилия</string>
     <string name="profile_hint_">Должность</string>

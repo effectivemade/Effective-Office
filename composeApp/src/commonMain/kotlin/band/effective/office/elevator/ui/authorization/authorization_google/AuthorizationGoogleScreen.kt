@@ -3,6 +3,7 @@ package band.effective.office.elevator.ui.authorization.authorization_google
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,7 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
-import band.effective.office.elevator.companyTitleColor
+import band.effective.office.elevator.components.EffectiveGradient
 import band.effective.office.elevator.components.GoogleSignInButton
 import band.effective.office.elevator.expects.showToast
 import band.effective.office.elevator.orange60
@@ -30,7 +31,6 @@ import band.effective.office.elevator.purple60
 import band.effective.office.elevator.ui.authorization.authorization_google.store.AuthorizationGoogleStore
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
-
 
 @Composable
 fun AuthorizationGoogleScreen(component: AuthorizationGoogleComponent) {
@@ -54,66 +54,54 @@ fun AuthorizationGoogleScreen(component: AuthorizationGoogleComponent) {
 
 @Composable
 private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.Intent) -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .blur(radius = 200.dp)
-            .background(EffectiveTheme.colors.divider.primary)
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val radius = size.minDimension / 4
-            val topMargin = size.height / 5
-
-
-            drawCircle(
-                color = purple60,
-                radius = radius,
-                center = Offset(x = size.width / 2, y = topMargin)
-            )
-
-
-            drawCircle(
-                color = orange60,
-                radius = radius,
-                center = Offset(x = size.width / 2, y = topMargin + radius * 2)
-            )
-        }
-    }
+    EffectiveGradient()
     Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround,
         ) {
             Column(
-              horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
-                Image(
-                    painterResource(MainRes.images.effective_logo),
-                    contentDescription = "Effective logo",
-                    modifier = Modifier.size(90.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = EffectiveTheme.colors.background.primary.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(20.dp)
+                    )
+                        .border(
+                            width = 1.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            color = EffectiveTheme.colors.stroke.primary
+                        )
+                        .padding(20.dp)
+                ) {
+                    Image(
+                        painter = painterResource(MainRes.images.ic_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(90.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(MainRes.strings.company_title_name),
-                    color = companyTitleColor,
-                    style = MaterialTheme.typography.h2
-
-
+                    color = EffectiveTheme.colors.text.primary,
+                    style = EffectiveTheme.typography.xlMedium
                 )
                 Text(
                     text = stringResource(MainRes.strings.company_subtitle_name),
-                    color = companyTitleColor,
-                    style = MaterialTheme.typography.h6
+                    color = EffectiveTheme.colors.text.primary,
+                    style = EffectiveTheme.typography.sMedium
                 )
             }
 
             GoogleSignInButton(
                 modifier = Modifier,
-                onClick = { onEvent(AuthorizationGoogleStore.Intent.SignInButtonClicked) })
+                onClick = { onEvent(AuthorizationGoogleStore.Intent.SignInButtonClicked) }
+            )
         }
     }
 }

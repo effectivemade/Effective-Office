@@ -2,13 +2,15 @@ package band.effective.office.elevator.ui.authorization
 
 import band.effective.office.elevator.domain.models.User
 import band.effective.office.elevator.domain.useCase.UpdateUserInfoUseCase
+import band.effective.office.elevator.domain.validator.UserInfoValidator
+import band.effective.office.elevator.ui.authorization.authorization_finish.AuthorizationFinishComponent
 import band.effective.office.elevator.ui.authorization.authorization_google.AuthorizationGoogleComponent
 import band.effective.office.elevator.ui.authorization.authorization_phone.AuthorizationPhoneComponent
 import band.effective.office.elevator.ui.authorization.authorization_profile.AuthorizationProfileComponent
 import band.effective.office.elevator.ui.authorization.authorization_telegram.AuthorizationTelegramComponent
+import band.effective.office.elevator.ui.authorization.no_booking.NoBookingComponent
 import band.effective.office.elevator.ui.authorization.store.AuthorizationStore
 import band.effective.office.elevator.ui.authorization.store.AuthorizationStoreFactory
-import band.effective.office.elevator.domain.validator.UserInfoValidator
 import band.effective.office.network.model.Either
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
@@ -45,8 +47,6 @@ class AuthorizationComponent(
     private val validator: UserInfoValidator = UserInfoValidator()
     private val navigation = StackNavigation<AuthorizationComponent.Config>()
     private val updateUserInfoUseCase: UpdateUserInfoUseCase by inject()
-    // TODO (Artem Gruzdev) replace this.This is a temporary crutch. It is necessary to synchronize the state somehow
-    private var userData: User = User.defaultUser
 
     private val authorizationStore =
         instanceKeeper.getStore {
@@ -88,8 +88,8 @@ class AuthorizationComponent(
     private fun child(
         config: AuthorizationComponent.Config,
         componentContext: ComponentContext
-    ): AuthorizationComponent.Child =
-        when (config) {
+    ): AuthorizationComponent.Child {
+        return when (config) {
             is Config.GoogleAuth -> Child.GoogleAuthChild(
                 AuthorizationGoogleComponent(
                     componentContext,
@@ -103,7 +103,7 @@ class AuthorizationComponent(
                     componentContext,
                     storeFactory,
                     validator,
-                    userData.phoneNumber,
+                    state.value.userData.phoneNumber,
                     ::phoneAuthOutput,
                     ::changePhoneNumber
                 )
@@ -114,8 +114,8 @@ class AuthorizationComponent(
                     componentContext,
                     storeFactory,
                     validator,
-                    userData.userName,
-                    userData.post,
+                    state.value.userData.userName,
+                    state.value.userData.post,
                     ::profileAuthOutput,
                     ::changeName,
                     ::changePost
@@ -127,18 +127,33 @@ class AuthorizationComponent(
                     componentContext,
                     storeFactory,
                     validator,
-                    userData.telegram,
+                    state.value.userData.telegram,
                     ::telegramAuthOutput,
                     ::changeTelegramNick
                 )
             )
+
+            is Config.FinishAuth -> Child.FinishAuthChild(
+                AuthorizationFinishComponent(
+                    componentContext,
+                    storeFactory,
+                    state.value.userData.userName,
+                    state.value.userData.post,
+                    state.value.userData.imageUrl,
+                    ::finishAuthOutput
+                )
+            )
+
+            is Config.NoBooking -> Child.NoBookingChild(
+                NoBookingComponent(componentContext, ::noBookingOutput)
+            )
         }
+    }
 
     private fun googleAuthOutput(output: AuthorizationGoogleComponent.Output) {
         when (output) {
             is AuthorizationGoogleComponent.Output.OpenAuthorizationPhoneScreen -> {
                 authorizationStore.accept(AuthorizationStore.Intent.UpdateUserInfo(output.userData))
-                userData = output.userData
                 navigation.replaceAll(
                     Config.PhoneAuth
                 )
@@ -177,9 +192,9 @@ class AuthorizationComponent(
             )
 
             // TODO (Artem Gruzdev) @Slivka you should replace this logic to storeFactory
-            is AuthorizationTelegramComponent.Output.OpenContentFlow -> {
+            is AuthorizationTelegramComponent.Output.OpenFinishScreen -> {
                 CoroutineScope(Dispatchers.IO).launch {
-                    Napier.d{
+                    Napier.d {
                         "telegram: ${authorizationStore.state.userData.telegram}"
                     }
                     val response = updateUserInfoUseCase.execute(authorizationStore.state.userData)
@@ -187,12 +202,12 @@ class AuthorizationComponent(
                         withContext(Dispatchers.Main) {
                             when (result) {
                                 is Either.Success -> {
-                                    openContentFlow()
+                                    navigation.bringToFront(Config.FinishAuth)
                                 }
 
                                 is Either.Error -> {
                                     println("error show content: ${result.error.error} ")
-                                    openContentFlow()
+                                    navigation.bringToFront(Config.FinishAuth)
                                     //TODO show error
                                 }
                             }
@@ -203,11 +218,26 @@ class AuthorizationComponent(
         }
     }
 
+    private fun finishAuthOutput(output: AuthorizationFinishComponent.Output) {
+        when (output) {
+            AuthorizationFinishComponent.Output.OpenNoBookingScreen ->
+                navigation.bringToFront(Config.NoBooking)
+        }
+    }
+
+    private fun noBookingOutput(output: NoBookingComponent.Output) {
+        when (output) {
+            NoBookingComponent.Output.OpenContentScreen -> openContentFlow()
+        }
+    }
+
     sealed class Child {
         class GoogleAuthChild(val component: AuthorizationGoogleComponent) : Child()
         class PhoneAuthChild(val component: AuthorizationPhoneComponent) : Child()
         class ProfileAuthChild(val component: AuthorizationProfileComponent) : Child()
         class TelegramAuthChild(val component: AuthorizationTelegramComponent) : Child()
+        class FinishAuthChild(val component: AuthorizationFinishComponent) : Child()
+        class NoBookingChild(val component: NoBookingComponent): Child()
     }
 
     sealed class Config : Parcelable {
@@ -222,5 +252,11 @@ class AuthorizationComponent(
 
         @Parcelize
         object TelegramAuth : Config()
+
+        @Parcelize
+        object FinishAuth : Config()
+
+        @Parcelize
+        object NoBooking: Config()
     }
 }
