@@ -133,7 +133,7 @@ private fun ProfileScreenContent(
         }
         Spacer(modifier = Modifier.padding(24.dp))
         Text(
-            text = "Редактировать профиль",
+            text = stringResource(MainRes.strings.edit_profile),
             style = EffectiveTheme.typography.mMedium,
             color = EffectiveTheme.colors.text.secondary,
             modifier = Modifier.clickable(onClick = { onEditProfile() }),

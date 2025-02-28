@@ -145,7 +145,7 @@ private fun AboutEmployeeContent(
                             painter = painterResource(MainRes.images.back_button),
                             contentDescription = stringResource(MainRes.strings.back),
                             tint = EffectiveTheme.colors.icon.secondary,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(32.dp),
                         )
                     }
                     TitlePage(

@@ -188,6 +188,7 @@
     <string name="post">Должность</string>
     <string name="phone_number">Номер телефона</string>
     <string name="save">Сохранить</string>
+    <string name="edit_profile">Редактировать профиль</string>
 
     <!-- Booking title -->
     <string name="number_with_parametr"> %s числа </string>
@@ -201,7 +202,7 @@
     <string name="no_free_place">На это время нет мест. Выберите другое время</string>
 
     <!-- Employee -->
-    <string name="about_the_employee">О сотруднике</string>
+    <string name="about_the_employee">О коллеге</string>
     <string name="upcoming_bookings">Брони</string>
     <string name="transfer">Перевод</string>
     <string name="none_booking_seats_by_the_employee">У этого сотрудника пока нет бронирований</string>

@@ -119,6 +119,7 @@
     <string name="_continue">Continue</string>
 
     <string name="button_title">Information can be changed in the profile screen</string>
+
     <!--Tab titles-->
     <string name="profile">Profile</string>
     <string name="main">Main</string>
@@ -182,6 +183,7 @@
     <string name="post">Post</string>
     <string name="phone_number">Telephone number</string>
     <string name="save">Save</string>
+    <string name="edit_profile">Edit profile</string>
 
     <!-- Employee -->
     <string name="about_the_employee">About the employee</string>
