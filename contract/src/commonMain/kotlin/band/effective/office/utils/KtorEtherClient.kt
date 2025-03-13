@@ -5,6 +5,7 @@ import band.effective.office.network.model.Either
 import band.effective.office.network.model.ErrorResponse
 import effective_office.contract.BuildConfig
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
@@ -20,11 +21,9 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.delay
-import kotlinx.serialization.json.Json
 import io.sentry.kotlin.multiplatform.Sentry
 
 object KtorEtherClient {
@@ -85,49 +84,47 @@ object KtorEtherClient {
     suspend inline fun <reified T> securityResponse(
         urlString: String,
         method: RestMethod = RestMethod.Get,
-        maxRetries: Int = 3,
         client: HttpClient = httpClient,
         block: HttpRequestBuilder.() -> Unit = {},
-    ): Either<ErrorResponse, T> = withRetry(maxRetries) {
+    ): Either<ErrorResponse, T> =
         try {
-            val response = when (method) {
-                RestMethod.Get -> client.get(urlString, block)
-                RestMethod.Post -> client.post(urlString, block)
-                RestMethod.Delete -> client.delete(urlString, block)
-                RestMethod.Put -> client.put(urlString, block)
-            }.bodyAsText()
-            Json.decodeFromString<T>(response)
+            retryApiCall {
+                when (method) {
+                    RestMethod.Get -> client.get(urlString, block)
+                    RestMethod.Post -> client.post(urlString, block)
+                    RestMethod.Delete -> client.delete(urlString, block)
+                    RestMethod.Put -> client.put(urlString, block)
+                }.body()
+            }
         } catch (e: Exception) {
-            Sentry.captureException(e.message)
-            throw Exception("Failed to parse response: ${e.message}")
+            Sentry.captureMessage(e.message ?: "Error in securityResponse")
+            Either.Error(ErrorResponse(code = 0, description = e.message ?: "Error"))
         }
-    }
 
     /**
      * Retry mechanism for unhandled exceptions
-     * @param maxRetries maximum number of retries
+     * @param retries number of retries
      * @param delayMs delay between retries in milliseconds
      * @param block suspended operation to retry
      */
-    suspend inline fun <reified T> withRetry(
-        maxRetries: Int,
+    suspend inline fun <T> retryApiCall(
+        retries: Int = 3,
         delayMs: Long = 3000L,
         block: () -> T
-    ): Either<ErrorResponse, T> {
-        var currentTry = 0
-        var lastException: Exception? = null
-
-        while (currentTry < maxRetries) {
+    ): T {
+        var currentDelay = delayMs
+        repeat(retries - 1) {
             try {
-                return Either.Success(block())
+                return block()
             } catch (e: Exception) {
-                lastException = e
-                currentTry++
-                if (currentTry < maxRetries) {
-                    delay(delayMs * currentTry)
-                }
+                delay(delayMs)
+                currentDelay += delayMs
             }
         }
-        return Either.Error(ErrorResponse(code = 0, description = lastException?.message ?: "Error"))
+        return try {
+            block()
+        } catch (e: Exception) {
+            throw Exception("Failed in retry: ${e.message}")
+        }
     }
 }
