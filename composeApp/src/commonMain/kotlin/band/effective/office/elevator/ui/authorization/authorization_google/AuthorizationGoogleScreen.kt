@@ -1,6 +1,5 @@
 package band.effective.office.elevator.ui.authorization.authorization_google
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,21 +12,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.EffectiveGradient
 import band.effective.office.elevator.components.GoogleSignInButton
 import band.effective.office.elevator.expects.showToast
-import band.effective.office.elevator.orange60
-import band.effective.office.elevator.purple60
 import band.effective.office.elevator.ui.authorization.authorization_google.store.AuthorizationGoogleStore
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -70,7 +66,7 @@ private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.
                         .background(
                             color = EffectiveTheme.colors.background.primary.copy(alpha = 0.6f),
                             shape = RoundedCornerShape(20.dp)
-                    )
+                        )
                         .border(
                             width = 1.dp,
                             shape = RoundedCornerShape(20.dp),
@@ -99,7 +95,6 @@ private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.
             }
 
             GoogleSignInButton(
-                modifier = Modifier,
                 onClick = { onEvent(AuthorizationGoogleStore.Intent.SignInButtonClicked) }
             )
         }
