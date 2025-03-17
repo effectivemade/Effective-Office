@@ -1,6 +1,5 @@
 package band.effective.office.elevator.ui.profile.editProfile.store
 
-import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.domain.models.User
 import band.effective.office.elevator.domain.useCase.GetUserUseCase
 import band.effective.office.elevator.domain.useCase.UpdateUserUseCase
@@ -54,10 +53,10 @@ internal class ProfileEditStoreFactory(
         data class PostError(val message: StringResource) : Msg
         data class TelegramError(val message: StringResource) : Msg
 
-        data object ValidPhone: Msg
-        data object ValidName: Msg
-        data object ValidPost: Msg
-        data object ValidTelegram: Msg
+        data object ValidPhone : Msg
+        data object ValidName : Msg
+        data object ValidPost : Msg
+        data object ValidTelegram : Msg
     }
 
     private inner class ExecutorImpl :
@@ -98,7 +97,9 @@ internal class ProfileEditStoreFactory(
                                 is Either.Success -> {
                                     dispatch(Msg.ProfileData(user = updatedUser))
                                     publish(Label.SavedChange)
+                                    returnToProfile()
                                 }
+
                                 is Either.Error -> {
                                     publish(Label.ServerError)
                                 }
@@ -115,6 +116,7 @@ internal class ProfileEditStoreFactory(
                     dispatch(Msg.TelegramError(result.message))
                     false
                 }
+
                 ExtendedUserInfoValidator.Result.Valid -> {
                     dispatch(Msg.ValidTelegram)
                     true
@@ -128,6 +130,7 @@ internal class ProfileEditStoreFactory(
                     dispatch(Msg.PostError(result.message))
                     false
                 }
+
                 ExtendedUserInfoValidator.Result.Valid -> {
                     dispatch(Msg.ValidPost)
                     true
@@ -141,6 +144,7 @@ internal class ProfileEditStoreFactory(
                     dispatch(Msg.NameError(result.message))
                     false
                 }
+
                 ExtendedUserInfoValidator.Result.Valid -> {
                     dispatch(Msg.ValidName)
                     true
@@ -154,6 +158,7 @@ internal class ProfileEditStoreFactory(
                     dispatch(Msg.PhoneError(result.message))
                     false
                 }
+
                 ExtendedUserInfoValidator.Result.Valid -> {
                     dispatch(Msg.ValidPhone)
                     true
@@ -198,11 +203,12 @@ internal class ProfileEditStoreFactory(
         override fun State.reduce(msg: Msg): State {
             return when (this) {
                 State.Loading -> {
-                    when(msg) {
+                    when (msg) {
                         is Msg.ProfileData -> State.Data(user = msg.user)
                         else -> this
                     }
                 }
+
                 is State.Data -> {
                     when (msg) {
                         is Msg.ProfileData -> State.Data(user = msg.user)

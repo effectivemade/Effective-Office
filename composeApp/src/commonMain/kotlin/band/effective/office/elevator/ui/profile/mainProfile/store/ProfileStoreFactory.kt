@@ -1,6 +1,5 @@
 package band.effective.office.elevator.ui.profile.mainProfile.store
 
-import band.effective.office.elevator.domain.GoogleSignIn
 import band.effective.office.elevator.domain.models.User
 import band.effective.office.elevator.domain.useCase.AuthorizationUseCase
 import band.effective.office.elevator.domain.useCase.GetUserUseCase

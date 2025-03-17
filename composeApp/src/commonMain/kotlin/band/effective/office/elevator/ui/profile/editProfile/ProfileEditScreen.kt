@@ -234,7 +234,6 @@ private fun ProfileEditScreenContent(
                     phoneNumberText,
                     telegramText
                 )
-                onReturnToProfile()
             },
             buttonText = stringResource(MainRes.strings.save),
         )
