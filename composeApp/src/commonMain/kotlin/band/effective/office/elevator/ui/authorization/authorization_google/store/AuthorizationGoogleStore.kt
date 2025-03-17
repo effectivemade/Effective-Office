@@ -11,7 +11,7 @@ interface AuthorizationGoogleStore :
         object SignInButtonClicked : Intent
     }
 
-    class State
+    data class State(val isAuthInProgress: Boolean)
 
     sealed interface Label {
         data class AuthorizationSuccess(val user: User) : Label

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,13 +42,20 @@ fun AuthorizationGoogleScreen(component: AuthorizationGoogleComponent) {
             }
         }
     }
+    val state by component.state.collectAsState()
 
-    AuthorizationGoogleScreenContent(onEvent = component::onEvent)
+    AuthorizationGoogleScreenContent(
+        isAuthInProgress = state.isAuthInProgress,
+        onEvent = component::onEvent,
+    )
 }
 
 
 @Composable
-private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.Intent) -> Unit) {
+private fun AuthorizationGoogleScreenContent(
+    isAuthInProgress: Boolean,
+    onEvent: (AuthorizationGoogleStore.Intent) -> Unit,
+) {
     EffectiveGradient()
     Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Column(
@@ -66,7 +72,7 @@ private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.
                         .background(
                             color = EffectiveTheme.colors.background.primary.copy(alpha = 0.6f),
                             shape = RoundedCornerShape(20.dp)
-                        )
+                    )
                         .border(
                             width = 1.dp,
                             shape = RoundedCornerShape(20.dp),
@@ -95,6 +101,8 @@ private fun AuthorizationGoogleScreenContent(onEvent: (AuthorizationGoogleStore.
             }
 
             GoogleSignInButton(
+                modifier = Modifier,
+                isEnabled = !isAuthInProgress,
                 onClick = { onEvent(AuthorizationGoogleStore.Intent.SignInButtonClicked) }
             )
         }
