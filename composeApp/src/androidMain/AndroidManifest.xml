@@ -10,8 +10,8 @@
 
     <application
         android:name=".AndroidApp"
-        android:icon="@mipmap/ic_launcher"
-        android:label="Office Elevator"
+        android:icon="@mipmap/ic_app"
+        android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
         android:usesCleartextTraffic="true">
         <activity
