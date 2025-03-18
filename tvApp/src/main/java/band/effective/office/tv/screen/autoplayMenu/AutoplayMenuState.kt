@@ -10,7 +10,6 @@ data class AutoplayMenuState(
     companion object {
         val defaultState = AutoplayMenuState(
             screenList = listOf(
-                Screen.Stories,
                 Screen.BestPhoto,
                 Screen.Events
             ),

@@ -7,7 +7,6 @@ import androidx.navigation.compose.composable
 import band.effective.office.tv.screen.autoplay.AutoplayScreen
 import band.effective.office.tv.screen.autoplayMenu.AutoplayMenuScreen
 import band.effective.office.tv.screen.menu.MenuScreen
-import band.effective.office.tv.screen.message.primaryMessage.PrimaryMessageScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController) {
@@ -22,8 +21,6 @@ fun NavigationHost(navController: NavHostController) {
         }
         composable(Screen.Autoplay.name) { AutoplayScreen() }
         composable(Screen.AutoplayMenu.name) { AutoplayMenuScreen(navController = navController) }
-        composable(Screen.MessageScreen.name) { PrimaryMessageScreen() {
 
-        }}
     }
 }

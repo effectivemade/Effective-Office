@@ -107,9 +107,9 @@ fun SelectableMenuItemPreview() {
             .clip(shape = RoundedCornerShape(20.dp)),
             defaultState = false,
             res = ItemRes(
-                text = stringResource(R.string.story_screen_title),
-                icon = painterResource(R.drawable.icon_stories_orange),
-                activeIcon = painterResource(R.drawable.icon_stories_white)
+                text = stringResource(R.string.event_screen_title),
+                icon = painterResource(R.drawable.icon_event_orange),
+                activeIcon = painterResource(R.drawable.icon_event_white)
             ),
             onClick = { },
             onFocus = {},
@@ -120,9 +120,9 @@ fun SelectableMenuItemPreview() {
             .clip(shape = RoundedCornerShape(20.dp)),
             defaultState = true,
             res = ItemRes(
-                text = stringResource(R.string.story_screen_title),
-                icon = painterResource(R.drawable.icon_stories_orange),
-                activeIcon = painterResource(R.drawable.icon_stories_white)
+                text = stringResource(R.string.event_screen_title),
+                icon = painterResource(R.drawable.icon_event_orange),
+                activeIcon = painterResource(R.drawable.icon_event_white)
             ),
             onClick = { },
             onFocus = {},

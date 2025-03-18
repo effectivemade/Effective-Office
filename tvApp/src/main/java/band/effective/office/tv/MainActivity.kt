@@ -9,7 +9,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import band.effective.office.tv.screen.message.primaryMessage.PrimaryMessageScreen
 import band.effective.office.tv.screen.navigation.NavigationHost
 import band.effective.office.tv.ui.theme.EffectiveTVTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,9 +25,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    PrimaryMessageScreen {
+
                         NavigationHost(navController)
-                    }
+
                 }
             }
         }

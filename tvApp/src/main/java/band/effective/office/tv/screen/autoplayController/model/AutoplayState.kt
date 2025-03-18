@@ -18,7 +18,7 @@ data class AutoplayState(
             isData = true,
             isError = false,
             errorMessage = StringResource.DynamicResource("Error"),
-            screensList = listOf(Screen.Stories, Screen.BestPhoto, Screen.Events),
+            screensList = listOf(Screen.BestPhoto, Screen.Events),
             currentScreenNumber = 0,
             screenState = ScreenState.default
         )

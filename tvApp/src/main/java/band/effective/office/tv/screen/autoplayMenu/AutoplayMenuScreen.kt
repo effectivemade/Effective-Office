@@ -80,14 +80,6 @@ fun AutoplayMenuScreen(
             itemModifier = Modifier.clip(shape = RoundedCornerShape(20.dp)),
             itemsList = listOf(
                 Pair(
-                    Screen.Stories,
-                    ItemRes(
-                        text = stringResource(R.string.story_screen_title),
-                        icon = painterResource(R.drawable.icon_stories_orange),
-                        activeIcon = painterResource(R.drawable.icon_stories_white)
-                    )
-                ),
-                Pair(
                     Screen.BestPhoto,
                     ItemRes(
                         text = stringResource(R.string.best_photo_screen_title),
