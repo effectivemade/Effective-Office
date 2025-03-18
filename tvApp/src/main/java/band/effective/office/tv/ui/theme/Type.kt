@@ -10,21 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import band.effective.office.tv.R
 
-val museoCyrl = FontFamily(Font(R.font.museocyrl))
-val drukLCGWideMedium = FontFamily(Font(R.font.druktextwidelcg_medium))
 
-val storyBodyStyle = TextStyle(
-    fontSize = 46.sp,
-    color = Color.Black,
-    fontFamily = drukLCGWideMedium,
-)
-
-val storyEmployeeNameStyle = TextStyle(
-    fontSize = 52.sp,
-    color = Color.Black,
-    fontFamily = museoCyrl,
-    fontStyle = FontStyle.Italic
-)
 
 // Set of Material typography styles to start with
 val Typography = Typography(
