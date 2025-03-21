@@ -1,5 +1,6 @@
 package band.effective.office.tv.screen.menu
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -49,9 +50,11 @@ fun MenuScreen(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     var isFocusOnMenu by remember { mutableStateOf(false) }
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     val options = listOf(MenuOption.Autoplay, MenuOption.Photo, MenuOption.Video)
-
+    BackHandler(enabled = isFocusOnMenu) {
+        isFocusOnMenu = false
+    }
     ScreenList(
         modifier = Modifier.fillMaxSize(),
         isFocusOnMenu = isFocusOnMenu,
@@ -117,11 +120,31 @@ fun MenuScreen(
                 }
 
                 MenuOption.Photo -> {
-                    MainMenuPlaceHolder("Раздел фото")
+                    MainMenuPlaceHolder(
+                        text = "Раздел фото",
+                        modifier = Modifier
+                            .focusRequester(focusRequester) // Добавляем focusRequester
+                            .onFocusChanged { isFocusOnMenu = !it.isFocused }
+                    )
                 }
 
                 MenuOption.Video -> {
-                    MainMenuPlaceHolder("Раздел видео")
+                    MainMenuPlaceHolder(
+                        text = "Раздел видео",
+                        modifier = Modifier
+                            .focusRequester(focusRequester) // Добавляем focusRequester
+                            .onFocusChanged { isFocusOnMenu = !it.isFocused }
+                    )
+                }
+            }
+        }
+        LaunchedEffect(isFocusOnMenu) {
+            if (!isFocusOnMenu) {
+                kotlinx.coroutines.delay(300)
+                try {
+                    focusRequester.requestFocus()
+                } catch (e: Exception) {
+                    println("Ошибка при запросе фокуса: ${e.message}")
                 }
             }
         }

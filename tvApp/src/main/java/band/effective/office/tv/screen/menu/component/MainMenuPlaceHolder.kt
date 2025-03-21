@@ -11,12 +11,16 @@ import androidx.tv.material3.Text
 import band.effective.office.tv.ui.theme.robotoFontFamily
 
 @Composable
-fun MainMenuPlaceHolder(text: String) {
+fun MainMenuPlaceHolder(
+    text: String,
+    modifier: Modifier = Modifier
+) {
     Text(
         text = text,
         fontFamily = robotoFontFamily(),
         fontSize = 50.sp,
-        color = Color.White
+        color = Color.White,
+        modifier = modifier
     )
     Spacer(Modifier.height(20.dp))
     Text(
