@@ -4,8 +4,7 @@ import platform.UIKit.UIPasteboard
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.desc.desc
 
-actual fun setClipboardText(text: String, label: String, toastMessage: StringResource) {
+actual fun setClipboardText(text: String, label: String) {
     UIPasteboard.generalPasteboard.string = text
-    showToast(toastMessage.desc().localized())
 }
 
