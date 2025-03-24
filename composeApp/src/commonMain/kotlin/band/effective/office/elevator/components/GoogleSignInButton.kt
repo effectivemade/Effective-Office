@@ -52,12 +52,5 @@ internal fun GoogleSignInButton(
         } else {
             CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            modifier = Modifier.padding(6.dp),
-            text = stringResource(MainRes.strings.sign_in_google),
-            style = EffectiveTheme.typography.mMedium,
-            color = EffectiveTheme.colors.text.accent,
-        )
     }
 }
