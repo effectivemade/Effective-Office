@@ -8,9 +8,15 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
+import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
+import com.arkivanov.mvikotlin.extensions.coroutines.states
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AuthorizationGoogleComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
@@ -23,6 +29,8 @@ class AuthorizationGoogleComponent(
                 storeFactory = storeFactory
             ).create()
         }
+
+    val state: StateFlow<AuthorizationGoogleStore.State> = authorizationStore.stateFlow
 
     val label: Flow<AuthorizationGoogleStore.Label> = authorizationStore.labels
 
