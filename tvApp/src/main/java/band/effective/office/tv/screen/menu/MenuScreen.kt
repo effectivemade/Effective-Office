@@ -51,103 +51,79 @@ fun MenuScreen(
     val coroutineScope = rememberCoroutineScope()
     var isFocusOnMenu by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
-    val options = listOf(MenuOption.Autoplay, MenuOption.Photo, MenuOption.Video)
+
     BackHandler(enabled = isFocusOnMenu) {
         isFocusOnMenu = false
     }
-    ScreenList(
+
+    CircleWithBlur(xOffset = 150.dp, color = EffectiveColor.purple)
+    CircleWithBlur(
+        modifier = Modifier.alpha(0.8f),
+        xOffset = (-150).dp,
+        color = EffectiveColor.orange
+    )
+    Column(
         modifier = Modifier.fillMaxSize(),
-        isFocusOnMenu = isFocusOnMenu,
-        options = options
-    ) { index ->
-        CircleWithBlur(xOffset = 150.dp, color = EffectiveColor.purple)
-        CircleWithBlur(
-            modifier = Modifier.alpha(0.8f),
-            xOffset = (-150).dp,
-            color = EffectiveColor.orange
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            modifier = Modifier.width(635.dp),
+            text = stringResource(R.string.welcome_string),
+            fontFamily = robotoFontFamily(),
+            fontSize = 50.sp,
+            color = Color.White,
+            textAlign = TextAlign.Center
         )
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Spacer(Modifier.height(10.dp))
+        Text(
+            modifier = Modifier.width(400.dp),
+            text = stringResource(id = R.string.main_menu_text),
+            color = Color.White,
+            style = MaterialTheme.typography.body1,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(20.dp))
+        PlayButton(
+            modifier = Modifier
+                .height(50.dp)
+                .width(210.dp)
+                .clip(shape = RoundedCornerShape(40.dp))
+                .onFocusChanged { isFocusOnMenu = !it.isFocused }
+                .focusRequester(focusRequester),
+            text = stringResource(id = R.string.autoplay_button),
+            onFocus = { coroutineScope.launch { scrollState.animateScrollTo(0) } },
+            onClick = { navController.navigate(Screen.Autoplay.name) }
+        )
+        Spacer(Modifier.height(5.dp))
+        ButtonAutoplay(
+            modifier = Modifier
+                .height(50.dp)
+                .width(190.dp)
+                .clip(shape = RoundedCornerShape(210.dp))
+                .onFocusChanged { isFocusOnMenu = !it.isFocused },
+            onFocus = { coroutineScope.launch { scrollState.animateScrollTo(0) } },
+            onClick = { navController.navigate(Screen.AutoplayMenu.name) }
         ) {
-            when (index) {
-                MenuOption.Autoplay -> {
-                    Text(
-                        modifier = Modifier.width(635.dp),
-                        text = stringResource(R.string.welcome_string),
-                        fontFamily = robotoFontFamily(),
-                        fontSize = 50.sp,
-                        color = Color.White,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        modifier = Modifier.width(400.dp),
-                        text = stringResource(id = R.string.main_menu_text),
-                        color = Color.White,
-                        style = MaterialTheme.typography.body1,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(Modifier.height(20.dp))
-                    PlayButton(
-                        modifier = Modifier
-                            .height(50.dp)
-                            .width(210.dp)
-                            .clip(shape = RoundedCornerShape(40.dp))
-                            .onFocusChanged { isFocusOnMenu = !it.isFocused }
-                            .focusRequester(focusRequester),
-                        text = stringResource(id = R.string.autoplay_button),
-                        onFocus = { coroutineScope.launch { scrollState.animateScrollTo(0) } },
-                        onClick = { navController.navigate(Screen.Autoplay.name) })
-                    Spacer(Modifier.height(5.dp))
-                    ButtonAutoplay(
-                        modifier = Modifier
-                            .height(50.dp)
-                            .width(190.dp)
-                            .clip(shape = RoundedCornerShape(210.dp))
-                            .onFocusChanged { isFocusOnMenu = !it.isFocused },
-                        onFocus = { coroutineScope.launch { scrollState.animateScrollTo(0) } },
-                        onClick = { navController.navigate(Screen.AutoplayMenu.name) }) {
-                        Text(
-                            text = stringResource(id = R.string.autoplay_settings),
-                            color = Color.White,
-                            modifier = Modifier
-                                .alpha(if (it) 1f else 0.5f),
-                            style = MaterialTheme.typography.body1
-                        )
-                    }
-                }
-
-                MenuOption.Photo -> {
-                    MainMenuPlaceHolder(
-                        text = "Раздел фото",
-                        modifier = Modifier
-                            .focusRequester(focusRequester) // Добавляем focusRequester
-                            .onFocusChanged { isFocusOnMenu = !it.isFocused }
-                    )
-                }
-
-                MenuOption.Video -> {
-                    MainMenuPlaceHolder(
-                        text = "Раздел видео",
-                        modifier = Modifier
-                            .focusRequester(focusRequester) // Добавляем focusRequester
-                            .onFocusChanged { isFocusOnMenu = !it.isFocused }
-                    )
-                }
-            }
+            Text(
+                text = stringResource(id = R.string.autoplay_settings),
+                color = Color.White,
+                modifier = Modifier
+                    .alpha(if (it) 1f else 0.5f),
+                style = MaterialTheme.typography.body1
+            )
         }
-        LaunchedEffect(isFocusOnMenu) {
-            if (!isFocusOnMenu) {
-                kotlinx.coroutines.delay(300)
-                try {
-                    focusRequester.requestFocus()
-                } catch (e: Exception) {
-                    println("Ошибка при запросе фокуса: ${e.message}")
-                }
-            }
-        }
-        LaunchedEffect(Unit) { focusRequester.requestFocus() }
     }
+
+    LaunchedEffect(isFocusOnMenu) {
+        if (!isFocusOnMenu) {
+            kotlinx.coroutines.delay(300)
+            try {
+                focusRequester.requestFocus()
+            } catch (e: Exception) {
+                println("Ошибка при запросе фокуса: ${e.message}")
+            }
+        }
+    }
+    LaunchedEffect(Unit) { focusRequester.requestFocus() }
 }

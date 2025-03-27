@@ -30,7 +30,7 @@ fun LeaderIdEventsScreen(viewModel: LeaderIdEventsViewModel = hiltViewModel()) {
     val (contentFocus, playButton) = remember { FocusRequester.createRefs() }
     when {
         state.isError -> ErrorScreen(state.errorText)
-        state.isLoading -> LoadScreen("Events")
+        state.isLoading -> LoadScreen("Мероприятия")
         state.isData -> ScreenWithControlsTemplate(
             modifier = Modifier.fillMaxSize().onFocusChanged { focusState ->
                 if (focusState.isFocused) MenuState.state.update { it.copy(selectButton = MenuButton.Nothink) }

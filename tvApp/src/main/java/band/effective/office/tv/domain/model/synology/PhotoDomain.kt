@@ -58,4 +58,4 @@ fun formThumbPhoto(photoPath: String, sid: String): String {
 }
 
 fun formThumbPhotoFromAlbum(cacheKey: String, id: Int, sid: String, size: String): String =
-    "${BuildConfig.apiSynologyUrl}/webapi/entry.cgi/?cache_key=${cacheKey}&id=${id}&api=SYNO.Foto.Thumbnail&method=get&version=1&type=unit&size=${size}&_sid=${sid}"
+    "${BuildConfig.apiSynologyUrl}/webapi/entry.cgi/?cache_key=${cacheKey}&id=${id-6}&api=SYNO.Foto.Thumbnail&method=get&version=1&type=unit&size=${size}&_sid=${sid}"
