@@ -54,12 +54,12 @@ class AuthorizationStoreFactory(
         override fun executeAction(action: Action, getState: () -> AuthorizationStore.State) {
             when(action) {
                 is Action.LoadUserData -> {
-                    featchUserInfo()
+                    fetchUserInfo()
                 }
             }
         }
 
-        private fun featchUserInfo() {
+        private fun fetchUserInfo() {
             scope.launch(Dispatchers.IO) {
                 getUserUseCase.execute().collect{ user ->
                     withContext(Dispatchers.Main) {
