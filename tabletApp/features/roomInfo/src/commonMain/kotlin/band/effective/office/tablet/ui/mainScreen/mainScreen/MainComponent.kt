@@ -2,6 +2,7 @@ package band.effective.office.tablet.ui.mainScreen.mainScreen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.model.Slot
@@ -73,7 +74,8 @@ class MainComponent(
     )
 
     fun openModalWindow(dist: ModalWindowsConfig) {
-        navigation.activate(dist) }
+        navigation.activate(dist)
+    }
 
     fun closeModalWindow() {
         navigation.dismiss()
@@ -124,6 +126,23 @@ class MainComponent(
                             eventInfo = eventInfo,
                             roomName = roomName
                         )
+                        when (result) {
+                            is Either.Success -> {
+                                mainStore.accept(
+                                    MainStore.Intent.OnShowToast(
+                                        "Событие создано успешно"
+                                    )
+                                )
+                            }
+
+                            is Either.Error -> {
+                                mainStore.accept(
+                                    MainStore.Intent.OnShowToast(
+                                        "Ошибка при создании события: ${result.error}"
+                                    )
+                                )
+                            }
+                        }
                     }
                 },
                 onEventUpdate = { eventInfo ->
@@ -136,19 +155,20 @@ class MainComponent(
                     }
                 }
             )
+
             is ModalWindowsConfig.FastEvent -> FastEventComponent(
                 componentContext = componentContext,
                 storeFactory = storeFactory,
                 minEventDuration = modalWindows.minEventDuration,
                 onEventCreation = { eventInfo, room ->
-                        val result = this.componentContext.componentCoroutineScope().async {
-                            eventManager.createBooking(
-                                eventInfo = eventInfo,
-                                roomName = room
-                            )
-                        }
+                    val result = this.componentContext.componentCoroutineScope().async {
+                        eventManager.createBooking(
+                            eventInfo = eventInfo,
+                            roomName = room
+                        )
+                    }
                     return@FastEventComponent result.await()
-                    },
+                },
                 onRemoveEvent = { event, room ->
                     val result = this.componentContext.componentCoroutineScope().async {
                         eventManager.deleteBooking(
@@ -170,8 +190,7 @@ class MainComponent(
         MainFactory(
             storeFactory = storeFactory,
             navigate = ::openModalWindow,
-            updateRoomInfo = {
-                roomInfo, date->
+            updateRoomInfo = { roomInfo, date ->
                 updateComponents(roomInfo, date)
             },
             updateDate = ::updateDate

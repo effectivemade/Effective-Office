@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import band.effective.office.network.model.Either
 import band.effective.office.tablet.domain.model.ErrorWithData
-import band.effective.office.tablet.domain.model.EventInfo
 import band.effective.office.tablet.domain.model.RoomInfo
 import band.effective.office.tablet.domain.useCase.CheckSettingsUseCase
 import band.effective.office.tablet.domain.useCase.RoomInfoUseCase
@@ -12,7 +11,6 @@ import band.effective.office.tablet.domain.useCase.TimerUseCase
 import band.effective.office.tablet.domain.useCase.UpdateUseCase
 import band.effective.office.tablet.ui.mainScreen.mainScreen.MainComponent
 import band.effective.office.tablet.utils.BootstrapperTimer
-import band.effective.office.tablet.utils.removeSeconds
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -124,6 +122,7 @@ class MainFactory(
         data class SelectRoom(val index: Int) : Message
         data object UpdateTimer : Message
         data class UpdateDate(val newDate: Calendar) : Message
+        data class ShowToast(val text: String) : Message
     }
 
     private sealed interface Action {
@@ -167,6 +166,7 @@ class MainFactory(
                         )
                     )
                 }
+
                 is MainStore.Intent.OnUpdateSelectDate -> {
                     currentTimeTimer.restart()
                     currentRoomTimer.restart()
@@ -183,6 +183,10 @@ class MainFactory(
                 MainStore.Intent.OnResetSelectDate -> {
                     updateDate(GregorianCalendar())
                     dispatch(Message.UpdateDate(GregorianCalendar()))
+                }
+
+                is MainStore.Intent.OnShowToast -> {
+                    dispatch(Message.ShowToast(intent.text))
                 }
             }
         }
@@ -212,6 +216,7 @@ class MainFactory(
                     )
                     updateRoomInfo(roomInfos.data[roomIndex], state.selectDate)
                 }
+
                 is Either.Error -> {
                     val save = roomInfos.error.saveData
                     if (!state.isData) {
@@ -243,6 +248,7 @@ class MainFactory(
                             )
                             reboot(getState())
                         }
+
                         is Either.Error -> {
                             val save = roomInfos.error.saveData
                             dispatch(
@@ -311,6 +317,7 @@ class MainFactory(
 
                 Message.UpdateTimer -> copy(timeToNextEvent = calcTimeToNextEvent())
                 is Message.UpdateDate -> copy(selectDate = message.newDate)
+                is Message.ShowToast -> copy(showToast = message.text)
             }
 
         private fun MainStore.State.calcTimeToNextEvent() =
