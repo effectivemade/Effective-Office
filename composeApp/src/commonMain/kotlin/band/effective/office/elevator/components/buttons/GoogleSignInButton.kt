@@ -1,4 +1,4 @@
-package band.effective.office.elevator.components
+package band.effective.office.elevator.components.buttons
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
+import band.effective.office.elevator.components.Elevation
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 

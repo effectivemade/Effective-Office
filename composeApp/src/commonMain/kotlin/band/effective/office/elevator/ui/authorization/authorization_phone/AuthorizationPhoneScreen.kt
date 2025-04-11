@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
-import band.effective.office.elevator.components.EffectiveButton
+import band.effective.office.elevator.components.buttons.EffectiveButton
 import band.effective.office.elevator.components.UserInfoTextField
 import band.effective.office.elevator.domain.validator.UserInfoValidator
 import band.effective.office.elevator.expects.showToast

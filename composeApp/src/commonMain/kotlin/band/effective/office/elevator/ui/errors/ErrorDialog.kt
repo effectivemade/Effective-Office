@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import band.effective.office.elevator.EffectiveTheme
-import band.effective.office.elevator.components.PrimaryButton
+import band.effective.office.elevator.components.buttons.PrimaryButton
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.painterResource

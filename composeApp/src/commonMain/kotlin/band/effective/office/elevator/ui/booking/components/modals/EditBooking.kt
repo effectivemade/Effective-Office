@@ -36,7 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.ExtendedThemeColors
 import band.effective.office.elevator.MainRes
-import band.effective.office.elevator.components.EffectiveButton
+import band.effective.office.elevator.components.buttons.EffectiveButton
 import band.effective.office.elevator.components.Elevation
 import band.effective.office.elevator.domain.models.DayOfWeek
 import dev.icerock.moko.resources.compose.painterResource

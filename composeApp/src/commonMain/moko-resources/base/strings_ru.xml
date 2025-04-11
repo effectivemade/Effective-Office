@@ -11,6 +11,9 @@
 
     <string name="back">Назад</string>
     <string name="close">Закрыть</string>
+    <string name="change">Изменить</string>
+    <string name="delete">Удалить</string>
+
 
     <!--Auth strings-->
     <string name="_continue">Продолжить</string>
@@ -200,6 +203,8 @@
     <string name="to_end_reccurense">по %s</string>
     <string name="repeate_times">повторяется %s раз(а)</string>
     <string name="no_free_place">На это время нет мест. Выберите другое время</string>
+    <string name="all_day">Весь день</string>
+    <string name="does_not_repeat">Не повторяется</string>
 
     <!-- Employee -->
     <string name="about_the_employee">О коллеге</string>

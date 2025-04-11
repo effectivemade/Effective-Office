@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.EffectiveGradient
-import band.effective.office.elevator.components.PrimaryButton
+import band.effective.office.elevator.components.buttons.PrimaryButton
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 

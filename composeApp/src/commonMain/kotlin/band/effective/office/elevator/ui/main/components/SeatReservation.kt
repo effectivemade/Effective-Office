@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import band.effective.office.elevator.MainRes
-import band.effective.office.elevator.components.EffectiveButton
+import band.effective.office.elevator.components.buttons.EffectiveButton
 import band.effective.office.elevator.textGrayColor
 import band.effective.office.elevator.ui.models.ReservedSeat
 import dev.icerock.moko.resources.compose.stringResource
