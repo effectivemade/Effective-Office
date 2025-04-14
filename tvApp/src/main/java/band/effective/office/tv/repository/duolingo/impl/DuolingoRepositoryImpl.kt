@@ -18,8 +18,8 @@ class DuolingoRepositoryImpl @Inject constructor(
         flow {
             val users = teammates.filter {
                 it.duolingo != null
-                        && it.employment == EmploymentType.Band.value
-                        && it.status == "Active"
+                        && it.employment.trim() == EmploymentType.Band.value
+                        && it.status.trim() == "Active"
             }
             var error = false
             val data = users.mapNotNull {

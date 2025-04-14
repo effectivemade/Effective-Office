@@ -15,5 +15,5 @@ data class Teammate(
     val photo: String,
     val status: String,
 ) {
-    fun isActive() = employment in setOf("Band", "Intern") && status == "Active"
+    fun isActive() = employment?.trim() in setOf("Band", "Intern") && status == "Active"
 }

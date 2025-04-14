@@ -39,7 +39,7 @@ class WorkTogetherImpl(private val notionClient: NotionClient, private val notio
             positions = getStringFromProp("Position")?.split(" ") ?: listOf(),
             employment = getStringFromProp("Employment") ?: "Null employment",
             startDate = getDateFromProp("Start Date"),
-            nextBDay = getDateFromProp("Next B-DAY"),
+            nextBDay = getDateFromProp("Birthday (any year)"),
             workEmail = getStringFromProp("Effective Email"),
             personalEmail = getStringFromProp("Personal Email") ?: "",
             duolingo = getStringFromProp("Профиль Duolingo"),
