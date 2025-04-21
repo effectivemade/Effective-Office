@@ -1,7 +1,5 @@
 package band.effective.office.elevator
 
-import androidx.compose.ui.graphics.Color
-
 val EffectiveLightColors = EffectiveThemeColors(
     background = EffectiveThemeColors.Background(
         primary = neutral10,
@@ -52,14 +50,17 @@ val EffectiveLightColors = EffectiveThemeColors(
         primaryNormal = orange60,
         primaryPress = orange50,
         primaryDisable = orange20,
+        secondaryNormal = neutral15,
+        secondaryPress = neutral10,
         iconNormal = neutral10,
         iconPress = neutral15,
         iconDisable = neutral10,
         tertiaryNormal = neutral10,
         tertiaryPress = neutral15,
-        actionNormalNormal = purple40,
+        actionEditNormal = purple40,
         actionEditPress = purple30,
-        actionDelete = red30,
+        actionDeleteNormal = red50,
+        actionDeletePress = red30,
         timeNormal = neutral5,
         timePress = neutral10,
         timeActive = neutral5,
@@ -68,7 +69,7 @@ val EffectiveLightColors = EffectiveThemeColors(
         repeatNormal = neutral5,
         repeatPress = neutral10,
         toggleOn = green50,
-        toggleOff = neutral5,
+        toggleOff = neutral25,
         toggleNormal = neutral10,
     ),
 

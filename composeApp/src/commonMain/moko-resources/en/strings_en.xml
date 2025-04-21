@@ -12,7 +12,8 @@
     <string name="employee_not_soon_in_office">No reservations</string>
     <string name="back">Back</string>
     <string name="close">Close</string>
-
+    <string name="change">Change</string>
+    <string name="delete">Delete</string>
 
     <!--Auth strings-->
     <string name="_continue">Continue</string>
@@ -92,6 +93,8 @@
     <string name="week">Week</string>
     <string name="month">Month</string>
     <string name="year">Year</string>
+    <string name="all_day">All day</string>
+    <string name="does_not_repeat">Does not repeat</string>
 
     <string name="map">Map</string>
     <string name="show_map">Show map</string>

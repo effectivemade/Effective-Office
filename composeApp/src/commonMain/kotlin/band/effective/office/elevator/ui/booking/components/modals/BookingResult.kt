@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.ExtendedThemeColors
 import band.effective.office.elevator.MainRes
-import band.effective.office.elevator.components.EffectiveButton
+import band.effective.office.elevator.components.buttons.EffectiveButton
 import dev.icerock.moko.resources.compose.stringResource
 
 @Composable

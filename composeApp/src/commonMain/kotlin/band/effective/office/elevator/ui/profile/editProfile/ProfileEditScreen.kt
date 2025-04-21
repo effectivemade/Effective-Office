@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import band.effective.office.elevator.EffectiveTheme
 import band.effective.office.elevator.MainRes
 import band.effective.office.elevator.components.LoadingIndicator
-import band.effective.office.elevator.components.PrimaryButton
+import band.effective.office.elevator.components.buttons.PrimaryButton
 import band.effective.office.elevator.components.PopupMessage
 import band.effective.office.elevator.components.PopupMessageInfo
 import band.effective.office.elevator.components.TitlePage
