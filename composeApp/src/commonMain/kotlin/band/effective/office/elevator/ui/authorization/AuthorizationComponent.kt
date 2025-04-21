@@ -154,9 +154,16 @@ class AuthorizationComponent(
         when (output) {
             is AuthorizationGoogleComponent.Output.OpenAuthorizationPhoneScreen -> {
                 authorizationStore.accept(AuthorizationStore.Intent.UpdateUserInfo(output.userData))
-                navigation.replaceAll(
-                    Config.PhoneAuth
-                )
+                when {
+                    output.userData.phoneNumber.isEmpty() ->
+                        navigation.replaceAll(Config.PhoneAuth)
+                    output.userData.userName.isEmpty() || output.userData.post.isEmpty() ->
+                        navigation.replaceAll(Config.ProfileAuth)
+                    output.userData.telegram.isEmpty() ->
+                        navigation.replaceAll(Config.TelegramAuth)
+                    else ->
+                        openContentFlow()
+                }
             }
         }
     }
