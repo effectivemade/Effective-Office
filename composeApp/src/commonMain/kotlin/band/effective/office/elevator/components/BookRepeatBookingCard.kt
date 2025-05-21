@@ -24,7 +24,7 @@ import band.effective.office.elevator.MainRes
 import dev.icerock.moko.resources.compose.painterResource
 
 @Composable
-fun BookCycleCard(
+fun BookRepeatBookingCard(
     modifier: Modifier = Modifier,
     zone: String,
     table: String,
@@ -89,9 +89,12 @@ fun BookCycleCard(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconWithCycleInfo(
+            IconWithRepeatBookingInfo(
                 onClick = { showInfo = !showInfo },
                 showInfo = showInfo,
+                onDismissRequest = { showInfo = false },
+                repeatDaysText = dateRange,
+                untilDateText = dateRange
             )
             ActionMenu()
         }
